@@ -1,19 +1,19 @@
 Title	URL	Assignees	Status	Story Point	Milestone	Labels
 [HW] Create software architecture overview	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/7	kristikotini, nikolas-rauscher, yashbhesaniya	Awaiting Review	5		homework
 Design user interface	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/14	Sandeep-kumar-Ramesh	Awaiting Review		Front-End User Interface	enhancement, Priority - High
+Set up initial project environment	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/16		Sprint Backlog			enhancement, Priority - High
+Set up LLM container on Docker	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/19		Sprint Backlog			enhancement, Priority - High
+FE build process	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/22		Sprint Backlog			enhancement, Priority - High
+PDF parsing into text	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/4		Sprint Backlog		Data source processing	enhancement, Priority - Medium
+Text to .json chunks	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/17		Sprint Backlog		Data source processing	enhancement, Priority - Medium
+Proof of Concept: Graph visualization	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/18		Sprint Backlog		Backend graph building	enhancement, Priority - Medium
+Upload of PDF document(s) -- Front End	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/1		Sprint Backlog		Data source processing	enhancement, Priority - Medium
+Upload of PDF document(s) -- Back End	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/20		Sprint Backlog		Data source processing	enhancement, Priority - Medium
 [HW] Create and upload screenshot of feature board	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/8	kuoirene	Sprint Backlog			homework
 [HW] Create and upload PDF of planning document	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/9	RebeccaGreiner	Sprint Backlog			homework
 [HW] Update planning doc "software bill of materials"	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/6		Sprint Backlog			homework
-Set up initial project environment	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/16		Product Backlog			enhancement, Priority - High
-Set up LLM container on Docker	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/19		Product Backlog			enhancement, Priority - High
-FE build process	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/22		Product Backlog			enhancement, Priority - High
-PDF parsing into text	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/4		Product Backlog		Data source processing	enhancement, Priority - Medium
-Text to .json chunks	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/17		Product Backlog		Data source processing	enhancement, Priority - Medium
-Proof of Concept: Graph visualization	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/18		Product Backlog		Backend graph building	enhancement, Priority - Medium
-Upload of PDF document(s) -- Front End	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/1		Product Backlog		Data source processing	enhancement, Priority - Medium
-Upload of PDF document(s) -- Back End	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/20		Product Backlog		Data source processing	enhancement, Priority - Medium
-Other stories -----			Product Backlog			
 Storage of PDF -- edit contents	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/3		Product Backlog			
+Other stories -----			Product Backlog			
 View of all files in storage -- edit this still (may not be needed)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/11		Product Backlog			enhancement
 Delete uploaded document	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/10		Product Backlog			enhancement, Priority - Low
 Edit filename	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/13		Product Backlog			enhancement, Priority - Low
