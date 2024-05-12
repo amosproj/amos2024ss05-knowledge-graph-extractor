@@ -16,6 +16,8 @@ Manage $(PROJECTNAME). Usage:
 make lint           	Run linter
 make format         	Run formatter
 make test           	Run tests
+make migrations         Create migration files e.g: make migrations message="Your migration message here"
+make migrate            Run migrations
 make build-dev      	Build and run dev environment
 make stop-dev       	Stop dev environment
 make all            	Show help
@@ -35,6 +37,14 @@ format:
 
 test:
 	@bash ./scripts/test.sh
+
+migrations:
+	docker exec -it $(BACKEND_APP_NAME) $(SHELL) "-c" \
+	"alembic revision --autogenerate -m '$(msg)'"
+
+migrate:
+	docker exec -it $(BACKEND_APP_NAME) $(SHELL) "-c" \
+	"alembic upgrade head"
 
 
 build-dev:

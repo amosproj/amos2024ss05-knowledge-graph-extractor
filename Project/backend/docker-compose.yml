@@ -14,7 +14,7 @@ services:
     depends_on:
       db:
         condition: service_healthy
-    command: "uvicorn main:app --host ${APP_HOST} --port ${APP_PORT} --reload"
+    command: "uvicorn main:app --host ${APP_HOST} --port ${APP_PORT} --reload && alembic upgrade head"
 
 
   db:
