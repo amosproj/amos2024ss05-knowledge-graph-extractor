@@ -34,7 +34,19 @@ services:
       timeout: 5s
       retries: 5
 
+  janusgraph:
+    image: docker.io/janusgraph/janusgraph:latest
+    container_name: "${APP_NAME}-janusgraph"
+    ports:
+      - "${JANUS_PORT}:${JANUS_PORT}"
+    restart: always
+
+    volumes:
+      - "janusgraph-default-data:/var/lib/janusgraph"
+
+
 volumes:
   amos_kg_postgres_data_dir:
+  janusgraph-default-data:
 
 
