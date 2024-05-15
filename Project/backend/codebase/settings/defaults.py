@@ -1,0 +1,13 @@
+import os
+
+PROJECT_NAME = "AMOS KNOWLEDGE GRAPH"
+
+# Database
+POSTGRES_USER = os.getenv("POSTGRES_USER", "amos")
+POSTGRES_PASSWORD = os.getenv("POSTGRES_PASSWORD", "password")
+POSTGRES_DB = os.getenv("POSTGRES_SERVER", "amos")
+POSTGRES_PORT = os.getenv("POSTGRES_PORT", "5432")
+POSTGRES_HOST = os.getenv("POSTGRES_HOST", "amos-db")
+
+DB_URL = f"postgresql+asyncpg://{POSTGRES_USER}:{POSTGRES_PASSWORD}@{POSTGRES_HOST}:{POSTGRES_PORT}/{POSTGRES_DB}"
+JANUS_PORT = os.getenv("JANUS_PORT", 8182)

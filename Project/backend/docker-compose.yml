@@ -1,0 +1,52 @@
+version: "3.9"
+
+services:
+  api:
+    container_name: "${APP_NAME}-backend"
+    build:
+      context: .
+      dockerfile: config/api/Dockerfile
+    volumes:
+      - ./codebase:/usr/src/app/
+    env_file: .env
+    ports:
+      - "${APP_PORT}:${APP_PORT}"
+    depends_on:
+      db:
+        condition: service_healthy
+    command: "uvicorn main:app --host ${APP_HOST} --port ${APP_PORT} --reload && alembic upgrade head"
+
+
+  db:
+    image: postgres:15.5-alpine
+    container_name: "${APP_NAME}-db"
+    hostname: "${POSTGRES_HOST}"
+    volumes:
+      - amos_kg_postgres_data_dir:/var/lib/postgresql/data/
+    env_file: .env
+    ports:
+      - "${POSTGRES_PORT}:${POSTGRES_PORT}"
+    shm_size: 1g
+    healthcheck:
+      test:
+        ["CMD", "pg_isready", "-U", "${POSTGRES_USER}", "-d", "${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  janusgraph:
+    image: docker.io/janusgraph/janusgraph:latest
+    container_name: "${APP_NAME}-janusgraph"
+    ports:
+      - "${JANUS_PORT}:${JANUS_PORT}"
+    restart: always
+
+    volumes:
+      - "janusgraph-default-data:/var/lib/janusgraph"
+
+
+volumes:
+  amos_kg_postgres_data_dir:
+  janusgraph-default-data:
+
+
