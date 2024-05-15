@@ -2,14 +2,11 @@ Title	URL	Assignees	Status	Labels	Estimated Size	Milestone	Real Size
 [HW] Create software architecture overview	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/7	kristikotini, nikolas-rauscher, yashbhesaniya	Feature Archive	homework	5		5
 Design user interface	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/14	Sandeep-kumar-Ramesh	Feature Archive	enhancement, Priority - High		User Interface	
 Set up LLM container on Docker (after #16)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/19	kristikotini, yashbhesaniya	Sprint Backlog	enhancement, Priority - High	3		
-Set up initial project environment (frontend+backend excluding LLM container)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/16	kristikotini, Sandeep-kumar-Ramesh, yashbhesaniya	In Progress	enhancement, Priority - High	8		
+Set up initial project environment (frontend+backend excluding LLM container)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/16	kristikotini, Sandeep-kumar-Ramesh, yashbhesaniya	Awaiting Review	enhancement, Priority - High	8		
+Allow user to upload PDF document(s)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/20	iremozs, Sandeep-kumar-Ramesh	Awaiting Review	enhancement, Priority - Medium	5	Data source processing	
 PDF parsing into text	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/4	borges-filipe	In Progress	enhancement, Priority - Medium	3	Data source processing	
 Prompt template for LLM	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/26	nikolas-rauscher	In Progress	enhancement, Priority - Medium	3	Interaction with LLM	
-Allow user to upload PDF document(s)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/20	iremozs, Sandeep-kumar-Ramesh	In Progress	enhancement, Priority - Medium	5	Data source processing	
 Text to .json chunks	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/17	get4flo	In Progress	enhancement, Priority - Medium	5	Data source processing	
-[HW] Create and upload screenshot of feature board	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/8	kuoirene	Sprint Backlog	homework			
-[HW] Create and upload PDF of planning document	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/9	RebeccaGreiner	Sprint Backlog	homework			
-[HW] Update planning doc "software bill of materials"	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/6		Sprint Backlog	homework			
 Create record in database	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/23		Product Backlog	enhancement, Priority - High		Data source processing	
 Create the dataframe for the contextual proximity relation between nodes	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/30		Product Backlog	enhancement, Priority - High		Graph building and visualization	
 Process results into required graph format	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/24		Product Backlog	enhancement, Priority - High		Graph building and visualization	
