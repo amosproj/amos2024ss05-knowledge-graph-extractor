@@ -31,9 +31,9 @@ async def create_check(check_dao: HealthCheckDAO = Depends()) -> {}:
 
 @router.get("/list-checks", response_model=List[HealthCheckResponse])
 async def get_dummy_models(
-        limit: int = 10,
-        offset: int = 0,
-        check_dao: HealthCheckDAO = Depends(),
+    limit: int = 10,
+    offset: int = 0,
+    check_dao: HealthCheckDAO = Depends(),
 ) -> List[HealthCheckResponse]:
     """
     Retrieve all health-check objects from the database.
