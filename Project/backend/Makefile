@@ -6,7 +6,7 @@ SHELL := /bin/sh
 PROJECTNAME ?= amos-knowledge-graph
 APP_NAME := $(PROJECTNAME)
 BACKEND_APP_NAME := $(APP_NAME)-backend
-DOCKER_COMPOSE != docker compose 1> /dev/null 2> /dev/null && echo docker compose || echo docker-compose
+DOCKER_COMPOSE := $(shell DOCKER_COMPOSE != docker compose 1> /dev/null 2> /dev/null && echo docker compose || echo docker-compose)
 
 
 define HELP
