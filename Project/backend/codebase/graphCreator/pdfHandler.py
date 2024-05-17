@@ -2,8 +2,10 @@ import os
 from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 
+
 def proccess(filename):
-    """Takes pdf file, an converts it into text chunks of equal length
+    """
+    Takes pdf file, and converts it into text chunks of equal length
 
     Parameters
     ----------
@@ -15,11 +17,11 @@ def proccess(filename):
     list
         a list of strings that are the chunks of the pdf converted to text
     """
-        
-    #load pdf
+
+    # load pdf
     if not os.path.isfile(filename):
         raise ValueError("Invalid PDF file path.")
-    if not filename.endswith('.pdf'):
+    if not filename.endswith(".pdf"):
         raise ValueError("File is not a PDF.")
     loader = PyPDFLoader(filename)
     docs = loader.load()
@@ -27,7 +29,7 @@ def proccess(filename):
     if not docs:
         raise ValueError("Failed to load PDF documents.")
 
-    #splits text into chunks including metadata for mapping from chunk to pdf page (splits[0].metadata['page'])
+    # splits text into chunks including metadata for mapping from chunk to pdf page (splits[0].metadata['page'])
     text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
     splits = text_splitter.split_documents(docs)
 
