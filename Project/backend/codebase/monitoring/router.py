@@ -56,6 +56,20 @@ async def get_dummy_models(
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
 async def upload_pdf(file: UploadFile = File(...)):
+    """
+    Uploads a PDF document.
+
+    Args:
+        file (UploadFile): PDF document to be uploaded.
+
+    Returns:
+        dict: A dictionary containing the filename and status.
+            filename (str): Name of the uploaded file.
+            status (str): Status message upload is successful.
+
+    Raises:
+        HTTPException: If the uploaded file type is not valid (not PDF).
+   """
 
     # Check if the uploaded file type is correct
     if file.content_type != "application/pdf":
