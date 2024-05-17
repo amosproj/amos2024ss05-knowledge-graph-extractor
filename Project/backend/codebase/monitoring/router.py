@@ -69,15 +69,16 @@ async def upload_pdf(file: UploadFile = File(...)):
 
     Raises:
         HTTPException: If the uploaded file type is not valid (not PDF).
-   """
+    """
 
     # Check if the uploaded file type is correct
     if file.content_type != "application/pdf":
         raise HTTPException(status_code=400, detail="Uploaded file is not a PDF.")
 
     # Define the directory for saving files
-    documents_directory = os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                                       "documents")
+    documents_directory = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "documents"
+    )
 
     if not os.path.exists(documents_directory):
         os.makedirs(documents_directory)

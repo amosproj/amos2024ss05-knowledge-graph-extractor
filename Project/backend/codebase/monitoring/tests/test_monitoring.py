@@ -26,13 +26,14 @@ def test_upload_pdf(client):
 
     # Upload PDF file
     with open(file_path, "rb") as f:
-        response = client.post(client.app.url_path_for("upload_pdf"),
-                               files={"file": (pdf_file, f, "application/pdf")})
+        response = client.post(
+            client.app.url_path_for("upload_pdf"),
+            files={"file": (pdf_file, f, "application/pdf")},
+        )
 
     # Check the response
     assert response.status_code == 200
-    assert response.json() == {"filename": pdf_file,
-                               "status": "uploaded successfully"}
+    assert response.json() == {"filename": pdf_file, "status": "uploaded successfully"}
 
     # Check if the file was saved in the correct directory
     saved_file_path = os.path.join("monitoring/documents", pdf_file)
