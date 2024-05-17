@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - Project/backend/**
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - Project/backend/**
+
+defaults:
+  run:
+    working-directory: main/Project/backend/
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          path: main
+
+        # Install python
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v4
+        with:
+          python-version: 3.11
+
+      - name: Install dependencies
+        run:
+          pip install -r codebase/requirements.txt
+
+      - name: Run tests
+        run: bash scripts/test.sh

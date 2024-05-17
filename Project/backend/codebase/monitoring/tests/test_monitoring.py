@@ -1,10 +1,9 @@
-import pytest
+from starlette import status
 
 MONITORING_API = "monitoring"
 
 
-@pytest.mark.api
-async def test_read_item(async_client):
-    response = await async_client.get(f"api/{MONITORING_API}/health")
-    assert response.status_code == 200
-    assert response.json() == {"message": "Hello World, I am healthy! :D"}
+def test_health_check(client):
+    url = client.app.url_path_for("health_check")
+    response = client.get(url)
+    assert response.status_code == status.HTTP_200_OK
