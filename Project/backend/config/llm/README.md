@@ -214,5 +214,3 @@ WantedBy=default.target
 ```
 
 ---
-
-Feel free to customize this `README.md` further to better fit your project and audience! 🚀😊
