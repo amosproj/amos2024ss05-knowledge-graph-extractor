@@ -3,7 +3,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from langchain_community.document_loaders import PyPDFLoader
 
 
-def proccess(filename):
+def process_pdf_into_chunks(filename):
     """
     Takes pdf file, and converts it into text chunks of equal length
 

@@ -1,4 +1,4 @@
-from graphCreator import pdfHandler
+from graph_creator import pdf_handler
 
 
 def test_chunking():
@@ -8,6 +8,6 @@ def test_chunking():
     # Arrange
     testfile = "tests/data/Automotive-SPICE-PAM-v40_p1-3.pdf"
     # Act
-    chunks = pdfHandler.proccess(testfile)
+    chunks = pdf_handler.process_pdf_into_chunks(testfile)
     # Assert
     assert chunks is not None
