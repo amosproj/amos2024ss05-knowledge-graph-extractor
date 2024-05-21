@@ -33,7 +33,7 @@
 
              #mynetwork {
                  width: 100%;
-                 height: 600px;
+                 height: 1000px;
                  background-color: #ffffff;
                  border: 1px solid lightgray;
                  position: relative;
@@ -88,8 +88,8 @@
                   
 
                   // parsing and collecting nodes and edges from the python
-                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "process capability level", "label": "process capability level", "shape": "dot"}, {"color": "#97c2fc", "id": "measurement framework", "label": "measurement framework", "shape": "dot"}, {"color": "#97c2fc", "id": "capability level", "label": "capability level", "shape": "dot"}, {"color": "#97c2fc", "id": "process attributes", "label": "process attributes", "shape": "dot"}, {"color": "#97c2fc", "id": "process capability model", "label": "process capability model", "shape": "dot"}, {"color": "#97c2fc", "id": "Automotive SPICE", "label": "Automotive SPICE", "shape": "dot"}, {"color": "#97c2fc", "id": "ISO/IEC 33020", "label": "ISO/IEC 33020", "shape": "dot"}]);
-                  edges = new vis.DataSet([{"from": "process capability level", "title": "defines the necessary requirements and rules for the capability dimension", "to": "measurement framework"}, {"from": "process capability level", "title": "derives a final capability level for a given process", "to": "process capability model"}, {"from": "process capability level", "title": "characterized by one or more process attributes", "to": "process attributes"}, {"from": "measurement framework", "title": "defines its own measurement framework", "to": "Automotive SPICE"}, {"from": "measurement framework", "title": "adapted from", "to": "ISO/IEC 33020"}, {"from": "capability level", "title": "constitutes a rational way of progressing through improvement of the capability of any process", "to": "process attributes"}]);
+                  nodes = new vis.DataSet([{"color": "#97c2fc", "id": "Measurement framework", "label": "Measurement framework", "shape": "dot"}, {"color": "#97c2fc", "id": "Capability dimension", "label": "Capability dimension", "shape": "dot"}, {"color": "#97c2fc", "id": "Schema", "label": "Schema", "shape": "dot"}, {"color": "#97c2fc", "id": "Process capability levels", "label": "Process capability levels", "shape": "dot"}, {"color": "#97c2fc", "id": "Level 0: Incomplete process", "label": "Level 0: Incomplete process", "shape": "dot"}, {"color": "#97c2fc", "id": "Level 1: Performed process", "label": "Level 1: Performed process", "shape": "dot"}, {"color": "#97c2fc", "id": "Level 2: Managed process", "label": "Level 2: Managed process", "shape": "dot"}, {"color": "#97c2fc", "id": "Process attributes", "label": "Process attributes", "shape": "dot"}]);
+                  edges = new vis.DataSet([{"from": "Measurement framework", "label": "The measurement framework provides the necessary requirements and rules for the capability dimension.", "title": "The measurement framework provides the necessary requirements and rules for the capability dimension.", "to": "Capability dimension"}, {"from": "Measurement framework", "label": "The measurement framework defines a schema which enables an assessor to determine the Capability Level of a given process.", "title": "The measurement framework defines a schema which enables an assessor to determine the Capability Level of a given process.", "to": "Schema"}, {"from": "Measurement framework", "label": "The measurement framework defines and provides rules for determining the Process Capability Levels.", "title": "The measurement framework defines and provides rules for determining the Process Capability Levels.", "to": "Process capability levels"}, {"from": "Measurement framework", "label": "Process attributes are features of a process that can be evaluated on a scale of achievement, providing a measurement of the capability of the process.", "title": "Process attributes are features of a process that can be evaluated on a scale of achievement, providing a measurement of the capability of the process.", "to": "Process attributes"}, {"from": "Process capability levels", "label": "A capability level is characterized by one or more process attributes whose implementation result in a significant improvement in the capability to perform a process. A process at Level 0 fails to achieve its process purpose.", "title": "A capability level is characterized by one or more process attributes whose implementation result in a significant improvement in the capability to perform a process. A process at Level 0 fails to achieve its process purpose.", "to": "Level 0: Incomplete process"}, {"from": "Process capability levels", "label": "A process at Level 1 achieves its process purpose.", "title": "A process at Level 1 achieves its process purpose.", "to": "Level 1: Performed process"}, {"from": "Process capability levels", "label": "A managed process is one that is implemented in a planned, monitored and adjusted fashion and its work products are appropriately established, controlled and maintained.", "title": "A managed process is one that is implemented in a planned, monitored and adjusted fashion and its work products are appropriately established, controlled and maintained.", "to": "Level 2: Managed process"}]);
 
                   nodeColors = {};
                   allNodes = nodes.get({ returnType: "Object" });
@@ -100,35 +100,7 @@
                   // adding nodes and edges to the graph
                   data = {nodes: nodes, edges: edges};
 
-                  var options = {
-    "configure": {
-        "enabled": false
-    },
-    "edges": {
-        "color": {
-            "inherit": true
-        },
-        "smooth": {
-            "enabled": true,
-            "type": "dynamic"
-        }
-    },
-    "interaction": {
-        "dragNodes": true,
-        "hideEdgesOnDrag": false,
-        "hideNodesOnDrag": false
-    },
-    "physics": {
-        "enabled": true,
-        "stabilization": {
-            "enabled": true,
-            "fit": true,
-            "iterations": 1000,
-            "onlyDynamicEdges": false,
-            "updateInterval": 50
-        }
-    }
-};
+                  var options = {"physics": {"barnesHut": {"gravitationalConstant": -30000, "centralGravity": 0.3, "springLength": 150, "springConstant": 0.05, "damping": 0.09}, "minVelocity": 0.75}};
 
                   
 
