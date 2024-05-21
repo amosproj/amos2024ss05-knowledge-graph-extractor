@@ -1,6 +1,4 @@
-import pytest
-import networkx as nx
-from ..graphCreator import json_to_graphml
+from ..graph_creator import json_to_graphml
 
 
 def test_valid_json():
