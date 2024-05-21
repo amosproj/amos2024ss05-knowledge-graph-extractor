@@ -84,6 +84,3 @@ def test_relation_non_string_values():
     assert len(graph.edges) == 1
     assert graph["C"]["D"]["label"] == "label2"
 
-
-if __name__ == "__main__":
-    pytest.main()

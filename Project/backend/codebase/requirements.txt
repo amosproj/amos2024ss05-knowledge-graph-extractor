@@ -33,8 +33,10 @@ mdurl==0.1.2
 multidict==6.0.5
 mypy-extensions==1.0.0
 nest-asyncio==1.6.0
+networkx==3.3
 orjson==3.10.3
 packaging==24.0
+pandas==2.2.2
 pathspec==0.12.1
 platformdirs==4.2.1
 pluggy==1.5.0
