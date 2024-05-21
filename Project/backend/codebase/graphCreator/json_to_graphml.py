@@ -3,21 +3,18 @@ import networkx as nx
 import pandas as pd
 import logging
 
-example = ('[\n   {\n       "node_1": "Measurement framework",\n       "node_2": "Capability levels",\n       "edge": '
-           '"Defines the schema for determining Capability Level of a process"\n   },\n   {\n       "node_1": '
-           '"Measurement framework",\n       "node_2": "Process attributes",\n       "edge": "Defines features of a '
-           'process that can be evaluated"\n   },\n   {\n       "node_1": "Capability levels",\n       "node_2": '
-           '"Level 0: Incomplete process",\n       "edge": "Characterized by a process that is not implemented or '
-           'fails to achieve its process purpose"\n   },\n   {\n       "node_1": "Capability levels",'
-           '\n       "node_2": "Level 1: Performed process",\n       "edge": "Characterized by a process that '
-           'achieves its process purpose"\n   },\n   {\n       "node_1": "Capability levels",\n       "node_2": '
-           '"Level 2: Managed process",\n       "edge": "Implemented in a managed fashion with planned, monitored and '
-           'adjusted work products"\n   },\n   {\n       "node_1": "Process attributes",\n       "node_2": "Feature '
-           'of a process",\n       "edge": "Can be evaluated on a scale of achievement, providing measurement of '
-           'process capability"\n   }\n]')
-
 
 def json_string_to_graph(json_string):
+    """
+    Converts a JSON string to a NetworkX graph.
+
+    Args:
+        json_string (str): The JSON string representing the graph.
+
+    Returns:
+        nx.Graph: The NetworkX graph representation of the JSON.
+
+    """
     try:
         json_object = json.loads(json_string)
     except json.JSONDecodeError as e:
@@ -56,6 +53,16 @@ def json_string_to_graph(json_string):
 
 
 def graph_to_dfs(graph):
+    """
+    Converts a NetworkX graph to DataFrames for nodes and edges.
+
+    Args:
+        graph (nx.Graph): The NetworkX graph to convert.
+
+    Returns:
+        tuple: A tuple containing the nodes DataFrame and edges DataFrame.
+
+    """
     # Create DataFrames for nodes and edges
     nodes_df = pd.DataFrame(graph.nodes(), columns=["Node"])
     edges_df = pd.DataFrame([(u, v, d['label']) for u, v, d in graph.edges(data=True)],
@@ -65,4 +72,14 @@ def graph_to_dfs(graph):
 
 
 def graph_to_graphml(graph):
+    """
+    Converts a NetworkX graph to a GraphML string.
+
+    Args:
+        graph (nx.Graph): The NetworkX graph to convert.
+
+    Returns:
+        str: The GraphML string representation of the graph.
+
+    """
     return nx.generate_graphml(graph, encoding='utf-8', prettyprint=True)
