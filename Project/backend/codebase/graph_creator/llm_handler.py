@@ -25,7 +25,7 @@ def extraxt_entities_and_relations_from_chunk(chunk):
         "   {\n"
         '       "node_1": "A concept from extracted ontology",\n'
         '       "node_2": "A related concept from extracted ontology",\n'
-        '       "edge": "relationship between the two concepts, node_1 and node_2 in one or two sentences"\n'
+        '       "edge": "relationship between the two concepts, node_1 and node_2"\n'
         "   }, {...}\n"
         "]"
     )
@@ -49,3 +49,79 @@ def extraxt_entities_and_relations_from_chunk(chunk):
     )
 
     return chat_completion.choices[0].message.content
+
+def extraxt_entities_with_metadata(chunk):
+    SYS_PROMPT = (
+        "Your task is extract the key concepts mentioned in the given context. "
+        "Extract only the most important and atomistic concepts, if needed break the concepts down to the simpler concepts."
+        "Categorize the concepts in one of the following categories: "
+        "[person, event, concept, place, object, document, organisation, condition, miscellaneous]\n"
+        "Format your output as a list of json (the output is processed further so only output json) with the following format:\n"
+        "[\n"
+        "   {\n"
+        '       "entity": The Concept,\n'
+        '       "importance": The concontextual importance of the concept on a scale of 1 to 5 (5 being the highest),\n'
+        '       "category": The Type of Concept,\n'
+        "   }, \n"
+        "{ }, \n"
+        "]\n"
+    )
+
+    # get api key from shell environment
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+
+    # request to the llm with the prepared prompts
+    chat_completion = client.chat.completions.create(
+        messages=[
+
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": chunk}
+        ],
+        model="llama3-8b-8192",
+    )
+
+    return chat_completion.choices[0].message.content
+
+def extraxt_relations_with_given_entities(chunk, entities):
+    SYS_PROMPT = (
+        "You are a network graph maker who extracts relations and entities from a text piece"
+        "In an earlier step of the knowlege graph creation process the following entities were extracted for this text chunk: "
+        f"{entities}"
+        "Given those entities what relations can you extract from the text chunk (delimited by ```) between the entities?"
+        "Thought 1: Think about how these entities can have one on one relation with other entities.\n"
+            "\tEntities that are mentioned in the same sentence or the same paragraph are typically related to each other.\n"
+            "\tEntities can be related to many other Entities\n\n"
+        "Thought 3: Find out the relation between each such related pair of terms. \n\n"
+        "Format your output as a list of json with the following format:\n"
+        "[\n"
+        "   {\n"
+        '       "entity_1": entity from the list of entities\n'
+        '       "entity_2": entity from the list of entities\n'
+        '       "edge": relationship between the two concepts, entity_1 and entity_2"\n'
+        "   }, \n"
+        "{ }, \n"
+        "]\n"
+    )
+
+    # input data for the llm to work on
+    USER_PROMPT = f"text chunk: ```{chunk}``` \n\n"
+
+    # get api key from shell environment
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+
+    # request to the llm with the prepared prompts
+    chat_completion = client.chat.completions.create(
+        messages=[
+
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": USER_PROMPT}
+        ],
+        model="llama3-8b-8192",
+    )
+
+    return chat_completion.choices[0].message.content
+    
