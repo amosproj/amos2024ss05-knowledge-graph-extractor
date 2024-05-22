@@ -6,7 +6,7 @@ SHELL := /bin/sh
 PROJECTNAME ?= amos-knowledge-graph
 APP_NAME := $(PROJECTNAME)
 BACKEND_APP_NAME := $(APP_NAME)-backend
-DOCKER_COMPOSE != docker compose 1> /dev/null 2> /dev/null && echo docker compose || echo docker-compose
+DOCKER_COMPOSE := $(shell DOCKER_COMPOSE != docker compose 1> /dev/null 2> /dev/null && echo docker compose || echo docker-compose)
 
 
 define HELP
@@ -49,7 +49,7 @@ migrate:
 
 build-dev:
 	DOCKER_BUILDKIT=1 COMPOSE_DOCKER_CLI_BUILD=1 $(DOCKER_COMPOSE) -f docker-compose.yml up --build -d
-
+	@cd ../frontend &&  sudo npm install && sudo npm run dev
 
 stop-dev:
 	@$(DOCKER_COMPOSE) -f docker-compose.yml down

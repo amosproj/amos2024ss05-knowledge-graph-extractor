@@ -32,8 +32,8 @@ class HealthCheckDAO:
         return list(raw_checks.scalars().fetchall())
 
     async def get(
-            self,
-            obj_id: uuid.UUID,
+        self,
+        obj_id: uuid.UUID,
     ) -> HealthCheck:
         """
         Get specific healthcheck model.

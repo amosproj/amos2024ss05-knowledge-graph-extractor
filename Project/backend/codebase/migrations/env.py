@@ -1,6 +1,5 @@
 import os
 from logging.config import fileConfig
-from sys import modules
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
@@ -30,6 +29,7 @@ target_metadata = Base.metadata
 # can be acquired:
 # my_important_option = config.get_main_option("my_important_option")
 # ... etc.
+
 
 def get_url():
     user = os.getenv("POSTGRES_USER", "amos")
@@ -82,9 +82,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()
