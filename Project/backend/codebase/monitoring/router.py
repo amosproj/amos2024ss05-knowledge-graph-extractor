@@ -1,7 +1,8 @@
 import os
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
+from fastapi import UploadFile, File, HTTPException
 
 from monitoring.dao.healthcheck_dao import HealthCheckDAO
 from monitoring.schemas.healthcheck import HealthCheckResponse
@@ -52,6 +53,44 @@ async def get_dummy_models(
     """
 
     return await check_dao.get_all_healthchecks(limit=limit, offset=offset)
+
+
+# Endpoint for uploading PDF documents
+@router.post("/upload/")
+async def upload_pdf(file: UploadFile = File(...)):
+    """
+    Uploads a PDF document.
+
+    Args:
+        file (UploadFile): PDF document to be uploaded.
+
+    Returns:
+        dict: A dictionary containing the filename and status.
+            filename (str): Name of the uploaded file.
+            status (str): Status message upload is successful.
+
+    Raises:
+        HTTPException: If the uploaded file type is not valid (not PDF).
+    """
+
+    # Check if the uploaded file type is correct
+    if file.content_type != "application/pdf":
+        raise HTTPException(status_code=400, detail="Uploaded file is not a PDF.")
+
+    # Define the directory for saving files
+    documents_directory = os.path.join(
+        os.path.dirname(os.path.abspath(__file__)), "documents"
+    )
+
+    if not os.path.exists(documents_directory):
+        os.makedirs(documents_directory)
+
+    # Save file
+    file_path = os.path.join(documents_directory, file.filename)
+    with open(file_path, "wb") as f:
+        f.write(file.file.read())
+
+    return {"filename": file.filename, "status": "uploaded successfully"}
 
 
 @router.post("/create_record")
