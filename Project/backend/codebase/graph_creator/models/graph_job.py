@@ -1,18 +1,20 @@
 import uuid
 
-from common.models import TrackedModel, Base
 from sqlalchemy import Column, String, Uuid
 
+from common.models import TrackedModel, Base
 
-class PDFRecord(Base, TrackedModel):
+
+class GraphJob(Base, TrackedModel):
     """Class for representing a table for
-    PDF Record in the database"""
+    graph jobs in the database"""
 
     # Define the table name
-    __tablename__ = "pdf_records"
+    __tablename__ = "graph_job"
     __table_args__ = {"extend_existing": True}
 
     # Define the columns
     id = Column(Uuid, primary_key=True, default=uuid.uuid4)
-    pdf_name = Column(String, nullable=False)
+    name = Column(String, nullable=False)
     location = Column(String, nullable=False)
+    status = Column(String, nullable=False)

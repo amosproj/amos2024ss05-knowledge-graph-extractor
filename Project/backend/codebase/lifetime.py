@@ -6,6 +6,11 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from settings.defaults import DB_URL
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     """
@@ -22,9 +27,10 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
         engine,
         expire_on_commit=False,
     )
-    print("_setup_db")
+    logger.info("app.state.db_session_factory")
     app.state.db_engine = engine
     app.state.db_session_factory = session_factory
+    logger.info(app.state.db_session_factory)
 
 
 def register_startup_event(
@@ -40,15 +46,14 @@ def register_startup_event(
     :return: function that actually performs actions.
     """
 
-    @asynccontextmanager
-    async def lifespan():
-
+    @app.on_event("startup")
+    async def _startup() -> None:  # noqa: WPS430
         app.middleware_stack = None
         _setup_db(app)
         app.middleware_stack = app.build_middleware_stack()
-        yield
+        pass  # noqa: WPS420
 
-    return lifespan
+    return _startup
 
 
 def register_shutdown_event(
@@ -61,11 +66,11 @@ def register_shutdown_event(
     :return: function that actually performs actions.
     """
 
-    @asynccontextmanager
-    async def lifespan():
-        yield
-
+    @app.on_event("shutdown")
+    async def _shutdown() -> None:  # noqa: WPS430
         await app.state.db_engine.dispose()
+
         pass  # noqa: WPS420
 
-    return lifespan
+    return _shutdown
+
