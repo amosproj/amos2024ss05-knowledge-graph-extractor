@@ -99,20 +99,20 @@ def combine_extracted_nodes_and_relations():
     
     df_data = pd.DataFrame(flattened_data)
     # connect subgraphs
-    #combined = graph_handler.connect_with_chunk_proximity(df_data)
+    combined = graph_handler.connect_with_chunk_proximity(df_data)
 
     # show what graph
-    graphBeforeCombination = True
+    graphBeforeCombination = False
     
     #display graph
     G = nx.Graph()
     if graphBeforeCombination:
         for edge in flattened_data:
             G.add_edge(edge['node_1'], edge['node_2'])
-    #else:
-        #combined = combined.reset_index()
-        #for index, row in combined.iterrows():
-            #G.add_edge(row['node_1'], row['node_2'])
+    else:
+        combined = combined.reset_index()
+        for index, row in combined.iterrows():
+            G.add_edge(row['node_1'], row['node_2'])
 
 
     nx.draw_networkx(G)
