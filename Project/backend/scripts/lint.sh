@@ -3,4 +3,4 @@
 APP_PATH="codebase"
 
 ruff $APP_PATH
-black $APP_PATH --check
+black $APP_PATH --check --exclude "migrations"
