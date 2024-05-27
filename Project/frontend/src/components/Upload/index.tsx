@@ -12,7 +12,7 @@ function Upload() {
   return <section className="upload_wrapper">
     <FilePond
       allowMultiple={false}
-      server={`${import.meta.env.VITE_BACKEND_HOST}/api/upload`}
+      server={`${import.meta.env.VITE_BACKEND_HOST}/api/monitoring/upload`}
       name="file"
       labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
       acceptedFileTypes={["application/pdf"]}
