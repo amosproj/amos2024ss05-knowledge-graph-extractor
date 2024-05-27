@@ -54,12 +54,21 @@ async def upload_pdf(file: UploadFile = File(...), graph_job_dao: GraphJobDAO = 
         f.write(file.file.read())
     logger.info(file_path)
 
-    # Create a record in the database
     graph_job = GraphJobCreate(
         name=file.filename,
         location=file_path,
         status="Document uploaded"
     )
+    # Check if graph job exists
+    existing_graph_job = await graph_job_dao.get_graph_job_by_name(graph_job.name)
+
+    # If graph job exists raise error
+    if existing_graph_job:
+        raise HTTPException(status_code=400,
+                            detail=f"Graph job with name '{graph_job.name}' has already been added."
+                            )
+
+    # Create a record in the database
     graph_job = await graph_job_dao.create_graph_job_model(graph_job=graph_job)
 
     return {"id": graph_job.id,

@@ -51,7 +51,7 @@ class GraphJobDAO:
         # Check if graph job exists
         existing_graph_job = await self.get_graph_job_by_name(graph_job.name)
 
-        # If graph job doesn't exist raise error
+        # If graph job exists raise error
         if existing_graph_job:
             raise ValueError(
                 f"Graph job with name '{graph_job.name}' has already been added."
