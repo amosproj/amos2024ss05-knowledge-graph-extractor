@@ -1,4 +1,3 @@
-
 import os
 import pytest
 
@@ -12,7 +11,6 @@ def test_health_check(client):
     url = client.app.url_path_for("health_check")
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
-
 
 
 @pytest.mark.api
@@ -44,4 +42,3 @@ def test_upload_pdf(client):
     # Remove the test files
     os.remove(file_path)
     os.remove(saved_file_path)
-
