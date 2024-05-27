@@ -1,4 +1,5 @@
 import pandas as pd
+from graph_creator import llm_handler
 
 
 def connect_with_chunk_proximity(data):
@@ -26,4 +27,6 @@ def connect_with_chunk_proximity(data):
     return df_result
 
 def connect_with_llm(data):
-    pass
+    dataCSV = data.to_csv(columns=["entity_1", "entity_2", "edge"], index=False)
+    llmDublicates = llm_handler.combine_dublicate_entities(dataCSV)
+    print(llmDublicates)

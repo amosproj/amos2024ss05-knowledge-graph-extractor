@@ -50,8 +50,48 @@ def extraxt_entities_and_relations_from_chunk(chunk):
 
     return chat_completion.choices[0].message.content
 
+def combine_dublicate_entities(entities_and_relations):
+    # system prompt to guide bahavior of llm
+    SYS_PROMPT = (
+        "Only answer in a JSON format. \n"
+        "Your task is to identify if there are dublicated nodes and if so merge them into one node."
+        "Only merge nodes that refere to the same enitity.\n"
+        "You will be given a dataset of nodes and relations and some of the nodes may be dublicated or refere to the same entity.\n"
+        "The dataset contains nodes in the form [entity_1, entity_2, edge], where entity_1 and entity_2 are entities and the edge the relation between them.\n"
+        "If either node_1 or node_2 refere to the same entity as another node then return tell me about the dublication."
+        "If there are no dublications in the list of nodes and relations return nothing.\n"
+        "Return dublicate entities in the following json format:\n"
+        "[\n"
+        "   {\n"
+        '       "Entity": "the entity name that better represents the entity",\n'
+        '       "Dublication": "The entity name that referes to the same entity"\n'
+        "   }, {...}\n"
+        "]"
+    )
+
+    # input data for the llm to work on
+    USER_PROMPT = f"Here is the data:\n {entities_and_relations} \n\n output: "
+
+    # get api key from shell environment
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+
+    # request to the llm with the prepared prompts
+    chat_completion = client.chat.completions.create(
+        messages=[
+
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": USER_PROMPT}
+        ],
+        model="llama3-8b-8192",
+    )
+
+    return chat_completion.choices[0].message.content
+
 def extraxt_entities_with_metadata(chunk):
     SYS_PROMPT = (
+        "Only answer in a JSON format. \n"
         "Your task is extract the key concepts mentioned in the given context. "
         "Extract only the most important and atomistic concepts, if needed break the concepts down to the simpler concepts."
         "Categorize the concepts in one of the following categories: "
@@ -86,6 +126,7 @@ def extraxt_entities_with_metadata(chunk):
 
 def extraxt_relations_with_given_entities(chunk, entities):
     SYS_PROMPT = (
+        "Only answer in a JSON format. \n"
         "You are a network graph maker who extracts relations and entities from a text piece"
         "In an earlier step of the knowlege graph creation process the following entities were extracted for this text chunk: "
         f"{entities}"
