@@ -22,14 +22,20 @@ class GraphJobDAO:
         Get a graph job by the id.
         """
 
-        return (await self.session.execute(select(GraphJob).filter(GraphJob.id == graph_job_id))).scalar()
+        return (
+            await self.session.execute(
+                select(GraphJob).filter(GraphJob.id == graph_job_id)
+            )
+        ).scalar()
 
     async def get_graph_job_by_name(self, name: str) -> GraphJob:
         """
         Get a graph job by the name.
         """
 
-        result = await self.session.execute(select(GraphJob).filter(GraphJob.name == name))
+        result = await self.session.execute(
+            select(GraphJob).filter(GraphJob.name == name)
+        )
         return result.scalar()
 
     async def get_graph_jobs(self, limit: int = 100, offset: int = 0) -> List[GraphJob]:
@@ -58,7 +64,9 @@ class GraphJobDAO:
             )
 
         # Create a new graph job and add it to session
-        new_graph_job = GraphJob(name=graph_job.name, location=graph_job.location, status=graph_job.status)
+        new_graph_job = GraphJob(
+            name=graph_job.name, location=graph_job.location, status=graph_job.status
+        )
         self.session.add(new_graph_job)
         await self.session.commit()
         await self.session.refresh(new_graph_job)

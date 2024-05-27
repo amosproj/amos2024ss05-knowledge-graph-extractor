@@ -1,4 +1,3 @@
-from contextlib import asynccontextmanager
 from typing import Awaitable, Callable
 
 from fastapi import FastAPI
@@ -73,4 +72,3 @@ def register_shutdown_event(
         pass  # noqa: WPS420
 
     return _shutdown
-
