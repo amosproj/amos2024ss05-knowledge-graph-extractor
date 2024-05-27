@@ -50,6 +50,44 @@ def extraxt_entities_and_relations_from_chunk(chunk):
 
     return chat_completion.choices[0].message.content
 
+
+def check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2):
+    # system prompt to guide bahavior of llm
+    SYS_PROMPT = (
+        "Only answer in JSON format. \n"
+        "Your task is to help create a knowlege graph by extracting one more relation between any of the two lists of entities.\n"
+        "We want to connect the subgraphs of nodes and relations that were extracted from the given text chunk (delimited by ```)."
+        "For this one more relation needs to be extracted from the given text chunk between any an entity of list_1 and list_2:\n"
+        f"list_1: {entities_component_1}\n"
+        f"list_2: {entities_component_2}\n"
+        "Return the one connecting relation in the following format:\n"
+        "{\n"
+        '    "node_1": "An entity from list_1",\n'
+        '    "node_2": "An entity from list_2",\n'
+        '    "edge": "relationship between the two entities, node_1 and node_2"\n'
+        "}"
+    )
+    # input data for the llm to work on
+    USER_PROMPT = f"text chunk: ```{text_chunk}``` \n\n output: "
+
+    # get api key from shell environment
+    client = Groq(
+        api_key=os.environ.get("GROQ_API_KEY"),
+    )
+
+    # request to the llm with the prepared prompts
+    chat_completion = client.chat.completions.create(
+        messages=[
+
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": USER_PROMPT}
+        ],
+        model="llama3-8b-8192",
+    )
+
+    return chat_completion.choices[0].message.content
+
+
 def combine_dublicate_entities(entities_and_relations):
     # system prompt to guide bahavior of llm
     SYS_PROMPT = (

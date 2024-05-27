@@ -87,8 +87,11 @@ def extract_information_with_llm_relations():
 
 #combine graph pieces to graph
 def combine_extracted_nodes_and_relations():
-    with open('llmExtractedInformationWithRelations.json') as file:
+    with open('llmExtractedInformation.json') as file:
         data = json.load(file)
+
+    with open('chunks.json') as file:
+        chunks = json.load(file)
 
     #flatten the list ba adding attribute chunk_id
     flattened_data = []
@@ -101,16 +104,16 @@ def combine_extracted_nodes_and_relations():
     df_data = pd.DataFrame(flattened_data)
     # connect subgraphs
     #combined = graph_handler.connect_with_chunk_proximity(df_data)
-    combined = graph_handler.connect_with_llm(df_data)
+    combined = graph_handler.connect_with_llm(df_data, chunks)
 
     # show what graph
-    graphBeforeCombination = True
+    graphBeforeCombination = False
     
     #display graph
     G = nx.Graph()
     if graphBeforeCombination:
         for edge in flattened_data:
-            G.add_edge(edge['entity_1'], edge['entity_2'])
+            G.add_edge(edge['node_1'], edge['node_2'])
     else:
         combined = combined.reset_index()
         for index, row in combined.iterrows():
