@@ -55,11 +55,12 @@ def check_for_connecting_relation(text_chunk, entities_component_1, entities_com
     # system prompt to guide bahavior of llm
     SYS_PROMPT = (
         "Only answer in JSON format. \n"
-        "Your task is to help create a knowlege graph by extracting one more relation between any of the two lists of entities.\n"
+        "Your task is to help create a knowlege graph by extracting one more relation between any entity of list_1 with any entity of list_2.\n"
         "We want to connect the subgraphs of nodes and relations that were extracted from the given text chunk (delimited by ```)."
-        "For this one more relation needs to be extracted from the given text chunk between any an entity of list_1 and list_2:\n"
+        "For this one more relation needs to be extracted from the given text chunk between any entity of list_1 and list_2:\n"
         f"list_1: {entities_component_1}\n"
         f"list_2: {entities_component_2}\n"
+        "Only use the exact entities given in the lists"
         "Return the one connecting relation in the following format:\n"
         "{\n"
         '    "node_1": "An entity from list_1",\n'

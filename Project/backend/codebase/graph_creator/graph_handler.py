@@ -126,13 +126,19 @@ def get_shared_chunks_by_component(component1, component2, entity_chunks_list):
 def translate_entity_list(entity_list, reverse_entities_dict):
     return [reverse_entities_dict[entity] for entity in entity_list]
 
-def extract_relation_from_llm_output(llm_output):
+def extract_relation_from_llm_output(llm_output, entities_c1, entities_c2):
     x = re.search(r"\{.*?\}", llm_output, re.DOTALL)
     if x is None:
         return None
-    relation = json.loads(x.group(0))
+    try:
+        relation = json.loads(x.group(0))
+    except KeyError as ke:
+        #print('Key Not Found in Dictionary:', ke)
+        return None
     keys = relation.keys()
-    if 'node_1' in keys and 'node_2' in keys and 'edge' in keys:
+    if 'node_1' not in keys or 'node_2' not in keys or 'edge' not in keys:
+        return None
+    if relation['node_1'] in entities_c1 and relation['node_2'] in entities_c2:
         return relation
     else:
         return None
@@ -159,6 +165,7 @@ def connect_with_llm(data, text_chunks):
     entities_dict, relations_list = index_entity_relation_table(data, entities)
     # test data [[1,2],[3,1],[1,4],[4,5],[5,7],[6,8],[6,5]]
     components = extract_components(relations_list)
+    #print(len(components))
 
     # get chunk information about contained entities
     entity_chunks_list = get_entities_by_chunk(data, entities_dict)
@@ -171,7 +178,7 @@ def connect_with_llm(data, text_chunks):
     #try connecting to the biggest component
     #sharedChunks, intersections= get_shared_chunks_by_component(components[0], components[1], entity_chunks_list)
     counter = 0
-    rate_limit = 1
+    rate_limit = 10
     connecting_relations = []
     for i in range(1, len(components)):
         main_component = components[0]
@@ -194,17 +201,20 @@ def connect_with_llm(data, text_chunks):
             connecting_relation = llm_handler.check_for_connecting_relation(text_chunk['page_content'], main_chunk_entities, current_chunk_entities)
             counter += 1
         
-            relation = extract_relation_from_llm_output(connecting_relation)
+            relation = extract_relation_from_llm_output(connecting_relation, main_chunk_entities, current_chunk_entities)
+            #if relation is extracted than a valid relation containing only existing entities can be added
+            #print(relation)
             if relation is not None:
                 relation['chunk_id'] = key_shared_chunk
                 connecting_relations.append(relation)
-                continue
+                break
 
     #testdata connecting_relations = [{'node_1': 'Ford', 'node_2': 'Toyota', 'edge': 'partnered for the development of autonomous cars', 'chunk_id' : '0'}]
     data = add_relations_to_data(data, connecting_relations)
-    entities_dict, relations_list = index_entity_relation_table(data, entities)
+    #entities_dict, relations_list = index_entity_relation_table(data, entities)
     # test data [[1,2],[3,1],[1,4],[4,5],[5,7],[6,8]]
-    components = extract_components(relations_list)
+    #components = extract_components(relations_list)
+    #print(len(components))
 
     return data
 
