@@ -25,12 +25,12 @@ def extraxt_entities_and_relations_from_chunk(chunk):
         "You are provided with a context chunk (delimited by ```) Your task is to extract the ontology "
         "of terms mentioned in the given context. These terms should represent the key concepts as per the context. \n"
         "Thought 1: While traversing through each sentence, Think about the key terms mentioned in it.\n"
-            "\tTerms may include object, entity, location, organization, person, \n"
-            "\tcondition, acronym, documents, service, concept, etc.\n"
-            "\tTerms should be as atomistic as possible\n\n"
+        "\tTerms may include object, entity, location, organization, person, \n"
+        "\tcondition, acronym, documents, service, concept, etc.\n"
+        "\tTerms should be as atomistic as possible\n\n"
         "Thought 2: Think about how these terms can have one on one relation with other terms.\n"
-            "\tTerms that are mentioned in the same sentence or the same paragraph are typically related to each other.\n"
-            "\tTerms can be related to many other terms\n\n"
+        "\tTerms that are mentioned in the same sentence or the same paragraph are typically related to each other.\n"
+        "\tTerms can be related to many other terms\n\n"
         "Thought 3: Find out the relation between each such related pair of terms. \n\n"
         "Format your output as a list of JSON. Each element of the list contains a pair of terms"
         "and the relation between them, like the follwing: \n"
@@ -54,9 +54,8 @@ def extraxt_entities_and_relations_from_chunk(chunk):
     # request to the llm with the prepared prompts
     chat_completion = client.chat.completions.create(
         messages=[
-
             {"role": "system", "content": SYS_PROMPT},
-            {"role": "user", "content": USER_PROMPT}
+            {"role": "user", "content": USER_PROMPT},
         ],
         model="llama3-8b-8192",
     )
@@ -64,10 +63,12 @@ def extraxt_entities_and_relations_from_chunk(chunk):
     return chat_completion.choices[0].message.content
 
 
-def check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2):
+def check_for_connecting_relation(
+    text_chunk, entities_component_1, entities_component_2
+):
     """
     Takes a text chunk, and two lists of entities (from each component in the graph)
-    and tries to extract a connection relation between any entity of 
+    and tries to extract a connection relation between any entity of
     entities_component_1 with any entity of entities_component_2
 
     Parameters
@@ -78,7 +79,7 @@ def check_for_connecting_relation(text_chunk, entities_component_1, entities_com
         List of entities
     entities_component_1 : list
         List of entities
-        
+
     Returns
     -------
     str
@@ -111,9 +112,8 @@ def check_for_connecting_relation(text_chunk, entities_component_1, entities_com
     # request to the llm with the prepared prompts
     chat_completion = client.chat.completions.create(
         messages=[
-
             {"role": "system", "content": SYS_PROMPT},
-            {"role": "user", "content": USER_PROMPT}
+            {"role": "user", "content": USER_PROMPT},
         ],
         model="llama3-8b-8192",
     )
