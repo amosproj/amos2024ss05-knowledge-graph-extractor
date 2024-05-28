@@ -1,0 +1,11 @@
+.graph_container {
+  flex-direction: column;
+  gap: 50px;
+  text-align: center;
+  justify-content: center;
+  align-items: center;
+}
+
+.react-sigma-controls {
+  margin-right: -45%;
+}
