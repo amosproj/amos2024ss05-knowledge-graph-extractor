@@ -17,6 +17,7 @@ register_shutdown_event(app)
 origins = [
     "http://localhost:8080",
     "http://localhost:8000",
+    "*",  # Allow all origins for now
 ]
 
 app.add_middleware(
