@@ -49,8 +49,17 @@ async def upload_pdf(
         os.makedirs(documents_directory)
     logger.info(documents_directory)
 
-    # Save file
+    # Define file path
     file_path = os.path.join(documents_directory, file.filename)
+
+    # Check if file with the same name exists
+    if os.path.isfile(file_path):
+        raise HTTPException(
+            status_code=400,
+            detail=f"File with name '{file.filename}' has already been uploaded.",
+        )
+
+    # Save file
     with open(file_path, "wb") as f:
         f.write(file.file.read())
     logger.info(file_path)
