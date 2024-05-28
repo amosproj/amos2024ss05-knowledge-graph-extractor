@@ -25,15 +25,20 @@ jobs:
         with:
           path: main
 
-        # Install python
+      # Install python
       - name: Set up Python 3.11
         uses: actions/setup-python@v4
         with:
           python-version: 3.11
 
       - name: Install dependencies
-        run:
+        run: |
           pip install -r codebase/requirements.txt
+          pip install black
+
+      - name: Run linting
+        run: |
+          black --check . || echo "::warning::Code formatting issues found. Please run black to format your code."
 
       - name: Run tests
         run: bash scripts/test.sh
