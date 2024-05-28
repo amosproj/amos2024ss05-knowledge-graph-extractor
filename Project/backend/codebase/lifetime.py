@@ -5,6 +5,11 @@ from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
 
 from settings.defaults import DB_URL
 
+import logging
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
+
 
 def _setup_db(app: FastAPI) -> None:  # pragma: no cover
     """
@@ -21,8 +26,10 @@ def _setup_db(app: FastAPI) -> None:  # pragma: no cover
         engine,
         expire_on_commit=False,
     )
+    logger.info("app.state.db_session_factory")
     app.state.db_engine = engine
     app.state.db_session_factory = session_factory
+    logger.info(app.state.db_session_factory)
 
 
 def register_startup_event(
