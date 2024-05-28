@@ -4,9 +4,22 @@ import json
 from graph_creator import llm_handler
 
 
-def connect_with_chunk_proximity(data):
+def connect_with_chunk_proximity(entity_and_relation_df):
+    """
+    Create connections by connecting entities that are from the same text chunk
+
+    Parameters
+    ----------
+    entity_and_relation_df :  pandas.dataframe
+        Table of nodes and relations between the nodes
+
+    Returns
+    -------
+    pandas.dataframe
+        A table with given relations and chunk proximity relations between the nodes
+    """
     # seperate all nodes by chunk_id
-    df_by_chunk_id = pd.melt(data, id_vars=["chunk_id"], value_vars=["node_1", "node_2"], value_name="node")
+    df_by_chunk_id = pd.melt(entity_and_relation_df, id_vars=["chunk_id"], value_vars=["node_1", "node_2"], value_name="node")
     df_by_chunk_id.drop(columns=["variable"], inplace=True)
     
     # connect all nodes within a chunk to each other
@@ -29,12 +42,41 @@ def connect_with_chunk_proximity(data):
     return df_result
 
 def extract_entity_set(entity_and_relation_df):
+    """
+    Extract a set of all entities from the table of entities and relations
+
+    Parameters
+    ----------
+    entity_and_relation_df :  pandas.dataframe
+        Table of nodes and relations between the nodes
+
+    Returns
+    -------
+    list
+        A set of all entities as a list
+    """
     nodes = entity_and_relation_df['node_1'].tolist()
     nodes += entity_and_relation_df['node_2'].tolist()
 
     return list(set(nodes))
 
 def index_entity_relation_table(entity_and_relation_df, entities):
+    """
+    Translate relation table with entity index to better process relations
+
+    Parameters
+    ----------
+    entity_and_relation_df :  pandas.dataframe
+        Table of nodes and relations between the nodes
+    entities : list
+        Set of entities (every entity just exists once)
+
+    Returns
+    -------
+    dict, list
+        A dictionary to translate entities to an index number
+        A List containing all relations as tuples of entity indexes
+    """
     entities_dict = {}
     #for reproducable results
     entities = sorted(entities)
@@ -49,6 +91,19 @@ def index_entity_relation_table(entity_and_relation_df, entities):
 
 
 def extract_components(relations_list):
+    """
+    Extract components of the graph created by the entities and relations
+
+    Parameters
+    ----------
+    relations_list :  list
+        A List containing all relations as tuples of entity indexes
+
+    Returns
+    -------
+    list
+        A list of lists, which each contain the entities of a component
+    """
     components = [[]]
     for relation in relations_list:
         node_1 = relation[0]
@@ -91,6 +146,21 @@ def extract_components(relations_list):
     return components
 
 def get_entities_by_chunk(entity_and_relation_df, entities_dict):
+    """
+    Get for each chunk all entities that were extracted from a chunk
+
+    Parameters
+    ----------
+    entity_and_relation_df :  pandas.dataframe
+        Table of nodes and relations between the nodes
+    entities_dict : dict
+        A dictionary to translate entities to an index number
+
+    Returns
+    -------
+    dict
+        A dictionary containing all entities per chunk as ids
+    """
     entities_by_chunk = {}
     for i, row in entity_and_relation_df.iterrows():
         if row['chunk_id'] in entities_by_chunk:
@@ -105,6 +175,24 @@ def get_entities_by_chunk(entity_and_relation_df, entities_dict):
 
 
 def get_shared_chunks_by_component(component1, component2, entity_chunks_list):
+    """
+    For two graph components get the shared chunks from which entities for both components were extracted
+
+    Parameters
+    ----------
+    component1 : list
+        A list contain the entities of component1
+    component2 : list
+        A list contain the entities of component2
+    entity_chunks_list : dict
+        A dictionary containing all entities per chunk as ids
+
+    Returns
+    -------
+    list, dict
+        A list containing the chunk_ids of all shared chunks
+        A dictionary containing for each shared chunk the nodes from component1 and component2 (seperated)
+    """
     entities_component_1 = set(component1)
     entities_component_2 = set(component2)
     shared_chunks = []
@@ -124,16 +212,47 @@ def get_shared_chunks_by_component(component1, component2, entity_chunks_list):
 
 
 def translate_entity_list(entity_list, reverse_entities_dict):
+    """
+    Translate a list of entity_ids back to the actual entities
+
+    Parameters
+    ----------
+    entity_list : list
+        A set of all entities as a list
+    reverse_entities_dict:
+        A dictionary containing the entity_id to entity mapping
+
+    Returns
+    -------
+    list
+        A list of entities
+    """
     return [reverse_entities_dict[entity] for entity in entity_list]
 
 def extract_relation_from_llm_output(llm_output, entities_c1, entities_c2):
+    """
+    Extract a dictionary from the llm output
+
+    Parameters
+    ----------
+    llm_output : str
+        The llm output
+    entities_c1 : list
+        The entities of component1
+    entities_c1 : list
+        The entities of component2
+
+    Returns
+    -------
+    dict
+        The relation as a dictionary
+    """
     x = re.search(r"\{.*?\}", llm_output, re.DOTALL)
     if x is None:
         return None
     try:
         relation = json.loads(x.group(0))
-    except KeyError as ke:
-        #print('Key Not Found in Dictionary:', ke)
+    except json.JSONDecodeError:
         return None
     keys = relation.keys()
     if 'node_1' not in keys or 'node_2' not in keys or 'edge' not in keys:
@@ -144,6 +263,23 @@ def extract_relation_from_llm_output(llm_output, entities_c1, entities_c2):
         return None
 
 def add_relations_to_data(entity_and_relation_df, new_relations):
+    """
+    Add a relation to the table of relations
+
+    Parameters
+    ----------
+    entity_and_relation_df : pandas.dataframe
+        Table of nodes and relations between the nodes
+    new_relations : dict
+        A new relation
+
+
+    Returns
+    -------
+    pandas.dataframe
+        The updated dataframe
+
+    """
     for relation in new_relations:
         node_1 = relation['node_1']
         node_2 = relation['node_2']
@@ -156,16 +292,27 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
     return entity_and_relation_df
 
 
-def connect_with_llm(data, text_chunks):
-    #dataCSV = data.to_csv(columns=["node_1", "node_2", "edge"], index=False)
-    #llmDublicates = llm_handler.combine_dublicate_entities(dataCSV)
-    #print(llmDublicates)
+def connect_with_llm(data, text_chunks, rate_limit):
+    """
+    Connect the pieces of the knowlege graph by extracting new relations between disjoint
+    graph pieces from the text chunks using the llm
+
+    Parameters
+    ----------
+    data : pandas.dataframe
+        Table of nodes and relations between the nodes
+    text_chunks : list
+        A list of dictionaries containing the text chunks
+
+    Returns
+    -------
+    pandas.dataframe
+        A table of the old and new relations
+    """
     # get components of unconnected graph
     entities = extract_entity_set(data)
     entities_dict, relations_list = index_entity_relation_table(data, entities)
-    # test data [[1,2],[3,1],[1,4],[4,5],[5,7],[6,8],[6,5]]
     components = extract_components(relations_list)
-    #print(len(components))
 
     # get chunk information about contained entities
     entity_chunks_list = get_entities_by_chunk(data, entities_dict)
@@ -176,9 +323,7 @@ def connect_with_llm(data, text_chunks):
     reverse_entities_dict = {v: k for k, v in entities_dict.items()}
 
     #try connecting to the biggest component
-    #sharedChunks, intersections= get_shared_chunks_by_component(components[0], components[1], entity_chunks_list)
     counter = 0
-    rate_limit = 10
     connecting_relations = []
     for i in range(1, len(components)):
         main_component = components[0]
@@ -209,12 +354,7 @@ def connect_with_llm(data, text_chunks):
                 connecting_relations.append(relation)
                 break
 
-    #testdata connecting_relations = [{'node_1': 'Ford', 'node_2': 'Toyota', 'edge': 'partnered for the development of autonomous cars', 'chunk_id' : '0'}]
     data = add_relations_to_data(data, connecting_relations)
-    #entities_dict, relations_list = index_entity_relation_table(data, entities)
-    # test data [[1,2],[3,1],[1,4],[4,5],[5,7],[6,8]]
-    #components = extract_components(relations_list)
-    #print(len(components))
 
     return data
 

@@ -104,7 +104,7 @@ def combine_extracted_nodes_and_relations():
     df_data = pd.DataFrame(flattened_data)
     # connect subgraphs
     #combined = graph_handler.connect_with_chunk_proximity(df_data)
-    combined = graph_handler.connect_with_llm(df_data, chunks)
+    combined = graph_handler.connect_with_llm(df_data, chunks, 30)
 
     # show what graph
     graphBeforeCombination = False
