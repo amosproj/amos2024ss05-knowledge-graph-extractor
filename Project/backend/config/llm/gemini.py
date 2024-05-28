@@ -6,7 +6,12 @@ from dotenv import load_dotenv
 
 
 def configure_genai():
+    """
+    Ensure the API key is set in the environment (set it in the .env file or Linux/Mac: export GOOGLE_API_KEY="Your_API_KEY")
 
+    Raises:
+        ValueError: If the API key is not found in the environment variables
+    """
     # load the API key from the environment variables (could be remove if the env is loaded in the main file)
     load_dotenv("../../.env", override=True)
 
@@ -20,6 +25,12 @@ def configure_genai():
 
 
 def create_model():
+    """
+    Create and configure a generative model with specified generation and safety settings.
+
+    Returns:
+        genai.GenerativeModel: A configured generative model instance.
+    """
     generation_config = {
         "temperature": 1,
         "top_p": 0.95,
@@ -54,7 +65,15 @@ def create_model():
 
 
 def serialize_chat_history(history):
-    # Convert the chat history to a serializable format
+    """
+    Convert the chat history to a serializable format.
+
+    Args:
+        history (list): A list of chat entries where each entry is an object containing message details.
+
+    Returns:
+        list: A list of dictionaries, each containing the serialized chat entry with message, timestamp, and role.
+    """
     serialized_history = []
     for entry in history:
         # Extract relevant information from the entry object
@@ -68,6 +87,20 @@ def serialize_chat_history(history):
 
 
 def generate_response(text_content, prompt_template):
+    """
+    Generate a response from a generative model based on provided text content and a prompt template.
+
+    Args:
+        text_content (str): The main text content to be used within the prompt template.
+        prompt_template (str): A template string for the prompt, containing a placeholder for the text content.
+
+    Returns:
+        str: A JSON-formatted string containing the response text and the serialized chat history.
+
+    Raises:
+        ValueError: If the API key is not found in the environment variables.
+        Exception: If there are issues in configuring the model or generating the response.
+    """
     configure_genai()
     model = create_model()
 

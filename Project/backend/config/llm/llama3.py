@@ -14,7 +14,12 @@ from groq import Groq
 
 
 def get_groq_client():
-    # Ensure the API key is set in the environment
+    """
+    Ensure the API key is set in the environment (set it in the .env file or Linux/Mac: export GROQ_API_KEY="Your_API_KEY")
+
+    Raises:
+        ValueError: If the API key is not found in the environment variables
+    """
     # load the API key from the environment variables (could be remove if the env is loaded in the main file)
     load_dotenv("../../.env", override=True)
 
@@ -25,6 +30,22 @@ def get_groq_client():
 
 
 def generate_response(text_content, prompt_template):
+    """
+    Generate a response from a Groq AI client based on provided text content and a prompt template.
+
+    This function initializes the Groq client, creates a chat completion request with the given text content
+    and prompt template, and retrieves the response along with the chat history. The response data is returned in JSON format.
+
+    Args:
+        text_content (str): The main text content to be used within the prompt template.
+        prompt_template (str): A template string for the prompt, containing a placeholder for the text content.
+
+    Returns:
+        str: A JSON-formatted string containing the response text and the serialized chat history.
+
+    Raises:
+        ValueError: If the API key is not found in the environment variables.
+    """
     client = get_groq_client()
 
     # Combine text content and prompt template to form the message
