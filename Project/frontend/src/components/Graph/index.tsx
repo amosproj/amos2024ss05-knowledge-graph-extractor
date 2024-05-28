@@ -19,7 +19,7 @@ export default function Graph() {
         const graph = new MultiDirectedGraph();
         graphData?.nodes?.forEach((node: any) => {
           const { id, ...rest } = node;
-          graph.addNode(id, { ...rest, x: Math.random(), y: Math.random() });
+          graph.addNode(id, { ...rest, x: Math.random()*100, y: Math.random()*100 });
         });
         graphData?.edges?.forEach((edge: any) => {
           const { id, source, target, ...rest } = edge;
@@ -52,15 +52,13 @@ export default function Graph() {
   if (!graphData?.nodes) return null;
 
   return (
-    <main>
+    <section className="graph_container">
       <h1>Graph Visualization</h1>
       <SigmaContainer
         style={{
-          maxHeight: "100vh",
-          minHeight: "50vh",
-          height: "70vh",
-          width: "70vw",
-          marginLeft: "-50%",
+          height: "calc(100vh - 50px)",
+          width: "100vw",
+          marginLeft: "-50%",        
         }}
         graph={graphData}
         settings={{
@@ -76,6 +74,6 @@ export default function Graph() {
         }}
       >
       </SigmaContainer>
-    </main>
+    </section>
   )
 {}}
