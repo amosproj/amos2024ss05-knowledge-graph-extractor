@@ -15,7 +15,9 @@ class NetXGraphDB:
     All the graphs operations will happen in memory.
     """
 
-    def create_graph_from_df(self, graph_job_id: uuid.UUID, data: pd.DataFrame = None) -> nx.Graph:
+    def create_graph_from_df(
+        self, graph_job_id: uuid.UUID, data: pd.DataFrame = None
+    ) -> nx.Graph:
         # todo- This function needs to be adapted and changed accordingly
         # Dummy DATA
         import pandas as pd
@@ -24,7 +26,7 @@ class NetXGraphDB:
             "node_1": ["Science", "Materials", "Foo"],
             "node_2": ["IOP", "Conference", "Bar"],
             "relation": ["part of", "related", "test"],
-            "chunk_id": [0, 0, 0]
+            "chunk_id": [0, 0, 0],
         }
 
         df = pd.DataFrame(data)
@@ -33,7 +35,7 @@ class NetXGraphDB:
         # Iterate over each row in the DataFrame
         for _, edge in df.iterrows():
             # Add edge with attributes to the graph
-            graph.add_edge(edge['node_1'], edge['node_2'], relation=edge['relation'])
+            graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["relation"])
         return graph
 
     def save_graph(self, graph_job_id: uuid.UUID, graph: nx.Graph):
@@ -51,7 +53,9 @@ class NetXGraphDB:
         graph_local_storage = self._get_graph_file_path_local_storage(graph_job_id)
         return nx.read_edgelist(graph_local_storage)
 
-    def graph_data_for_visualization(self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int) -> GraphVisData:
+    def graph_data_for_visualization(
+        self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
+    ) -> GraphVisData:
         """
         Given a graph travers it and return a json format of all the nodes and edges they have
         ready for visualization to FE
@@ -67,7 +71,11 @@ class NetXGraphDB:
     def _get_graph_file_path_local_storage(graph_job_id: uuid.UUID) -> str:
         # Define the path for saving graph files
         graphs_directory = os.path.join(
-            os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))), ".media", "graphs"
+            os.path.dirname(
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+            ),
+            ".media",
+            "graphs",
         )
         os.makedirs(graphs_directory, exist_ok=True)
 
@@ -91,8 +99,10 @@ class NetXGraphDB:
             edge_properties = graph[source][target]
             edges_data.append(
                 GraphEdge(
-                    id=f"{source}_{target}", source=str(source), target=str(target),
-                    label=str(edge_properties["relation"])
+                    id=f"{source}_{target}",
+                    source=str(source),
+                    target=str(target),
+                    label=str(edge_properties["relation"]),
                 )
             )
 
@@ -106,9 +116,7 @@ class NetXGraphDB:
         # Iterate over nodes
         for node in graph.nodes(data=True):
             node_id, node_attrs = node
-            nodes_data.append(
-                GraphNode(id=str(node_id), label=str(node_id))
-            )
+            nodes_data.append(GraphNode(id=str(node_id), label=str(node_id)))
 
         # Iterate over edges
         for edge in graph.edges(data=True):
@@ -118,7 +126,7 @@ class NetXGraphDB:
                     id=f"{source}_{target}",
                     source=str(source),
                     target=str(target),
-                    label=str(edge_attrs['relation']),
+                    label=str(edge_attrs["relation"]),
                 )
             )
 

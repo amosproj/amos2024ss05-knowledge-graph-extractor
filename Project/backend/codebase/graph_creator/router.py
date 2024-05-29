@@ -182,16 +182,18 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
 
 @router.get("/create_graph/{graph_job_id}")
 async def create_graph(
-        graph_job_id: uuid.UUID,
-        graph_job_dao: GraphJobDAO = Depends(),
-        netx_services: NetXGraphDB = Depends()
+    graph_job_id: uuid.UUID,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
 ):
     g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
 
     if not g_job:
         raise HTTPException(status_code=404, detail="Graph job not found")
     if g_job.status != "Document uploaded":
-        raise HTTPException(status_code=400, detail="Graph job status is not `Document uploaded`")
+        raise HTTPException(
+            status_code=400, detail="Graph job status is not `Document uploaded`"
+        )
 
     graph = netx_services.create_graph_from_df(graph_job_id=graph_job_id, data=None)
     netx_services.save_graph(graph_job_id=graph_job_id, graph=graph)
@@ -204,16 +206,20 @@ async def create_graph(
 
 @router.get("/visualize/{graph_job_id}")
 async def get_graph_data_for_visualization(
-        graph_job_id: uuid.UUID,
-        node: Optional[str] = None,
-        adj_depth: int = 1,
-        graph_job_dao: GraphJobDAO = Depends(),
-        netx_services: NetXGraphDB = Depends()
+    graph_job_id: uuid.UUID,
+    node: Optional[str] = None,
+    adj_depth: int = 1,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
 ) -> GraphVisData:
     g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
 
     if not g_job:
         raise HTTPException(status_code=404, detail="Graph job not found")
     if g_job.status != "graph_ready":
-        raise HTTPException(status_code=400, detail="A graph needs to be created for this job first!")
-    return netx_services.graph_data_for_visualization(g_job.id, node=node, adj_depth=adj_depth)
+        raise HTTPException(
+            status_code=400, detail="A graph needs to be created for this job first!"
+        )
+    return netx_services.graph_data_for_visualization(
+        g_job.id, node=node, adj_depth=adj_depth
+    )
