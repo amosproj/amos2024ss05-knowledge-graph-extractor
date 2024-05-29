@@ -45,6 +45,7 @@ pydantic==2.7.1
 pydantic_core==2.18.2
 Pygments==2.18.0
 pytest==8.2.0
+pytest-mock==3.14.0
 python-dotenv==1.0.1
 python-multipart==0.0.9
 PyYAML==6.0.1

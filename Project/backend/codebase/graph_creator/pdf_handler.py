@@ -30,7 +30,7 @@ def process_pdf_into_chunks(filename):
         raise ValueError("Failed to load PDF documents.")
 
     # splits text into chunks including metadata for mapping from chunk to pdf page (splits[0].metadata['page'])
-    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
+    text_splitter = RecursiveCharacterTextSplitter(chunk_size=1500, chunk_overlap=150)
     splits = text_splitter.split_documents(docs)
 
     return splits
