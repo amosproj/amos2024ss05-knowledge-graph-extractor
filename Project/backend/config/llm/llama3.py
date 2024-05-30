@@ -14,15 +14,7 @@ from groq import Groq
 
 
 def get_groq_client():
-    """
-    Ensure the API key is set in the environment (set it in the .env file or Linux/Mac: export GROQ_API_KEY="Your_API_KEY")
-
-    Raises:
-        ValueError: If the API key is not found in the environment variables
-    """
-    # load the API key from the environment variables (could be remove if the env is loaded in the main file)
-    load_dotenv("../../.env", override=True)
-
+    load_dotenv("Project/backend/.env", override=True)
     api_key = os.getenv("GROQ_API_KEY")
     if not api_key:
         raise ValueError("API key not found in environment variables")
