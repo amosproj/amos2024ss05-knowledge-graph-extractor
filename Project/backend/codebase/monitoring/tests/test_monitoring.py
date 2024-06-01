@@ -11,6 +11,7 @@ def test_health_check(client):
     response = client.get(url)
     assert response.status_code == status.HTTP_200_OK
 
+
 @pytest.mark.api
 def test_upload_pdf(client):
 
