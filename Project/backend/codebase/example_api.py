@@ -1,10 +1,9 @@
 import os
 import tempfile
-from fastapi import FastAPI, File, UploadFile
+from fastapi import FastAPI, File, UploadFile, HTTPException
 from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.llama3 import process_chunks
 import shutil
-import mimetypes
 
 app = FastAPI(
     title="amos",
@@ -21,10 +20,10 @@ async def process_pdf(file: UploadFile = File(...)):
         filename = tmp.name
 
     try:
-        # Check if the file is a PDF by MIME type
-        mime_type, _ = mimetypes.guess_type(filename)
-        if mime_type != 'application/pdf':
-            raise ValueError("Uploaded file is not a PDF based on MIME type.")
+        # Check if the file has a .pdf extension
+        if not file.filename.endswith('.pdf'):
+            raise HTTPException(status_code=422, detail="Uploaded file does not have a .pdf extension.")
+        
 
         # Process PDF into chunks
         chunks = process_pdf_into_chunks(filename)
