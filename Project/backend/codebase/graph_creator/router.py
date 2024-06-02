@@ -1,12 +1,17 @@
 import logging
 import os
 import uuid
+import tempfile
 
 from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
+from graph_creator.pdf_handler import process_pdf_into_chunks
+from graph_creator.gemini import process_chunks
+import shutil
+import mimetypes
 
 import shutil
 import tempfile
@@ -17,6 +22,47 @@ router = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+
+@router.post("/process_pdf/")
+async def process_pdf(file: UploadFile = File(...)):
+    """
+    Process an uploaded PDF file.
+
+    Args:
+        file (UploadFile): The uploaded PDF file.
+
+    Returns:
+        dict: A dictionary containing the response JSON.
+
+    Raises:
+        ValueError: If the uploaded file is not a PDF based on MIME type.
+    """
+    # Save uploaded PDF file temporarily
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        filename = tmp.name
+
+    try:
+        # Check if the file is a PDF by MIME type
+        mime_type, _ = mimetypes.guess_type(filename)
+        if mime_type != "application/pdf":
+            raise ValueError("Uploaded file is not a PDF based on MIME type.")
+
+        # Process PDF into chunks
+        chunks = process_pdf_into_chunks(filename)
+        text_chunks = [
+            {"text": chunk.page_content} for chunk in chunks
+        ]  # Assuming chunk has 'page_content' attribute
+
+        # Define the prompt template
+        prompt_template = "Give all valid relation in the given: {text_content}"
+
+        # Generate response using LLM
+        response_json = process_chunks(text_chunks, prompt_template)
+        return {"response": response_json}
+    finally:
+        os.remove(filename)
 
 
 # Endpoint for uploading PDF documents
