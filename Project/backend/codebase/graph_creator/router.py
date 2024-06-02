@@ -8,6 +8,11 @@ from fastapi import UploadFile, File, HTTPException
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
 
+import shutil
+import tempfile
+from graph_creator.pdf_handler import process_pdf_into_chunks
+from graph_creator.llama3 import process_chunks
+
 router = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
@@ -175,3 +180,43 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
     if graph_job is None:
         raise HTTPException(status_code=404, detail="Graph job not found")
     await graph_job_dao.delete_graph_job(graph_job)
+
+
+@router.post("/api/process_pdf/")
+async def process_pdf(file: UploadFile = File(...)):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        filename = tmp.name
+    try:
+        if not file.filename.endswith('.pdf'):
+            raise HTTPException(status_code=422, detail="Uploaded file does not have a .pdf extension.")
+        chunks = process_pdf_into_chunks(filename)
+        text_chunks = [{"text": chunk.page_content} for chunk in chunks]
+        prompt_template = "Give all valid relation in the given: {text_content}"
+        response_json = process_chunks(text_chunks, prompt_template)
+        return {"response": response_json}
+    finally:
+        os.remove(filename)
+
+# Combine all routers
+api_router = APIRouter()
+api_router.include_router(router)
+@router.post("/process_pdf/")
+async def process_pdf(file: UploadFile = File(...)):
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".pdf") as tmp:
+        shutil.copyfileobj(file.file, tmp)
+        filename = tmp.name
+    try:
+        if not file.filename.endswith('.pdf'):
+            raise HTTPException(status_code=422, detail="Uploaded file does not have a .pdf extension.")
+        chunks = process_pdf_into_chunks(filename)
+        text_chunks = [{"text": chunk.page_content} for chunk in chunks]
+        prompt_template = "Give all valid relation in the given: {text_content}"
+        response_json = process_chunks(text_chunks, prompt_template)
+        return {"response": response_json}
+    finally:
+        os.remove(filename)
+
+# Combine all routers
+api_router = APIRouter()
+api_router.include_router(router)
