@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
-
 import { MultiDirectedGraph } from "graphology";
 import { SigmaContainer } from "@react-sigma/core";
 import { useParams } from "react-router-dom";
-
 import "@react-sigma/core/lib/react-sigma.min.css";
 import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { EdgeArrowProgram } from "sigma/rendering";
-
 import "./index.css";
 import { VISUALIZE_API_PATH } from "../../constant";
 
 export default function Graph() {
-
   const [graphData, setGraphData] = useState<MultiDirectedGraph>({} as any);
-
   const { fileId = "" } = useParams();
 
   useEffect(() => {
     console.log(fileId);
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`
-    fetch(API)     //TODO: vite
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`;
+    fetch(API)
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
@@ -32,10 +27,7 @@ export default function Graph() {
           const { id, source, target, ...rest } = edge;
           graph.addEdgeWithKey(id, source, target, rest);
         });
-
         indexParallelEdgesIndex(graph, { edgeIndexAttribute: "parallelIndex", edgeMaxIndexAttribute: "parallelMaxIndex" });
-
-        // Adapt types and curvature of parallel edges for rendering:
         graph.forEachEdge((edge, { parallelIndex, parallelMaxIndex }) => {
           if (typeof parallelIndex === "number") {
             graph.mergeEdgeAttributes(edge, {
@@ -46,17 +38,19 @@ export default function Graph() {
             graph.setEdgeAttribute(edge, "type", "straight");
           }
         });
-
         setGraphData(graph);
-
-        console.log(graph)
+        console.log(graph);
       })
       .catch((error) => {
-        console.error('Error fetching graphData:', error);
-      });
+        console.log("Error fetching graphData:", error);
+      })
   }, [fileId]);
 
-  if (!graphData?.nodes) return null;
+  if (!graphData?.nodes) {
+    return (
+      <div className="loading_spinner">Loading graph...</div>
+    );
+  }
 
   return (
     <section className="graph_container">
@@ -77,11 +71,8 @@ export default function Graph() {
             straight: EdgeArrowProgram,
             curved: EdgeCurveProgram,
           },
-
         }}
-      >
-      </SigmaContainer>
+      ></SigmaContainer>
     </section>
-  )
-  { }
+  );
 }
