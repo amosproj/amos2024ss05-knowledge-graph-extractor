@@ -2,24 +2,31 @@ import { useEffect, useState } from "react";
 
 import { MultiDirectedGraph } from "graphology";
 import { SigmaContainer } from "@react-sigma/core";
+import { useParams } from "react-router-dom";
+
 import "@react-sigma/core/lib/react-sigma.min.css";
 import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { EdgeArrowProgram } from "sigma/rendering";
 
 import "./index.css";
+import { VISUALIZE_API_PATH } from "../../constant";
 
 export default function Graph() {
 
   const [graphData, setGraphData] = useState<MultiDirectedGraph>({} as any);
 
+  const { fileId = "" } = useParams();
+
   useEffect(() => {
-    fetch('https://run.mocky.io/v3/0d596fcc-8909-4b4b-bae3-4c0400f2fa49')
+    console.log(fileId);
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`
+    fetch(API)     //TODO: vite
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
         graphData?.nodes?.forEach((node: any) => {
           const { id, ...rest } = node;
-          graph.addNode(id, { ...rest, x: Math.random()*100, y: Math.random()*100 });
+          graph.addNode(id, { ...rest, x: Math.random() * 100, y: Math.random() * 100 });
         });
         graphData?.edges?.forEach((edge: any) => {
           const { id, source, target, ...rest } = edge;
@@ -47,7 +54,7 @@ export default function Graph() {
       .catch((error) => {
         console.error('Error fetching graphData:', error);
       });
-  }, []);
+  }, [fileId]);
 
   if (!graphData?.nodes) return null;
 
@@ -58,7 +65,7 @@ export default function Graph() {
         style={{
           height: "calc(100vh - 50px)",
           width: "100vw",
-          marginLeft: "-50%",        
+          marginLeft: "-50%",
         }}
         graph={graphData}
         settings={{
@@ -76,4 +83,5 @@ export default function Graph() {
       </SigmaContainer>
     </section>
   )
-{}}
+  { }
+}

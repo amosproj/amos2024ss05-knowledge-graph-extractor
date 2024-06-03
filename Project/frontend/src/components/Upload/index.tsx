@@ -4,6 +4,7 @@ import 'filepond/dist/filepond.min.css'
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
 import "./index.css";
+import { UPLOAD_API_PATH } from '../../constant';
 
 registerPlugin(FilePondPluginFileValidateType);
 
@@ -16,7 +17,7 @@ function Upload(props: UploadProps) {
     <section className="upload_wrapper">
       <FilePond
         allowMultiple={false}
-        server={`${import.meta.env.VITE_BACKEND_HOST}/api/graph/upload/`}
+        server={`${import.meta.env.VITE_BACKEND_HOST}${UPLOAD_API_PATH}`}
         name="file"
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
         acceptedFileTypes={["application/pdf"]}

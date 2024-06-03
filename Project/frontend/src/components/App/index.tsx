@@ -18,7 +18,7 @@ function App() {
             element={<Home />}
           />
           <Route
-            path="/graph"
+            path="/graph/:fileId"
             element={<Graph />}
           />
         </Routes>

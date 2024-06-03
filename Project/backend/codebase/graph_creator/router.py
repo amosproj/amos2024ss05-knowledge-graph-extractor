@@ -1,12 +1,15 @@
 import logging
 import os
 import uuid
+from typing import Optional
 
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Response
 from fastapi import UploadFile, File, HTTPException
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
+from graph_creator.schemas.graph_vis import GraphVisData
+from graph_creator.services.netx_graphdb import NetXGraphDB
 
 router = APIRouter()
 
@@ -175,3 +178,48 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
     if graph_job is None:
         raise HTTPException(status_code=404, detail="Graph job not found")
     await graph_job_dao.delete_graph_job(graph_job)
+
+
+@router.get("/create_graph/{graph_job_id}")
+async def create_graph(
+    graph_job_id: uuid.UUID,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
+):
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != "Document uploaded":
+        raise HTTPException(
+            status_code=400, detail="Graph job status is not `Document uploaded`"
+        )
+
+    graph = netx_services.create_graph_from_df(graph_job_id=graph_job_id, data=None)
+    netx_services.save_graph(graph_job_id=graph_job_id, graph=graph)
+
+    g_job.status = "graph_ready"
+    graph_job_dao.session.add(g_job)
+    await graph_job_dao.session.commit()
+    return Response(status_code=201)
+
+
+@router.get("/visualize/{graph_job_id}")
+async def get_graph_data_for_visualization(
+    graph_job_id: uuid.UUID,
+    node: Optional[str] = None,
+    adj_depth: int = 1,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
+) -> GraphVisData:
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != "graph_ready":
+        raise HTTPException(
+            status_code=400, detail="A graph needs to be created for this job first!"
+        )
+    return netx_services.graph_data_for_visualization(
+        g_job.id, node=node, adj_depth=adj_depth
+    )
