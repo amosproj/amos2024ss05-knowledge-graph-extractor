@@ -19,7 +19,8 @@ export default function Graph() {
 
   useEffect(() => {
     console.log(fileId);
-    fetch(VISUALIZE_API_PATH.replace(":fileId", fileId))     //TODO: vite
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`
+    fetch(API)     //TODO: vite
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();

@@ -25,7 +25,7 @@ function Home() {
   }
 
   const handleGenerateGraph = () => {
-    const API = GENERATE_API_PATH.replace(":fileId", fileId);   //TODO: vite
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(":fileId", fileId)}`;   //TODO: vite
     fetch(API, {
 
       // Adding method type 
