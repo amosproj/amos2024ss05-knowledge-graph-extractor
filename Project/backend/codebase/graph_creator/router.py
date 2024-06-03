@@ -252,7 +252,10 @@ async def create_graph(
     g_job.status = GraphStatus.GRAPH_READY
     graph_job_dao.session.add(g_job)
     await graph_job_dao.session.commit()
-    return Response(status_code=201)
+    return Response(
+        content={"id": g_job.id, "status": GraphStatus.GRAPH_READY},
+        status_code=201
+    )
 
 
 @router.get("/visualize/{graph_job_id}")
