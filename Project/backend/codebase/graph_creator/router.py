@@ -134,7 +134,8 @@ async def upload_pdf(
     graph_job = await graph_job_dao.create_graph_job_model(graph_job=graph_job)
 
     #trigger graph creation
-    background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
+    #background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
+    graph_creator_main.process_file_to_graph(graph_job)
 
     return {
         "id": graph_job.id,

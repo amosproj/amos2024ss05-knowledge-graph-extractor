@@ -1,8 +1,11 @@
 import json
+import mimetypes
 import pandas
+import tempfile
+import shutil
 
+from graph_creator.gemini import process_chunks
 from graph_creator.models.graph_job import GraphJob
-
 from graph_creator import pdf_handler
 from graph_creator import llm_handler
 from graph_creator import graph_handler
@@ -21,6 +24,12 @@ def process_file_to_graph(g_job: GraphJob):
     """
     # extract entities and relations
     entities_and_relations = process_file_to_entities_and_relations(g_job.location)
+
+    #check for error
+    if entities_and_relations == None:
+        return
+    
+    #connect graph pieces
     uuid = g_job.id
     create_and_store_graph(uuid, entities_and_relations)
 
@@ -35,21 +44,32 @@ def process_file_to_entities_and_relations(file):
     Returns:
         list: A list of dictionaries representing the extracted entities and relations.
     """
-    # todo: implement actual processing
-    # chunks = pdf_handler.process_pdf_into_chunks(file)
+    # Save uploaded PDF file temporarily
+    filename = file
 
-    with open("tests/data/llmExtractedInformation.json") as file:
-        entities_and_relations = json.load(file)
+    try:
+        # Check if the file is a PDF by MIME type
+        mime_type, _ = mimetypes.guess_type(filename)
+        if mime_type != "application/pdf":
+            raise ValueError("Uploaded file is not a PDF based on MIME type.")
 
-    # flatten the list ba adding attribute chunk_id
-    flattened_data = []
-    for j in range(len(entities_and_relations)):
-        id = j
-        for i in range(len(entities_and_relations[j])):
-            entities_and_relations[j][i]["chunk_id"] = str(id)
-            flattened_data.append(entities_and_relations[j][i])
+        # Process PDF into chunks
+        chunks = pdf_handler.process_pdf_into_chunks(filename)
+        text_chunks = [
+            {"text": chunk.page_content} for chunk in chunks
+        ]  # Assuming chunk has 'page_content' attribute
 
-    return flattened_data
+        # Define the prompt template
+        prompt_template = "Give all valid relation in the given: {text_content}"
+
+        # Generate response using LLM
+        response_json = process_chunks(text_chunks, prompt_template)
+        print(response_json)
+    
+    finally:
+        response_json = None
+    
+    return response_json
 
 
 def create_and_store_graph(uuid, entities_and_relations):
@@ -63,12 +83,21 @@ def create_and_store_graph(uuid, entities_and_relations):
     Returns:
     None
     """
+    # flatten the list ba adding attribute chunk_id
+    flattened_data = []
+    for j in range(len(entities_and_relations)):
+        id = j
+        for i in range(len(entities_and_relations[j])):
+            entities_and_relations[j][i]["chunk_id"] = str(id)
+            flattened_data.append(entities_and_relations[j][i])
+
     # convert data to dataframe
     df_e_and_r = pandas.DataFrame(entities_and_relations)
 
     # combine knowledge graph pieces
-    print(df_e_and_r)
     combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+
+    print(combined)
 
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()
@@ -78,5 +107,3 @@ def create_and_store_graph(uuid, entities_and_relations):
 
     # save graph as file
     graph_db_service.save_graph(uuid, graph)
-
-    print("Done with processing")

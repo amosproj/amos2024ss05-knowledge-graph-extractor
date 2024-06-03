@@ -22,13 +22,6 @@ class NetXGraphDB:
         # Dummy DATA
         import pandas as pd
 
-        data = {
-            "node_1": ["Science", "Materials", "Foo"],
-            "node_2": ["IOP", "Conference", "Bar"],
-            "relation": ["part of", "related", "test"],
-            "chunk_id": [0, 0, 0],
-        }
-
         df = pd.DataFrame(data)
         graph = nx.Graph()
 
