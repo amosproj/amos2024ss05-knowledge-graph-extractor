@@ -5,6 +5,7 @@ import tempfile
 import shutil
 
 from graph_creator.gemini import process_chunks
+from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
 from graph_creator import llm_handler
@@ -34,7 +35,7 @@ def process_file_to_graph(g_job: GraphJob):
     create_and_store_graph(uuid, entities_and_relations)
 
 
-def process_file_to_entities_and_relations(file):
+def process_file_to_entities_and_relations(file: str):
     """
     Process the given file to extract entities and relations.
 
@@ -63,10 +64,11 @@ def process_file_to_entities_and_relations(file):
         prompt_template = "Give all valid relation in the given: {text_content}"
 
         # Generate response using LLM
-        response_json = process_chunks(text_chunks, prompt_template)
+        # response_json = process_chunks(text_chunks, prompt_template)
+        response_json = groq_process_chunks(text_chunks, prompt_template)
         print(response_json)
-    
-    finally:
+    except Exception as e:
+        print(e)
         response_json = None
     
     return response_json
@@ -92,7 +94,7 @@ def create_and_store_graph(uuid, entities_and_relations):
             flattened_data.append(entities_and_relations[j][i])
 
     # convert data to dataframe
-    df_e_and_r = pandas.DataFrame(entities_and_relations)
+    df_e_and_r = pandas.DataFrame(flattened_data)
 
     # combine knowledge graph pieces
     combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)

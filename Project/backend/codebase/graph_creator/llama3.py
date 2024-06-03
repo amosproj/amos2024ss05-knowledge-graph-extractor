@@ -4,6 +4,9 @@ from datetime import datetime
 from dotenv import load_dotenv
 from groq import Groq
 
+from graph_creator.services.json_handler import transform_llm_output_to_dict
+
+
 def configure_groq():
     """
     Ensure the API key is set in the environment
@@ -107,6 +110,7 @@ def process_chunks(chunks, prompt_template, entities_component_1=None, entities_
             response_json = check_for_connecting_relation(text_content, entities_component_1, entities_component_2, groq_client)
         else:
             response_json = extract_entities_and_relations(text_content, groq_client)
-        responses.append(response_json)
+
+        responses.append(transform_llm_output_to_dict(response_json))
 
     return responses
