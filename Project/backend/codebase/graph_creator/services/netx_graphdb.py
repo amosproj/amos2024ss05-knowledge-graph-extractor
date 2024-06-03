@@ -22,20 +22,13 @@ class NetXGraphDB:
         # Dummy DATA
         import pandas as pd
 
-        data = {
-            "node_1": ["Science", "Materials", "Foo"],
-            "node_2": ["IOP", "Conference", "Bar"],
-            "relation": ["part of", "related", "test"],
-            "chunk_id": [0, 0, 0],
-        }
-
         df = pd.DataFrame(data)
         graph = nx.Graph()
 
         # Iterate over each row in the DataFrame
         for _, edge in df.iterrows():
             # Add edge with attributes to the graph
-            graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["relation"])
+            graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
         return graph
 
     def save_graph(self, graph_job_id: uuid.UUID, graph: nx.Graph):
@@ -44,14 +37,14 @@ class NetXGraphDB:
         The filename/location will be <GraphJob.id>.edgelist
         """
         location = self._get_graph_file_path_local_storage(graph_job_id)
-        nx.write_edgelist(graph, location, data=True)
+        nx.write_gml(graph, location)
 
     def load_graph(self, graph_job_id: uuid.UUID) -> nx.Graph:
         """
         Given a GraphJob retrieve its graph from the local-storage
         """
         graph_local_storage = self._get_graph_file_path_local_storage(graph_job_id)
-        return nx.read_edgelist(graph_local_storage)
+        return nx.read_gml(graph_local_storage)
 
     def graph_data_for_visualization(
         self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
@@ -79,7 +72,7 @@ class NetXGraphDB:
         )
         os.makedirs(graphs_directory, exist_ok=True)
 
-        return os.path.join(graphs_directory, f"{graph_job_id}.edgelist")
+        return os.path.join(graphs_directory, f"{graph_job_id}.gml")
 
     @staticmethod
     def _graph_bfs_edges(graph: nx.Graph, node: str, adj_depth: int) -> GraphVisData:
