@@ -231,7 +231,7 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
     await graph_job_dao.delete_graph_job(graph_job)
 
 
-@router.get("/create_graph/{graph_job_id}")
+@router.post("/create_graph/{graph_job_id}")
 async def create_graph(
     graph_job_id: uuid.UUID,
     graph_job_dao: GraphJobDAO = Depends(),
