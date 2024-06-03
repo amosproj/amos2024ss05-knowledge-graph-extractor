@@ -6,69 +6,65 @@ import Upload from "../Upload";
 import "./index.css";
 import { GENERATE_API_PATH } from "../../constant";
 
-
 function Home() {
   const [disableGenerate, setDisableGenerate] = useState(true);
   const [fileId, setFileId] = useState("");
+  const [isLoading, setIsLoading] = useState(false); 
 
   const navigate = useNavigate();
 
   const handleAddFile = (error: any, file: any) => {
     // TODO: This needs to be changed once we have the CORS ready.
-    console.log(file)
+    console.log(file);
 
     if (!error) {
       const fileId = JSON.parse(file.serverId as any).id;
       setFileId(fileId);
-      setDisableGenerate(false)
+      setDisableGenerate(false);
     }
-  }
+  };
 
   const handleGenerateGraph = () => {
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(":fileId", fileId)}`;   //TODO: vite
+    setIsLoading(true);
+
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(":fileId", fileId)}`;
     fetch(API, {
-
-      // Adding method type 
       method: "POST",
-
-      // Adding body or contents to send 
-      // body: JSON.stringify({ 
-      //     title: "foo", 
-      //     body: "bar", 
-      //     userId: 1 
-      // }), 
-
-      // Adding headers to the request 
       headers: {
-        "Content-type": "application/json; charset=UTF-8"
-      }
+        "Content-type": "application/json; charset=UTF-8",
+      },
     })
-
-      // Converting to JSON 
-      .then(response => response.json())
-
-      // Displaying results to console 
-      .then(json => {
+      .then((response) => response.json())
+      .then((json) => {
         console.log(json);
-        //TODO: Check status generated
+        // TODO: Check status generated
         navigate(`/graph/${fileId}`);
       })
-      .catch(e => navigate(`/graph/${fileId}`) //TODO: console.log(e)
-      )
-
-  }
+      .catch((e) => {
+        //navigate(`/graph/${fileId}`); // TODO: console.log(e)
+        console.log(e)
+      })
+      .finally(() => {
+        setIsLoading(false); 
+      });
+  };
 
   return (
     <main className="main_wrapper">
-      <div><header>
-        <h2>AMOS Project SS24 - Knowledge Graph Extractor</h2>
-      </header>
+      <div>
+        <header>
+          <h2>AMOS Project SS24 - Knowledge Graph Extractor</h2>
+        </header>
         <img className="logo" src={logo} alt="" />
-        <Upload
-          handleAddFile={handleAddFile}
-        />
+        <Upload handleAddFile={handleAddFile} />
         <div>
-          <button className="primary_btn" disabled={!fileId} onClick={handleGenerateGraph}>Generate Graph</button>
+          <button
+            className="primary_btn"
+            disabled={!fileId || isLoading}
+            onClick={handleGenerateGraph}
+          >
+            {isLoading ? "Generating Graph" : "Generate Graph"}
+          </button>
         </div>
       </div>
     </main>
