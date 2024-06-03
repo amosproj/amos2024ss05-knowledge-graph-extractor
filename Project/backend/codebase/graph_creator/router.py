@@ -4,12 +4,14 @@ import uuid
 from typing import Optional
 
 from fastapi import APIRouter, Depends, Response
-from fastapi import UploadFile, File, HTTPException
+from fastapi import UploadFile, File, HTTPException, BackgroundTasks
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
 from graph_creator.schemas.graph_vis import GraphVisData
 from graph_creator.services.netx_graphdb import NetXGraphDB
+
+import graph_creator.graph_creator_main as graph_creator_main
 
 router = APIRouter()
 
@@ -20,7 +22,9 @@ logger = logging.getLogger(__name__)
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
 async def upload_pdf(
-    file: UploadFile = File(...), graph_job_dao: GraphJobDAO = Depends()
+    background_tasks: BackgroundTasks,
+    file: UploadFile = File(...),
+    graph_job_dao: GraphJobDAO = Depends()
 ):
     """
     Uploads a PDF document.
@@ -82,6 +86,9 @@ async def upload_pdf(
 
     # Create a record in the database
     graph_job = await graph_job_dao.create_graph_job_model(graph_job=graph_job)
+
+    #trigger graph creation
+    background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
 
     return {
         "id": graph_job.id,
