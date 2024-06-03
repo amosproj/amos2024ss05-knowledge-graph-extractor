@@ -19,6 +19,7 @@ from graph_creator.schemas.graph_vis import GraphVisData
 from graph_creator.services.netx_graphdb import NetXGraphDB
 
 import graph_creator.graph_creator_main as graph_creator_main
+from graph_creator.utils.const import GraphStatus
 
 router = APIRouter()
 
@@ -118,7 +119,7 @@ async def upload_pdf(
     logger.info(file_path)
 
     graph_job = GraphJobCreate(
-        name=file.filename, location=file_path, status="Document uploaded"
+        name=file.filename, location=file_path, status=GraphStatus.DOC_UPLOADED
     )
     # Check if graph job exists
     existing_graph_job = await graph_job_dao.get_graph_job_by_name(graph_job.name)
@@ -244,7 +245,7 @@ async def create_graph(
 
     if not g_job:
         raise HTTPException(status_code=404, detail="Graph job not found")
-    if g_job.status != "Document uploaded":
+    if g_job.status != GraphStatus.DOC_UPLOADED:
         raise HTTPException(
             status_code=400, detail="Graph job status is not `Document uploaded`"
         )
@@ -252,7 +253,7 @@ async def create_graph(
     graph = netx_services.create_graph_from_df(graph_job_id=graph_job_id, data=None)
     netx_services.save_graph(graph_job_id=graph_job_id, graph=graph)
 
-    g_job.status = "graph_ready"
+    g_job.status = GraphStatus.GRAPH_READY
     graph_job_dao.session.add(g_job)
     await graph_job_dao.session.commit()
     return Response(status_code=201)
@@ -270,7 +271,7 @@ async def get_graph_data_for_visualization(
 
     if not g_job:
         raise HTTPException(status_code=404, detail="Graph job not found")
-    if g_job.status != "graph_ready":
+    if g_job.status != GraphStatus.GRAPH_READY:
         raise HTTPException(
             status_code=400, detail="A graph needs to be created for this job first!"
         )
