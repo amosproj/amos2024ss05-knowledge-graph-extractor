@@ -1,12 +1,10 @@
 #Makefile frontend
 .PHONY: start stop
 
-start:
+start-dev:
 	sudo npm install
 	sudo npm run dev
 
-stop:
+stop-dev:
 	# tba
 	@echo "Stopping frontend"
-
-
