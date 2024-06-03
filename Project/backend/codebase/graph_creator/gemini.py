@@ -6,9 +6,9 @@ import google.generativeai as genai
 
 def configure_genai():
     """
-    Ensure the API key is set in the environment (set it in the .env file or Linux/Mac: export GOOGLE_API_KEY="Your_API_KEY")
+    Ensure the API key is set in the environment
     """
-    load_dotenv("Project/backend/.env", override=True)
+    # load_dotenv("Project/backend/.env", override=True)
     api_key = os.getenv("GOOGLE_API_KEY")
     if not api_key:
         raise ValueError("API key not found in environment variables")
