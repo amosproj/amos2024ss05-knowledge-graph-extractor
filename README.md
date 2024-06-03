@@ -41,10 +41,12 @@
     - Clone the repository and change into the project directory
     - Copy the `.env.example` file to `.env` and update the values as needed
 
+
 2. **Run the application:**
     - Create and activate a virtual environment
     - Install the development requirements
-    - Build the Docker image and run the container
+    - Build the Docker image and run the container with `make build-dev`
+
 
 *For detailed instructions, see the [Getting Started Guide](Documentation/getting-started.md).*
 

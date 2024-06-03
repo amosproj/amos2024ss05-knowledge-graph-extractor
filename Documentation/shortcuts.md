@@ -1,19 +1,18 @@
 # Shortcuts 🔑
 
-This project includes several shortcuts to streamline the development process:
+> [!TIP]
+> This project includes several shortcuts to streamline the development process.
 
-### Starting the Development Environment from the root directory
+### Starting the Development Environment from the Root Directory
 
-
-To Build and run the development environment (backend and frontend an the same time), you can run the following command in the root directory of the project:
+To build and run the development environment (backend and frontend at the same time), you can run the following command in the root directory of the project:
 
 ```bash
 make build-dev
 ```
 
-**To Stop the development environment (frontend and backend):**
-
-Press `Ctrl + C` to stop the npm server and run the following command:
+> [!IMPORTANT]
+> To stop the development environment (frontend and backend), press `Ctrl + C` to stop the npm server and run the following command:
 
 ```bash
 make stop-dev
@@ -21,13 +20,9 @@ make stop-dev
 
 ### Separately Starting the Components
 
-If you want to start the components separately.
+If you want to start the components separately, you can use the prefix `make backend-<command>`/`make frontend-<command>` for the separate backend and frontend commands or by navigating to the respective directories and running the Makefile commands.
 
-You can use the prefix `make backend-<command>`/` make frontend-<command>` for the separate backend and frontend commands or by navigating to the respective directories and running the Makefile commands.
-
-
-
- **Start only the frontend:**
+**Start only the frontend:**
 
 ```bash
 make frontend-build-dev
@@ -39,17 +34,18 @@ make frontend-build-dev
 make backend-build-dev
 ```
 
-  **Run a backend command:**
+> [!NOTE]
+> You can run backend commands using the following format:
 
 ```bash
 make backend-<command>
 ```
 
-  >Example: To run the tests in the backend:
+Example: To run the tests in the backend:
 
-  ```bash
-  make backend-tests
-  ```
+```bash
+make backend-tests
+```
 
 **Or navigate to the backend directory and run the command:**
 
@@ -65,12 +61,11 @@ cd Project/frontend
 make start-dev
 ```
 
-### Show help:
-You can allwas run the following command to see the available commands:
+### Show Help
 
-
+> [!NOTE]
+> You can always run the following command to see the available commands:
 
 ```bash
 make help
 ```
-

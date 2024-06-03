@@ -21,6 +21,8 @@ cp Project/backend/.env.example Project/backend/.env
 ---
 
 ## Initial Setup ⚙️
+> [!IMPORTANT]
+> Ensure you have Docker and Python 3.11 or higher installed before proceeding with the setup.
 
 ### Development Prerequisites
 
@@ -36,7 +38,7 @@ python -m venv venv
 source venv/bin/activate
 ```
 
-1. **Install the development requirements specific to your IDE for enhanced functionality and support:**
+3. **Install the development requirements specific to your IDE for enhanced functionality and support:**
 
 ```bash
 pip install -r Project/backend/codebase/requirements.txt
@@ -62,6 +64,7 @@ docker-compose -f Project/backend/docker-compose.yml up --build -d
 make build-dev
 ```
 
-> You can now access the application at [http://localhost:8000](http://localhost:8000). The development environment allows for immediate reflection of code changes.
+> [!NOTE]
+> You can now access the application at [http://localhost:8080](http://localhost:8080. The development environment allows for immediate reflection of code changes.
 
 Next [Step](shortcuts.md)
