@@ -6,11 +6,11 @@ all: help
 
 build-dev:
 	@$(MAKE) -C Project/backend build-dev
-	@$(MAKE) -C Project/frontend start
+	@$(MAKE) -C Project/frontend start-dev
 
 stop-dev:
 	@$(MAKE) -C Project/backend stop-dev
-	@$(MAKE) -C Project/frontend stop
+	@$(MAKE) -C Project/frontend stop-dev
 
 # Pass through to backend Makefile
 backend-%:

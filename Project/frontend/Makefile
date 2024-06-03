@@ -1,5 +1,5 @@
 #Makefile frontend
-.PHONY: start stop
+.PHONY: start-dev stop-dev
 
 start-dev:
 	sudo npm install
