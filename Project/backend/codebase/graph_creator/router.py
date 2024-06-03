@@ -29,6 +29,7 @@ logger = logging.getLogger(__name__)
 
 @router.post("/process_pdf/")
 async def process_pdf(file: UploadFile = File(...)):
+    # todo- clean up, not being used
     """
     Process a PDF file into chunks and generate a response using LLM.
 
@@ -69,7 +70,6 @@ async def process_pdf(file: UploadFile = File(...)):
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
 async def upload_pdf(
-    background_tasks: BackgroundTasks,
     file: UploadFile = File(...),
     graph_job_dao: GraphJobDAO = Depends()
 ):
@@ -133,10 +133,6 @@ async def upload_pdf(
 
     # Create a record in the database
     graph_job = await graph_job_dao.create_graph_job_model(graph_job=graph_job)
-
-    #trigger graph creation
-    #background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
-    graph_creator_main.process_file_to_graph(graph_job)
 
     return {
         "id": graph_job.id,
@@ -239,7 +235,6 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
 async def create_graph(
     graph_job_id: uuid.UUID,
     graph_job_dao: GraphJobDAO = Depends(),
-    netx_services: NetXGraphDB = Depends(),
 ):
     g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
 
@@ -250,8 +245,9 @@ async def create_graph(
             status_code=400, detail="Graph job status is not `Document uploaded`"
         )
 
-    graph = netx_services.create_graph_from_df(graph_job_id=graph_job_id, data=None)
-    netx_services.save_graph(graph_job_id=graph_job_id, graph=graph)
+    # trigger graph creation
+    # background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
+    graph_creator_main.process_file_to_graph(g_job)
 
     g_job.status = GraphStatus.GRAPH_READY
     graph_job_dao.session.add(g_job)
