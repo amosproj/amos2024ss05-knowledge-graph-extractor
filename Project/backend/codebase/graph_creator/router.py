@@ -6,8 +6,9 @@ import tempfile
 from typing import Optional
 
 
-from fastapi import APIRouter, Depends, Response
+from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException, BackgroundTasks
+from starlette.responses import JSONResponse
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
@@ -242,7 +243,7 @@ async def create_graph(
         raise HTTPException(status_code=404, detail="Graph job not found")
     if g_job.status != GraphStatus.DOC_UPLOADED:
         raise HTTPException(
-            status_code=400, detail="Graph job status is not `Document uploaded`"
+            status_code=400, detail=f"Graph job status is not `{GraphStatus.DOC_UPLOADED}`"
         )
 
     # trigger graph creation
@@ -252,8 +253,8 @@ async def create_graph(
     g_job.status = GraphStatus.GRAPH_READY
     graph_job_dao.session.add(g_job)
     await graph_job_dao.session.commit()
-    return Response(
-        content={"id": g_job.id, "status": GraphStatus.GRAPH_READY},
+    return JSONResponse(
+        content={"id": str(g_job.id), "status": GraphStatus.GRAPH_READY},
         status_code=201
     )
 
