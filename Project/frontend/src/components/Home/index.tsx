@@ -18,6 +18,8 @@ function Home() {
     }
   };
 
+  const handleRemoveFile = () => { setFileId(""); }
+
   const handleGenerateGraph = () => {
     setIsLoading(true);
 
@@ -50,7 +52,10 @@ function Home() {
           <h2>AMOS Project SS24 - Knowledge Graph Extractor</h2>
         </header>
         <img className="logo" src={logo} alt="" />
-        <Upload handleAddFile={handleAddFile} />
+        <Upload
+          handleAddFile={handleAddFile}
+          handleRemoveFile={handleRemoveFile}
+        />
         <div>
           <button
             className="primary_btn"

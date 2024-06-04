@@ -10,7 +10,9 @@ registerPlugin(FilePondPluginFileValidateType);
 
 type UploadProps = {
   handleAddFile: (error: any, file: File) => void;
+  handleRemoveFile: () => void;
 }
+
 
 function Upload(props: UploadProps) {
   return (
@@ -23,6 +25,7 @@ function Upload(props: UploadProps) {
         acceptedFileTypes={["application/pdf"]}
         credits={false}
         onprocessfile={props.handleAddFile}
+        onremovefile={props.handleRemoveFile}
       />
     </section>
   )
