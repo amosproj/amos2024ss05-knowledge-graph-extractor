@@ -4,23 +4,17 @@ import { useNavigate } from "react-router-dom";
 import logo from "../../assets/team-logo.svg";
 import Upload from "../Upload";
 import "./index.css";
-import { GENERATE_API_PATH } from "../../constant";
+import { GENERATE_API_PATH, GraphStatus } from "../../constant";
 
 function Home() {
-  const [disableGenerate, setDisableGenerate] = useState(true);
   const [fileId, setFileId] = useState("");
-  const [isLoading, setIsLoading] = useState(false); 
-
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleAddFile = (error: any, file: any) => {
-    // TODO: This needs to be changed once we have the CORS ready.
-    console.log(file);
-
     if (!error) {
       const fileId = JSON.parse(file.serverId as any).id;
       setFileId(fileId);
-      setDisableGenerate(false);
     }
   };
 
@@ -35,17 +29,17 @@ function Home() {
       },
     })
       .then((response) => response.json())
-      .then((json) => {
-        console.log(json);
-        // TODO: Check status generated
-        navigate(`/graph/${fileId}`);
+      .then((res) => {
+
+        if (res.status === GraphStatus.GRAPH_READY) {
+          navigate(`/graph/${fileId}`);
+        }
       })
       .catch((e) => {
-        //navigate(`/graph/${fileId}`); // TODO: console.log(e)
         console.log(e)
       })
       .finally(() => {
-        setIsLoading(false); 
+        setIsLoading(false);
       });
   };
 
@@ -63,7 +57,7 @@ function Home() {
             disabled={!fileId || isLoading}
             onClick={handleGenerateGraph}
           >
-            {isLoading ? "Generating Graph" : "Generate Graph"}
+            {isLoading ? <span className="loading_spinner_home">Generating graph...</span> : "Generate Graph"}
           </button>
         </div>
       </div>
