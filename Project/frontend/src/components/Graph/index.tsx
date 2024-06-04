@@ -9,11 +9,11 @@ import "./index.css";
 import { VISUALIZE_API_PATH } from "../../constant";
 
 export default function Graph() {
-  const [graphData, setGraphData] = useState<MultiDirectedGraph>({} as any);
+  const [graphData, setGraphData] = useState<MultiDirectedGraph | null>(null);
   const { fileId = "" } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log(fileId);
     const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`;
     fetch(API)
       .then((res) => res.json())
@@ -39,19 +39,25 @@ export default function Graph() {
           }
         });
         setGraphData(graph);
-        console.log(graph);
       })
       .catch((error) => {
         console.log("Error fetching graphData:", error);
       })
+      .finally(() => {
+        setIsLoading(false);
+      });
   }, [fileId]);
 
-  if (!graphData?.nodes) {
+  if (isLoading) {
     return (
-      <div className="loading_spinner">Loading graph...</div>
+      <div className="loading_spinner_graph">Loading graph...</div>
     );
   }
-
+  if (!graphData) {
+    return (
+      <div className="error_container">Sorry error has been occurred!</div>
+    )
+  }
   return (
     <section className="graph_container">
       <h1>Graph Visualization</h1>
