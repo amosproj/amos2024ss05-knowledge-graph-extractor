@@ -72,6 +72,7 @@ export default function Graph() {
           allowInvalidContainer: true,
           renderLabels: true,
           renderEdgeLabels: true,
+          labelRenderedSizeThreshold: 0,
           defaultEdgeType: "straight",
           edgeProgramClasses: {
             straight: EdgeArrowProgram,
