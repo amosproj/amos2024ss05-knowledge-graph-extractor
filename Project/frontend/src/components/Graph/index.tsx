@@ -1,26 +1,21 @@
 import { useEffect, useState } from "react";
-
 import { MultiDirectedGraph } from "graphology";
 import { SigmaContainer } from "@react-sigma/core";
 import { useParams } from "react-router-dom";
-
 import "@react-sigma/core/lib/react-sigma.min.css";
 import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from "@sigma/edge-curve";
 import { EdgeArrowProgram } from "sigma/rendering";
-
 import "./index.css";
 import { VISUALIZE_API_PATH } from "../../constant";
 
 export default function Graph() {
-
-  const [graphData, setGraphData] = useState<MultiDirectedGraph>({} as any);
-
+  const [graphData, setGraphData] = useState<MultiDirectedGraph | null>(null);
   const { fileId = "" } = useParams();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    console.log(fileId);
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`
-    fetch(API)     //TODO: vite
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(":fileId", fileId)}`;
+    fetch(API)
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
@@ -32,10 +27,7 @@ export default function Graph() {
           const { id, source, target, ...rest } = edge;
           graph.addEdgeWithKey(id, source, target, rest);
         });
-
         indexParallelEdgesIndex(graph, { edgeIndexAttribute: "parallelIndex", edgeMaxIndexAttribute: "parallelMaxIndex" });
-
-        // Adapt types and curvature of parallel edges for rendering:
         graph.forEachEdge((edge, { parallelIndex, parallelMaxIndex }) => {
           if (typeof parallelIndex === "number") {
             graph.mergeEdgeAttributes(edge, {
@@ -46,18 +38,26 @@ export default function Graph() {
             graph.setEdgeAttribute(edge, "type", "straight");
           }
         });
-
         setGraphData(graph);
-
-        console.log(graph)
       })
       .catch((error) => {
-        console.error('Error fetching graphData:', error);
+        console.log("Error fetching graphData:", error);
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, [fileId]);
 
-  if (!graphData?.nodes) return null;
-
+  if (isLoading) {
+    return (
+      <div className="loading_spinner_graph">Loading graph...</div>
+    );
+  }
+  if (!graphData) {
+    return (
+      <div className="error_container">Sorry error has been occurred!</div>
+    )
+  }
   return (
     <section className="graph_container">
       <h1>Graph Visualization</h1>
@@ -77,11 +77,8 @@ export default function Graph() {
             straight: EdgeArrowProgram,
             curved: EdgeCurveProgram,
           },
-
         }}
-      >
-      </SigmaContainer>
+      ></SigmaContainer>
     </section>
-  )
-  { }
+  );
 }
