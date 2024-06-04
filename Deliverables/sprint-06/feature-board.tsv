@@ -1,0 +1,62 @@
+Title	URL	Assignees	Status	Estimated Size	Milestone	Labels
+Prepare LLM setup for dev team	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/45	nikolas-rauscher	Feature Archive	2	Interaction with LLM	enhancement, Priority - High
+LLM function	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/54	yashbhesaniya	Feature Archive	3	Interaction with LLM	enhancement, Priority - High
+CORS implementation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/62	nikolas-rauscher	Feature Archive	3	Data source processing	enhancement, Priority - High
+Generate graph button	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/56	Sandeep-kumar-Ramesh	Feature Archive	5	User Interface	enhancement, Priority - High
+Create record in database	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/23	iremozs	Feature Archive	5	Data source processing	enhancement, Priority - High
+HW: Build Process Video	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/60	borges-filipe	Feature Archive	3		homework, Priority - High
+CI/CD improvements	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/58	borges-filipe	Feature Archive	2		enhancement, Priority - High
+POC: Combine graph pieces with llm 	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/30	get4flo	Feature Archive	8	Graph building and visualization	POC, Priority - Medium
+Update software architecture diagram and documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/52	nikolas-rauscher	Feature Archive	1		documentation
+Set up Mistral locally: documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/19	yashbhesaniya	Feature Archive	3		documentation
+POC: Prompt template for LLM	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/26	nikolas-rauscher	Feature Archive	3	Interaction with LLM	POC, Priority - High
+Syntax checking for JSON and converting to Graph format	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/24	borges-filipe	Feature Archive	5	Graph building and visualization	POC, Priority - High
+POC: Graph visualization	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/18	Sandeep-kumar-Ramesh	Feature Archive	5	Graph building and visualization	POC, Priority - Medium
+Allow user to upload PDF document(s)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/20	iremozs, Sandeep-kumar-Ramesh	Feature Archive	5	Data source processing	enhancement, Priority - High
+Interface setup	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/44	Sandeep-kumar-Ramesh	Feature Archive	3		enhancement, Priority - High
+Text to .json chunks	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/17	get4flo	Feature Archive	5	Data source processing	enhancement, Priority - High
+PDF parsing into text	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/4	borges-filipe	Feature Archive	3	Data source processing	enhancement, Priority - High
+Set up initial project environment (backend excluding LLM container)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/16	kristikotini, Sandeep-kumar-Ramesh, yashbhesaniya	Feature Archive	8		enhancement, Priority - High
+[HW] Create software architecture overview	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/7	kristikotini, nikolas-rauscher, yashbhesaniya	Feature Archive	5		homework
+Design user interface	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/14	Sandeep-kumar-Ramesh	Feature Archive	8	User Interface	enhancement, Priority - High
+Connecting components from document to entities	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/55	borges-filipe, yashbhesaniya	Awaiting Review	5		enhancement, Priority - High
+Connect entities to graph data	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/79	get4flo, nikolas-rauscher	Awaiting Review	5		enhancement, Priority - High
+Generate graph visualization from database	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/80	kristikotini, Sandeep-kumar-Ramesh	Awaiting Review	5	Graph building and visualization	enhancement, Priority - High
+Save graph data	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/25	kristikotini	Awaiting Review	8	Graph building and visualization	enhancement, Priority - High
+Technical/design documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/83	kristikotini	Awaiting Review	2		homework, Priority - High
+User documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/82	iremozs	Awaiting Review	3		homework, Priority - High
+Deploy documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/84	nikolas-rauscher	Awaiting Review	3		homework, Priority - High
+Create landing page	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/94		Product Backlog		User Interface	enhancement, Priority - High
+View list/table of existing knowledge graphs	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/95		Product Backlog		User Interface	enhancement, Priority - Medium
+Create new knowledge graph button (link to current user flow)	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/96		Product Backlog		User Interface	enhancement, Priority - Medium
+Refine .json extraction from LLM results	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/117		Product Backlog		Interaction with LLM	enhancement, Priority - Medium
+Refine graph connections	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/118		Product Backlog		Graph building and visualization	enhancement, Priority - Medium
+POC: ordering size of nodes in graph visualization	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/97		Product Backlog		Graph building and visualization	POC, Priority - Medium
+Delete uploaded document from upload screen	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/29		Product Backlog		Data source processing	enhancement, Priority - Low
+Remove JanusGraph	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/120		Product Backlog			Priority - Low, refactoring
+Linting/Formatting	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/88		Product Backlog	0		enhancement, Priority - Low
+Update upload page to design theme	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/98		Product Backlog		User Interface	enhancement, Priority - Medium
+Update knowledge graph visualization page to design theme	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/99		Product Backlog		User Interface	enhancement, Priority - Medium
+View details of a specific knowledge graph	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/100		Product Backlog		User Interface	enhancement, Priority - Medium
+Allow user to delete knowledge graph	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/109		Product Backlog		User Interface	enhancement, Priority - Medium
+Graph display consistency	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/101		Product Backlog		Graph building and visualization	enhancement, Priority - Low
+After LLM results, eliminate duplicates -- could use more Acceptance Criteria	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/102		Product Backlog		Interaction with LLM	enhancement, Priority - Medium
+Find dataset for Natural Language to Knowledge Graphs	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/49		Product Backlog		Interaction with LLM	POC, Priority - Low
+POC: extract categories from entities	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/119		Product Backlog		Graph building and visualization	enhancement, Priority - Low
+Follow up on POC (grouping of nodes) depending on outcome	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/103		Product Backlog		Graph building and visualization	enhancement
+Draggable nodes	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/104		Product Backlog		Graph building and visualization	enhancement
+Graph "zoom"	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/105		Product Backlog		Graph building and visualization	enhancement
+Fine-tuning of prompt template and ontology	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/39		Product Backlog	5	Interaction with LLM	enhancement
+POC:Use categories to connect sub-graphs with LLM	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/106		Product Backlog		Interaction with LLM	enhancement
+Graph search in database - return table results	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/107		Product Backlog		Graph querying	enhancement
+Graph "search" bar from UI	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/108		Product Backlog		User Interface	enhancement
+Follow up on POC from Sprint 9	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/110		Product Backlog			enhancement
+Graph search in database - return text results	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/121		Product Backlog		Graph querying	enhancement
+Demo day slide	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/123		Product Backlog			homework
+Demo day video	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/124		Product Backlog			homework
+Clean up codebase	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/122		Product Backlog			Priority - Low, refactoring
+Finalize user, (technical) design, and build/deploy documentation	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/111		Product Backlog			documentation
+End-to-end testing of application and features	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/125		Product Backlog			
+Finalize demo day workflow	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/112		Product Backlog			
+Finalize project report	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/issues/113		Product Backlog			homework
+Syntax checking for JSON and converting to Graph format	https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/pull/63	borges-filipe	Feature Archive			
