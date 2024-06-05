@@ -1,5 +1,5 @@
 #Makefile frontend
-.PHONY: start-dev stop-dev
+.PHONY: start-dev stop-dev lint format
 
 start-dev:
 	sudo npm install
@@ -8,3 +8,9 @@ start-dev:
 stop-dev:
 	# tba
 	@echo "Stopping frontend"
+
+lint:
+	npm run lint
+
+format:
+	npm run format
