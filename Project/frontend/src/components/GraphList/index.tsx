@@ -23,16 +23,6 @@ interface IGraphList {
     updated_at: string | null;
 }
 
-const list: IGraphList[] = [
-    {
-        "created_at": "2024-06-06T18:43:42.399134+00:00",
-        "name": "01. Robinson Crusoe author Daniel Defoew.pdf",
-        "id": "d918c358-4cf1-49cf-badf-401126c55199",
-        "location": "/usr/src/app/.media/documents/01. Robinson Crusoe author Daniel Defoew.pdf",
-        "status": "document_uploaded" as GraphStatus,
-        "updated_at": null
-    }];
-
 const getStatus = (status: GraphStatus) => {
     if (status === GraphStatus.DOC_UPLOADED) {
         return "Document uploaded";
