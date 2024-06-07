@@ -3,6 +3,7 @@ import React from 'react';
 import { Typography, Container, Box } from '@mui/material';
 
 import "./index.css";
+import GraphList from '../GraphList';
 
 const LandingPage = () => {
   return (
@@ -15,6 +16,10 @@ const LandingPage = () => {
           Create, View & Query Knowledge Graphs
         </Typography>
       </Box>
+
+      <section className="graph_list_container">
+        <GraphList />
+      </section>
     </Container>
   );
 };
