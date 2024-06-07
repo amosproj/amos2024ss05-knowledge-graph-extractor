@@ -3,6 +3,7 @@ import mimetypes
 import pandas
 import tempfile
 import shutil
+import time
 
 from graph_creator.gemini import process_chunks
 from graph_creator.llama3 import process_chunks as groq_process_chunks
@@ -11,6 +12,8 @@ from graph_creator import pdf_handler
 from graph_creator import llm_handler
 from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
+
+chunks = None
 
 
 def process_file_to_graph(g_job: GraphJob):
@@ -45,6 +48,7 @@ def process_file_to_entities_and_relations(file: str):
     Returns:
         list: A list of dictionaries representing the extracted entities and relations.
     """
+    global chunks
     # Save uploaded PDF file temporarily
     filename = file
 
@@ -97,9 +101,11 @@ def create_and_store_graph(uuid, entities_and_relations):
     df_e_and_r = pandas.DataFrame(flattened_data)
 
     # combine knowledge graph pieces
-    combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
-
-    print(combined)
+    #combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+    time.sleep(60)
+    for i in range(len(chunks)):
+        chunks[i] = chunks[i].dict()
+    combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
 
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()

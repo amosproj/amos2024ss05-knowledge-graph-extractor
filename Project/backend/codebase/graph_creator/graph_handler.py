@@ -1,3 +1,4 @@
+import time
 import pandas as pd
 import re
 import json
@@ -326,6 +327,8 @@ def connect_with_llm(data, text_chunks, rate_limit):
     entities_dict, relations_list = index_entity_relation_table(data, entities)
     components = extract_components(relations_list)
 
+    print("Before connecting {} components".format(len(components)))
+
     # get chunk information about contained entities
     entity_chunks_list = get_entities_by_chunk(data, entities_dict)
 
@@ -360,7 +363,8 @@ def connect_with_llm(data, text_chunks, rate_limit):
             # make call to llm with chunk and the entities of both components from that chunk
             text_chunk = text_chunks[int(key_shared_chunk)]
             if counter == rate_limit:
-                break
+                time.sleep(60)
+                counter = 0
             connecting_relation = llm_handler.check_for_connecting_relation(
                 text_chunk["page_content"], main_chunk_entities, current_chunk_entities
             )
@@ -376,6 +380,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
                 connecting_relations.append(relation)
                 break
 
+    #print("Tried to connect {} times")
     data = add_relations_to_data(data, connecting_relations)
 
     return data
