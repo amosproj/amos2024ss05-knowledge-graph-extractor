@@ -32,7 +32,7 @@ class NetXGraphDB:
 
         # Add node sizes based on degree
         for node in graph.nodes:
-            graph.nodes[node]['size'] = graph.degree(node)
+            graph.nodes[node]["size"] = graph.degree(node)
 
         return graph
 
@@ -114,9 +114,11 @@ class NetXGraphDB:
         # Iterate over nodes
         for node in graph.nodes(data=True):
             node_id, node_attrs = node
-            nodes_data.append(GraphNode(id=str(node_id),
-                                        label=str(node_id),
-                                        size=node_attrs.get("size", 1)))
+            nodes_data.append(
+                GraphNode(
+                    id=str(node_id), label=str(node_id), size=node_attrs.get("size", 1)
+                )
+            )
 
         # Iterate over edges
         for edge in graph.edges(data=True):
