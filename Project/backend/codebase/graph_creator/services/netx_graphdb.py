@@ -29,6 +29,11 @@ class NetXGraphDB:
         for _, edge in df.iterrows():
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
+
+        # Add node sizes based on degree
+        for node in graph.nodes:
+            graph.nodes[node]['size'] = graph.degree(node)
+
         return graph
 
     def save_graph(self, graph_job_id: uuid.UUID, graph: nx.Graph):
@@ -109,7 +114,9 @@ class NetXGraphDB:
         # Iterate over nodes
         for node in graph.nodes(data=True):
             node_id, node_attrs = node
-            nodes_data.append(GraphNode(id=str(node_id), label=str(node_id)))
+            nodes_data.append(GraphNode(id=str(node_id),
+                                        label=str(node_id),
+                                        size=node_attrs.get("size", 1)))
 
         # Iterate over edges
         for edge in graph.edges(data=True):
