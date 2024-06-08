@@ -34,9 +34,23 @@ class NetXGraphDB:
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
 
-        # Add node sizes based on degree
-        for node in graph.nodes:
-            graph.nodes[node]["size"] = graph.degree(node)
+        # Add min max log scaled sizes to nodes based on degree
+        log_sizes = [np.log(graph.degree(node)) for node in graph.nodes()]
+        min_log_size = min(log_sizes)
+        max_log_size = max(log_sizes)
+
+        scaled_sizes = [
+            round(
+                scale_range[0]
+                + scale_range[1]
+                * (log_size - min_log_size)
+                / (max_log_size - min_log_size)
+            )
+            for log_size in log_sizes
+        ]
+
+        for i, node in enumerate(graph.nodes):
+            graph.nodes[node]["size"] = scaled_sizes[i]
 
         return graph
 
@@ -93,11 +107,23 @@ class NetXGraphDB:
 
             if source not in visited:
                 visited.add(source)
-                nodes_data.append(GraphNode(id=str(source), label=str(source)))
+                nodes_data.append(
+                    GraphNode(
+                        id=str(source),
+                        label=str(source),
+                        size=source.get("size", 1),
+                    )
+                )
 
             if target not in visited:
                 visited.add(target)
-                nodes_data.append(GraphNode(id=str(target), label=str(target)))
+                nodes_data.append(
+                    GraphNode(
+                        id=str(target),
+                        label=str(target),
+                        size=target.get("size", 1),
+                    )
+                )
             edge_properties = graph[source][target]
             edges_data.append(
                 GraphEdge(
@@ -115,23 +141,6 @@ class NetXGraphDB:
         nodes_data = []
         edges_data = []
 
-        # Min max scaling the log sizes to given range for better visualization
-        log_sizes = [
-            np.log(graph.nodes[node].get("size") + 1) for node in graph.nodes()
-        ]
-        min_log_size = min(log_sizes)
-        max_log_size = max(log_sizes)
-
-        scaled_sizes = [
-            round(
-                scale_range[0]
-                + scale_range[1]
-                * (log_size - min_log_size)
-                / (max_log_size - min_log_size)
-            )
-            for log_size in log_sizes
-        ]
-
         # Iterate over nodes
         for i, node in enumerate(graph.nodes(data=True)):
             node_id, node_attrs = node
@@ -139,7 +148,7 @@ class NetXGraphDB:
                 GraphNode(
                     id=str(node_id),
                     label=str(node_id),
-                    size=scaled_sizes[i],
+                    size=node_attrs.get("size", 1),
                 )
             )
 
