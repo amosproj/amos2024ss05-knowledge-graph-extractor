@@ -2,9 +2,13 @@ import os
 import uuid
 
 import networkx as nx
+import numpy as np
 import pandas as pd
 
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
+
+# Scale range for min-max scaling the node sizes
+scale_range = [1, 15]
 
 
 class NetXGraphDB:
@@ -111,12 +115,31 @@ class NetXGraphDB:
         nodes_data = []
         edges_data = []
 
+        # Min max scaling the log sizes to given range for better visualization
+        log_sizes = [
+            np.log(graph.nodes[node].get("size") + 1) for node in graph.nodes()
+        ]
+        min_log_size = min(log_sizes)
+        max_log_size = max(log_sizes)
+
+        scaled_sizes = [
+            round(
+                scale_range[0]
+                + scale_range[1]
+                * (log_size - min_log_size)
+                / (max_log_size - min_log_size)
+            )
+            for log_size in log_sizes
+        ]
+
         # Iterate over nodes
-        for node in graph.nodes(data=True):
+        for i, node in enumerate(graph.nodes(data=True)):
             node_id, node_attrs = node
             nodes_data.append(
                 GraphNode(
-                    id=str(node_id), label=str(node_id), size=node_attrs.get("size", 1)
+                    id=str(node_id),
+                    label=str(node_id),
+                    size=scaled_sizes[i],
                 )
             )
 

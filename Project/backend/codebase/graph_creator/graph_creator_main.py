@@ -22,7 +22,7 @@ def process_file_to_graph(g_job: GraphJob):
     entities_and_relations = process_file_to_entities_and_relations(g_job.location)
 
     # check for error
-    if entities_and_relations == None:
+    if entities_and_relations is None:
         return
 
     # connect graph pieces
