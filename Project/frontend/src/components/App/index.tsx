@@ -12,6 +12,8 @@ import Graph from "../Graph";
 import LandingPage from "../LandingPage";
 
 import "./index.css";
+import {ToastContainer} from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 
 const theme = createTheme({
   palette: {
@@ -57,6 +59,7 @@ function App() {
             />
           </Routes>
         </main>
+        <ToastContainer />
       </ThemeProvider>
     </Router>
 
