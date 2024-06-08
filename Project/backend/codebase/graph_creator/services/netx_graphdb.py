@@ -46,6 +46,11 @@ class NetXGraphDB:
         graph_local_storage = self._get_graph_file_path_local_storage(graph_job_id)
         return nx.read_gml(graph_local_storage)
 
+    def delete_graph(self, graph_job_id: uuid.UUID):
+        file_location = self._get_graph_file_path_local_storage(graph_job_id)
+        if os.path.exists(file_location):
+            os.remove(file_location)
+
     def graph_data_for_visualization(
         self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
     ) -> GraphVisData:
