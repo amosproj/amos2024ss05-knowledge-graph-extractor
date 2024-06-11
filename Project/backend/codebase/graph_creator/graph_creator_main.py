@@ -1,14 +1,9 @@
-import json
 import mimetypes
 import pandas
-import tempfile
-import shutil
 
-from graph_creator.gemini import process_chunks
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
-from graph_creator import llm_handler
 from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
 
@@ -26,11 +21,11 @@ def process_file_to_graph(g_job: GraphJob):
     # extract entities and relations
     entities_and_relations = process_file_to_entities_and_relations(g_job.location)
 
-    #check for error
-    if entities_and_relations == None:
+    # check for error
+    if entities_and_relations is None:
         return
-    
-    #connect graph pieces
+
+    # connect graph pieces
     uuid = g_job.id
     create_and_store_graph(uuid, entities_and_relations)
 
@@ -70,7 +65,7 @@ def process_file_to_entities_and_relations(file: str):
     except Exception as e:
         print(e)
         response_json = None
-    
+
     return response_json
 
 
