@@ -62,7 +62,11 @@
   box-shadow: none;
   transform: translateY(0);
 }
-
+.red_btn {
+  background-color: red;
+  border-color: red;
+  color: white; /* Optional: ensure text color is readable */
+}
 .loading_spinner_home {
   display: flex;
   align-items: center;

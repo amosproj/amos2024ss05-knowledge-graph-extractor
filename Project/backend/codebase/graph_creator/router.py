@@ -213,8 +213,12 @@ async def read_graph_job_by_name(
     return graph_job
 
 
-@router.delete("/graph_jobs/name/{graph_job_name}")
-async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Depends()):
+@router.delete("/graph_jobs/{graph_job_id}")
+async def delete_graph_job(
+        graph_job_id: uuid.UUID,
+        graph_job_dao: GraphJobDAO = Depends(),
+        netx_services: NetXGraphDB = Depends(),
+):
     """
     Delete a graph job with the given name
 
@@ -225,10 +229,12 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
     Raises:
         HTTPException: If there is no graph job with the given name.
     """
-    graph_job = await graph_job_dao.get_graph_job_by_name(graph_job_name)
+    graph_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
     if graph_job is None:
         raise HTTPException(status_code=404, detail="Graph job not found")
+    graph_job_id = graph_job.id
     await graph_job_dao.delete_graph_job(graph_job)
+    netx_services.delete_graph(graph_job_id)
 
 
 @router.post("/create_graph/{graph_job_id}")

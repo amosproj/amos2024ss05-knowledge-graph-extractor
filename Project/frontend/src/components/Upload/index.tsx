@@ -19,12 +19,14 @@ interface FilePondError {
 type UploadProps = {
   handleAddFile: (error: FilePondError | null, file: FilePondFile) => void;
   handleRemoveFile: () => void;
+  pondRef: React.RefObject<any>;
 };
 
 function Upload(props: UploadProps) {
   return (
     <section className="upload_wrapper">
       <FilePond
+        ref={props.pondRef}
         allowMultiple={false}
         server={`${import.meta.env.VITE_BACKEND_HOST}${UPLOAD_API_PATH}`}
         name="file"
