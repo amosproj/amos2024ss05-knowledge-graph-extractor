@@ -19,7 +19,9 @@ def process_file_to_graph(g_job: GraphJob):
         None
     """
     # extract entities and relations
-    entities_and_relations = process_file_to_entities_and_relations(g_job.location)
+    entities_and_relations, chunks = process_file_to_entities_and_relations(
+        g_job.location
+    )
 
     # check for error
     if entities_and_relations is None:
@@ -27,7 +29,7 @@ def process_file_to_graph(g_job: GraphJob):
 
     # connect graph pieces
     uuid = g_job.id
-    create_and_store_graph(uuid, entities_and_relations)
+    create_and_store_graph(uuid, entities_and_relations, chunks)
 
 
 def process_file_to_entities_and_relations(file: str):
@@ -55,21 +57,18 @@ def process_file_to_entities_and_relations(file: str):
             {"text": chunk.page_content} for chunk in chunks
         ]  # Assuming chunk has 'page_content' attribute
 
-        # Define the prompt template
-        prompt_template = "Give all valid relation in the given: {text_content}"
-
         # Generate response using LLM
         # response_json = process_chunks(text_chunks, prompt_template)
-        response_json = groq_process_chunks(text_chunks, prompt_template)
+        response_json = groq_process_chunks(text_chunks)
         print(response_json)
     except Exception as e:
         print(e)
         response_json = None
 
-    return response_json
+    return response_json, chunks
 
 
-def create_and_store_graph(uuid, entities_and_relations):
+def create_and_store_graph(uuid, entities_and_relations, chunks):
     """
     Create and store a graph based on the given entities and relations.
 
@@ -80,21 +79,13 @@ def create_and_store_graph(uuid, entities_and_relations):
     Returns:
     None
     """
-    # flatten the list ba adding attribute chunk_id
-    flattened_data = []
-    for j in range(len(entities_and_relations)):
-        id = j
-        for i in range(len(entities_and_relations[j])):
-            entities_and_relations[j][i]["chunk_id"] = str(id)
-            flattened_data.append(entities_and_relations[j][i])
-
-    # convert data to dataframe
-    df_e_and_r = pandas.DataFrame(flattened_data)
+    df_e_and_r = graph_handler.build_flattened_dataframe(entities_and_relations)
 
     # combine knowledge graph pieces
-    combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
-
-    print(combined)
+    # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+    for i in range(len(chunks)):
+        chunks[i] = chunks[i].dict()
+    combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
 
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()
