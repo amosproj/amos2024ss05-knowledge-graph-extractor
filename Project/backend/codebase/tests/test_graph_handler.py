@@ -87,9 +87,11 @@ def test_component_connection_with_llm(mocker):
         ]
     """
     mocker.patch(
-        "graph_creator.llm_handler.check_for_connecting_relation",
+        "graph_creator.llama3.check_for_connecting_relation_",
         return_value=llm_response,
     )
+    mocker.patch("time.sleep")
+
     with open("tests/data/llmExtractedInformation.json") as file:
         entities_and_relations = json.load(file)
 

@@ -98,6 +98,25 @@ def check_for_connecting_relation(chunk, entities_component_1, entities_componen
     return chat_completion.choices[0].message.content
 
 def check_for_connecting_relation_(text_chunk, entities_component_1, entities_component_2):
+    """
+    Takes a text chunk, and two lists of entities (from each component in the graph)
+    and tries to extract a connection relation between any entity of
+    entities_component_1 with any entity of entities_component_2
+
+    Parameters
+    ----------
+    text_chunk : str
+        The text chunk to be proccessed
+    entities_component_1 : list
+        List of entities
+    entities_component_1 : list
+        List of entities
+
+    Returns
+    -------
+    str
+        The Response of the llm as a string
+    """
     groq_client = configure_groq()
 
     return check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2, groq_client)

@@ -1,10 +1,5 @@
-import json
 import mimetypes
-import tempfile
-import shutil
-import time
 
-from graph_creator.gemini import process_chunks
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
