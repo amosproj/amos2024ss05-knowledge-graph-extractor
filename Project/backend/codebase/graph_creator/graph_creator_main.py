@@ -18,13 +18,15 @@ def process_file_to_graph(g_job: GraphJob):
         None
     """
     # extract entities and relations
-    entities_and_relations, chunks = process_file_to_entities_and_relations(g_job.location)
+    entities_and_relations, chunks = process_file_to_entities_and_relations(
+        g_job.location
+    )
 
-    #check for error
-    if entities_and_relations == None:
+    # check for error
+    if entities_and_relations is None:
         return
-    
-    #connect graph pieces
+
+    # connect graph pieces
     uuid = g_job.id
     create_and_store_graph(uuid, entities_and_relations, chunks)
 
@@ -61,7 +63,7 @@ def process_file_to_entities_and_relations(file: str):
     except Exception as e:
         print(e)
         response_json = None
-    
+
     return response_json, chunks
 
 
@@ -79,7 +81,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     df_e_and_r = graph_handler.build_flattened_dataframe(entities_and_relations)
 
     # combine knowledge graph pieces
-    #combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+    # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)

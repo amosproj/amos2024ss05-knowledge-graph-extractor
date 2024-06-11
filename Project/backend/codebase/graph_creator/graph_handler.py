@@ -1,12 +1,25 @@
-
 import pandas as pd
 import re
 import json
 import time
 from graph_creator import llama3
 
+
 def build_flattened_dataframe(entities_and_relations):
-        # flatten the list ba adding attribute chunk_id
+    """
+    Flatten list of lists by adding chunk_id attribute convert to pandas dataframe
+
+    Parameters
+    ----------
+    entity_and_relations :  list
+        List of Lists of dictionaries
+
+    Returns
+    -------
+    pandas.dataframe
+        A table of the flattened data
+    """
+    # flatten the list by adding attribute chunk_id
     flattened_data = []
     for j in range(len(entities_and_relations)):
         id = j
@@ -18,6 +31,7 @@ def build_flattened_dataframe(entities_and_relations):
     df_e_and_r = pd.DataFrame(flattened_data)
 
     return df_e_and_r
+
 
 def connect_with_chunk_proximity(entity_and_relation_df):
     """
@@ -352,7 +366,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
     components.sort(reverse=True, key=len)
     reverse_entities_dict = {v: k for k, v in entities_dict.items()}
 
-    #wait 60s so that available requests are refreshed
+    # wait 60s so that available requests are refreshed
     time.sleep(60)
 
     # try connecting small components to the biggest component
@@ -402,7 +416,11 @@ def connect_with_llm(data, text_chunks, rate_limit):
                 connections += 1
                 break
 
-    print("Made {} new connections and thereby reduced the graph to {} components".format(connections, number_components - connections))
+    print(
+        "Made {} new connections and thereby reduced the graph to {} components".format(
+            connections, number_components - connections
+        )
+    )
     data = add_relations_to_data(data, connecting_relations)
 
     return data

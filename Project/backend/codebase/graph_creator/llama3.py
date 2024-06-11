@@ -1,7 +1,5 @@
 import os
-import json
 from datetime import datetime
-from dotenv import load_dotenv
 from groq import Groq
 
 from graph_creator.services.json_handler import transform_llm_output_to_dict
@@ -17,6 +15,7 @@ def configure_groq():
         raise ValueError("API key not found in environment variables")
     return Groq(api_key=api_key)
 
+
 def serialize_chat_history(history):
     """
     Convert the chat history to a serializable format.
@@ -30,6 +29,7 @@ def serialize_chat_history(history):
         }
         serialized_history.append(serialized_entry)
     return serialized_history
+
 
 def extract_entities_and_relations(chunk, groq_client):
     """
@@ -68,7 +68,10 @@ def extract_entities_and_relations(chunk, groq_client):
     )
     return chat_completion.choices[0].message.content
 
-def check_for_connecting_relation(chunk, entities_component_1, entities_component_2, groq_client):
+
+def check_for_connecting_relation(
+    chunk, entities_component_1, entities_component_2, groq_client
+):
     """
     Check for connecting relation between entities of two components.
     """
@@ -97,7 +100,10 @@ def check_for_connecting_relation(chunk, entities_component_1, entities_componen
     )
     return chat_completion.choices[0].message.content
 
-def check_for_connecting_relation_(text_chunk, entities_component_1, entities_component_2):
+
+def check_for_connecting_relation_(
+    text_chunk, entities_component_1, entities_component_2
+):
     """
     Takes a text chunk, and two lists of entities (from each component in the graph)
     and tries to extract a connection relation between any entity of
@@ -119,7 +125,10 @@ def check_for_connecting_relation_(text_chunk, entities_component_1, entities_co
     """
     groq_client = configure_groq()
 
-    return check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2, groq_client)
+    return check_for_connecting_relation(
+        text_chunk, entities_component_1, entities_component_2, groq_client
+    )
+
 
 def process_chunks(chunks):
     """

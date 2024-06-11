@@ -69,7 +69,7 @@ def test_relation_extraction_from_llm_entity_not_in_lists():
         llm_response, ["Autonomous"], ["Conference"]
     )
     # Assert
-    assert relation == None
+    assert relation is None
 
 
 def test_component_connection_with_llm(mocker):
