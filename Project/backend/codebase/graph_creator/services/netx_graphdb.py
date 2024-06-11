@@ -44,6 +44,7 @@ class NetXGraphDB:
 
         for i, node in enumerate(graph.nodes):
             graph.nodes[node]["size"] = scaled_sizes[i]
+            graph.nodes[node]["degree"] = graph.degree(node)  # Add node degree as an attribute
 
         return graph
 
@@ -103,7 +104,8 @@ class NetXGraphDB:
                     GraphNode(
                         id=str(source),
                         label=str(source),
-                        size=source.get("size", 1),
+                        size=graph.nodes[source].get("size", 1),
+                        degree=graph.nodes[source].get("degree", 0)
                     )
                 )
 
@@ -113,7 +115,8 @@ class NetXGraphDB:
                     GraphNode(
                         id=str(target),
                         label=str(target),
-                        size=target.get("size", 1),
+                        size=graph.nodes[target].get("size", 1),
+                        degree=graph.nodes[target].get("degree", 0)
                     )
                 )
             edge_properties = graph[source][target]
@@ -141,6 +144,7 @@ class NetXGraphDB:
                     id=str(node_id),
                     label=str(node_id),
                     size=node_attrs.get("size", 1),
+                    degree=node_attrs.get("degree", 0)
                 )
             )
 
