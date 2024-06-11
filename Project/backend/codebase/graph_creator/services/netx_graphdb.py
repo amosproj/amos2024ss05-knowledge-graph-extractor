@@ -35,7 +35,7 @@ class NetXGraphDB:
         scaled_sizes = [
             round(
                 scale_range[0]
-                + scale_range[1]
+                + (scale_range[1] - scale_range[0])
                 * (log_size - min_log_size)
                 / (max_log_size - min_log_size)
             )
