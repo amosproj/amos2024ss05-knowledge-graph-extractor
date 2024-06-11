@@ -93,7 +93,28 @@ def check_for_connecting_relation(chunk, entities_component_1, entities_componen
     
     return response.text
 
-def process_chunks(chunks, prompt_template, entities_component_1=None, entities_component_2=None):
+def check_for_connecting_relation_(text_chunk, entities_component_1, entities_component_2):
+    configure_genai()
+    genai_client = genai.GenerativeModel(
+        model_name="gemini-1.5-pro-latest",
+        safety_settings=[
+            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+        ],
+        generation_config={
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        }
+    )
+
+    return check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2, genai_client)
+
+def process_chunks(chunks):
     """
     Process a list of chunks through the generative model.
     """
@@ -119,10 +140,8 @@ def process_chunks(chunks, prompt_template, entities_component_1=None, entities_
 
     for chunk in chunks:
         text_content = chunk["text"]
-        if entities_component_1 and entities_component_2:
-            response_json = check_for_connecting_relation(text_content, entities_component_1, entities_component_2, genai_client)
-        else:
-            response_json = extract_entities_and_relations(text_content, genai_client)
+        
+        response_json = extract_entities_and_relations(text_content, genai_client)
 
         responses.append(transform_llm_output_to_dict(response_json))
 

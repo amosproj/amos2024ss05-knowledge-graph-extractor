@@ -3,7 +3,7 @@ import pandas as pd
 import re
 import json
 import time
-from graph_creator import llm_handler
+from graph_creator import llama3
 
 def build_flattened_dataframe(entities_and_relations):
         # flatten the list ba adding attribute chunk_id
@@ -386,7 +386,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
             if llm_calls > 0 and llm_calls % rate_limit == 0:
                 time.sleep(60)
 
-            connecting_relation = llm_handler.check_for_connecting_relation(
+            connecting_relation = llama3.check_for_connecting_relation_(
                 text_chunk["page_content"], main_chunk_entities, current_chunk_entities
             )
             llm_calls += 1

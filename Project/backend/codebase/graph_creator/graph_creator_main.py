@@ -8,7 +8,6 @@ from graph_creator.gemini import process_chunks
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
-from graph_creator import llm_handler
 from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
 
@@ -60,12 +59,9 @@ def process_file_to_entities_and_relations(file: str):
             {"text": chunk.page_content} for chunk in chunks
         ]  # Assuming chunk has 'page_content' attribute
 
-        # Define the prompt template
-        prompt_template = "Give all valid relation in the given: {text_content}"
-
         # Generate response using LLM
         # response_json = process_chunks(text_chunks, prompt_template)
-        response_json = groq_process_chunks(text_chunks, prompt_template)
+        response_json = groq_process_chunks(text_chunks)
         print(response_json)
     except Exception as e:
         print(e)

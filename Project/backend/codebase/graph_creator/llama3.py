@@ -97,7 +97,12 @@ def check_for_connecting_relation(chunk, entities_component_1, entities_componen
     )
     return chat_completion.choices[0].message.content
 
-def process_chunks(chunks, prompt_template, entities_component_1=None, entities_component_2=None):
+def check_for_connecting_relation_(text_chunk, entities_component_1, entities_component_2):
+    groq_client = configure_groq()
+
+    return check_for_connecting_relation(text_chunk, entities_component_1, entities_component_2, groq_client)
+
+def process_chunks(chunks):
     """
     Process a list of chunks through the generative model.
     """
@@ -106,10 +111,8 @@ def process_chunks(chunks, prompt_template, entities_component_1=None, entities_
 
     for chunk in chunks:
         text_content = chunk["text"]
-        if entities_component_1 and entities_component_2:
-            response_json = check_for_connecting_relation(text_content, entities_component_1, entities_component_2, groq_client)
-        else:
-            response_json = extract_entities_and_relations(text_content, groq_client)
+
+        response_json = extract_entities_and_relations(text_content, groq_client)
 
         responses.append(transform_llm_output_to_dict(response_json))
 
