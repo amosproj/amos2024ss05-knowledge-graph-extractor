@@ -1,4 +1,5 @@
 import mimetypes
+import pandas
 
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob

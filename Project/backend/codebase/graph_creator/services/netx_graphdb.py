@@ -1,11 +1,12 @@
 import os
 import uuid
-
 import networkx as nx
+import numpy as np
 import pandas as pd
-
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
+# Scale range for min-max scaling the node sizes
+scale_range = [1, 15]
 
 class NetXGraphDB:
     """
@@ -18,10 +19,6 @@ class NetXGraphDB:
     def create_graph_from_df(
         self, graph_job_id: uuid.UUID, data: pd.DataFrame = None
     ) -> nx.Graph:
-        # todo- This function needs to be adapted and changed accordingly
-        # Dummy DATA
-        import pandas as pd
-
         df = pd.DataFrame(data)
         graph = nx.Graph()
 
@@ -29,6 +26,26 @@ class NetXGraphDB:
         for _, edge in df.iterrows():
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
+
+        # Add min max log scaled sizes to nodes based on degree
+        log_sizes = [np.log(graph.degree(node)) for node in graph.nodes()]
+        min_log_size = min(log_sizes)
+        max_log_size = max(log_sizes)
+
+        scaled_sizes = [
+            round(
+                scale_range[0]
+                + (scale_range[1] - scale_range[0])
+                * (log_size - min_log_size)
+                / (max_log_size - min_log_size)
+            )
+            for log_size in log_sizes
+        ]
+
+        for i, node in enumerate(graph.nodes):
+            graph.nodes[node]["size"] = scaled_sizes[i]
+            graph.nodes[node]["degree"] = graph.degree(node)  # Add node degree as an attribute
+
         return graph
 
     def save_graph(self, graph_job_id: uuid.UUID, graph: nx.Graph):
@@ -81,14 +98,27 @@ class NetXGraphDB:
         visited = set()
 
         for source, target in nx.bfs_edges(graph, node, depth_limit=adj_depth):
-
             if source not in visited:
                 visited.add(source)
-                nodes_data.append(GraphNode(id=str(source), label=str(source)))
+                nodes_data.append(
+                    GraphNode(
+                        id=str(source),
+                        label=str(source),
+                        size=graph.nodes[source].get("size", 1),
+                        degree=graph.nodes[source].get("degree", 0)
+                    )
+                )
 
             if target not in visited:
                 visited.add(target)
-                nodes_data.append(GraphNode(id=str(target), label=str(target)))
+                nodes_data.append(
+                    GraphNode(
+                        id=str(target),
+                        label=str(target),
+                        size=graph.nodes[target].get("size", 1),
+                        degree=graph.nodes[target].get("degree", 0)
+                    )
+                )
             edge_properties = graph[source][target]
             edges_data.append(
                 GraphEdge(
@@ -107,9 +137,16 @@ class NetXGraphDB:
         edges_data = []
 
         # Iterate over nodes
-        for node in graph.nodes(data=True):
+        for i, node in enumerate(graph.nodes(data=True)):
             node_id, node_attrs = node
-            nodes_data.append(GraphNode(id=str(node_id), label=str(node_id)))
+            nodes_data.append(
+                GraphNode(
+                    id=str(node_id),
+                    label=str(node_id),
+                    size=node_attrs.get("size", 1),
+                    degree=node_attrs.get("degree", 0)
+                )
+            )
 
         # Iterate over edges
         for edge in graph.edges(data=True):
