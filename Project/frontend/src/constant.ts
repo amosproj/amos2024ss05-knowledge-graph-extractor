@@ -4,6 +4,6 @@ export const VISUALIZE_API_PATH = "/api/graph/visualize/:fileId";
 export const GRAPH_LIST_API_PATH = "/api/graph/graph_jobs";
 
 export enum GraphStatus {
-    DOC_UPLOADED = "document_uploaded",
-    GRAPH_READY = "graph_ready"
+  DOC_UPLOADED = 'document_uploaded',
+  GRAPH_READY = 'graph_ready',
 }
