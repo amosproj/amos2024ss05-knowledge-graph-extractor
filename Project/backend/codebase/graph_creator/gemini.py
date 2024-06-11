@@ -1,9 +1,6 @@
 import os
-import json
 from datetime import datetime
-from dotenv import load_dotenv
 import google.generativeai as genai
-from graph_creator.graph_handler import extract_relation_from_llm_output
 from graph_creator.services.json_handler import transform_llm_output_to_dict
 
 
@@ -16,6 +13,7 @@ def configure_genai():
     if not api_key:
         raise ValueError("API key not found in environment variables")
     genai.configure(api_key=api_key)
+
 
 def serialize_chat_history(history):
     """
@@ -30,6 +28,7 @@ def serialize_chat_history(history):
         }
         serialized_history.append(serialized_entry)
     return serialized_history
+
 
 def extract_entities_and_relations(chunk, genai_client):
     """
@@ -59,14 +58,17 @@ def extract_entities_and_relations(chunk, genai_client):
         "]"
     )
     USER_PROMPT = f"context: ```{chunk}``` \n\n output: "
-    
+
     chat_session = genai_client.start_chat(history=[])
     message = SYS_PROMPT + USER_PROMPT
     response = chat_session.send_message(message)
-    
+
     return response.text
 
-def check_for_connecting_relation(chunk, entities_component_1, entities_component_2, genai_client):
+
+def check_for_connecting_relation(
+    chunk, entities_component_1, entities_component_2, genai_client
+):
     """
     Check for connecting relation between entities of two components.
     """
@@ -86,25 +88,56 @@ def check_for_connecting_relation(chunk, entities_component_1, entities_componen
         "}"
     )
     USER_PROMPT = f"text chunk: ```{chunk}``` \n\n output: "
-    
+
     chat_session = genai_client.start_chat(history=[])
     message = SYS_PROMPT + USER_PROMPT
     response = chat_session.send_message(message)
-    
+
     return response.text
 
-def process_chunks(chunks, prompt_template, entities_component_1=None, entities_component_2=None):
+
+def check_for_connecting_relation_(
+    text_chunk, entities_component_1, entities_component_2
+):
     """
-    Process a list of chunks through the generative model.
+    Takes a text chunk, and two lists of entities (from each component in the graph)
+    and tries to extract a connection relation between any entity of
+    entities_component_1 with any entity of entities_component_2
+
+    Parameters
+    ----------
+    text_chunk : str
+        The text chunk to be proccessed
+    entities_component_1 : list
+        List of entities
+    entities_component_1 : list
+        List of entities
+
+    Returns
+    -------
+    str
+        The Response of the llm as a string
     """
     configure_genai()
     genai_client = genai.GenerativeModel(
         model_name="gemini-1.5-pro-latest",
         safety_settings=[
-            {"category": "HARM_CATEGORY_HARASSMENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_HATE_SPEECH", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_SEXUALLY_EXPLICIT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
-            {"category": "HARM_CATEGORY_DANGEROUS_CONTENT", "threshold": "BLOCK_MEDIUM_AND_ABOVE"},
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
         ],
         generation_config={
             "temperature": 1,
@@ -112,17 +145,54 @@ def process_chunks(chunks, prompt_template, entities_component_1=None, entities_
             "top_k": 64,
             "max_output_tokens": 8192,
             "response_mime_type": "text/plain",
-        }
+        },
     )
-    
+
+    return check_for_connecting_relation(
+        text_chunk, entities_component_1, entities_component_2, genai_client
+    )
+
+
+def process_chunks(chunks):
+    """
+    Process a list of chunks through the generative model.
+    """
+    configure_genai()
+    genai_client = genai.GenerativeModel(
+        model_name="gemini-1.5-pro-latest",
+        safety_settings=[
+            {
+                "category": "HARM_CATEGORY_HARASSMENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_HATE_SPEECH",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_SEXUALLY_EXPLICIT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+            {
+                "category": "HARM_CATEGORY_DANGEROUS_CONTENT",
+                "threshold": "BLOCK_MEDIUM_AND_ABOVE",
+            },
+        ],
+        generation_config={
+            "temperature": 1,
+            "top_p": 0.95,
+            "top_k": 64,
+            "max_output_tokens": 8192,
+            "response_mime_type": "text/plain",
+        },
+    )
+
     responses = []
 
     for chunk in chunks:
         text_content = chunk["text"]
-        if entities_component_1 and entities_component_2:
-            response_json = check_for_connecting_relation(text_content, entities_component_1, entities_component_2, genai_client)
-        else:
-            response_json = extract_entities_and_relations(text_content, genai_client)
+
+        response_json = extract_entities_and_relations(text_content, genai_client)
 
         responses.append(transform_llm_output_to_dict(response_json))
 

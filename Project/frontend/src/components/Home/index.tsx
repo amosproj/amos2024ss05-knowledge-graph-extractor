@@ -1,23 +1,34 @@
-import {useRef, useState} from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import logo from "../../assets/team-logo.svg";
-import Upload from "../Upload";
-import "./index.css";
-import {GENERATE_API_PATH, GRAPH_DELETE_API_PATH, GraphStatus} from "../../constant";
+import logo from '../../assets/team-logo.svg';
+import Upload from '../Upload';
+import './index.css';
+import { GENERATE_API_PATH, GRAPH_DELETE_API_PATH, GraphStatus } from '../../constant';
 import {toast} from "react-toastify";
 
+interface UploadedFile {
+  serverId: string;
+}
+
+interface FilePondError {
+  message: string;
+  code: number;
+}
+
 function Home() {
-  const [fileId, setFileId] = useState("");
+  const [fileId, setFileId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const pondRef = useRef(null);
 
 
-  const handleAddFile = (error: any, file: any) => {
+  const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
     if (!error) {
-      const fileId = JSON.parse(file.serverId as any).id;
+      const fileId = JSON.parse(file.serverId).id;
       setFileId(fileId);
+    } else {
+      console.log('Error:', error.message);
     }
   };
   const notifySuccess = () => {
@@ -32,31 +43,30 @@ function Home() {
 
   const handleRemoveFile = () => {
 
-    setFileId("");
+    setFileId('');
     if (pondRef.current) {
       pondRef.current.removeFiles();
     }
-  }
+  };
 
   const handleGenerateGraph = () => {
     setIsLoading(true);
 
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(":fileId", fileId)}`;
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', fileId)}`;
     fetch(API, {
-      method: "POST",
+      method: 'POST',
       headers: {
-        "Content-type": "application/json; charset=UTF-8",
+        'Content-type': 'application/json; charset=UTF-8',
       },
     })
       .then((response) => response.json())
       .then((res) => {
-
         if (res.status === GraphStatus.GRAPH_READY) {
           navigate(`/graph/${fileId}`);
         }
       })
       .catch((e) => {
-        console.log(e)
+        console.log(e);
       })
       .finally(() => {
         setIsLoading(false);
@@ -103,7 +113,11 @@ function Home() {
             disabled={!fileId || isLoading}
             onClick={handleGenerateGraph}
           >
-            {isLoading ? <span className="loading_spinner_home">Working...</span> : "Generate Graph"}
+            {isLoading ? (
+              <span className="loading_spinner_home">Working...</span>
+            ) : (
+              'Generate Graph'
+            )}
           </button>
         </div>
 

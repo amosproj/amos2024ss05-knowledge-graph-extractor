@@ -5,6 +5,6 @@ export const GRAPH_LIST_API_PATH = "/api/graph/graph_jobs";
 export const GRAPH_DELETE_API_PATH = "/api/graph/graph_jobs/:fileId";
 
 export enum GraphStatus {
-    DOC_UPLOADED = "document_uploaded",
-    GRAPH_READY = "graph_ready"
+  DOC_UPLOADED = 'document_uploaded',
+  GRAPH_READY = 'graph_ready',
 }

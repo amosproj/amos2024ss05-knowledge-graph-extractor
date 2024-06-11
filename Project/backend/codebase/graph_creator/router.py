@@ -7,7 +7,7 @@ from typing import Optional
 
 
 from fastapi import APIRouter, Depends
-from fastapi import UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
@@ -71,8 +71,7 @@ async def process_pdf(file: UploadFile = File(...)):
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
 async def upload_pdf(
-    file: UploadFile = File(...),
-    graph_job_dao: GraphJobDAO = Depends()
+    file: UploadFile = File(...), graph_job_dao: GraphJobDAO = Depends()
 ):
     """
     Uploads a PDF document.
@@ -249,7 +248,8 @@ async def create_graph(
         raise HTTPException(status_code=404, detail="Graph job not found")
     if g_job.status != GraphStatus.DOC_UPLOADED:
         raise HTTPException(
-            status_code=400, detail=f"Graph job status is not `{GraphStatus.DOC_UPLOADED}`"
+            status_code=400,
+            detail=f"Graph job status is not `{GraphStatus.DOC_UPLOADED}`",
         )
 
     # trigger graph creation
@@ -261,7 +261,7 @@ async def create_graph(
     await graph_job_dao.session.commit()
     return JSONResponse(
         content={"id": str(g_job.id), "status": GraphStatus.GRAPH_READY},
-        status_code=201
+        status_code=201,
     )
 
 
@@ -284,4 +284,3 @@ async def get_graph_data_for_visualization(
     return netx_services.graph_data_for_visualization(
         g_job.id, node=node, adj_depth=adj_depth
     )
-

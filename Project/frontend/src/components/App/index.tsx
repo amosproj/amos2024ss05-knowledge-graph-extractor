@@ -22,8 +22,6 @@ const theme = createTheme({
 });
 
 function App() {
-
-
   return (
     <Router>
       <ThemeProvider theme={theme}>
@@ -62,7 +60,6 @@ function App() {
         <ToastContainer />
       </ThemeProvider>
     </Router>
-
   );
 }
 

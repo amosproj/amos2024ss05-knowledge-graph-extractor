@@ -1,19 +1,26 @@
-
-import { FilePond, registerPlugin, File } from 'react-filepond'
-import 'filepond/dist/filepond.min.css'
+import { FilePond, registerPlugin } from 'react-filepond';
+import 'filepond/dist/filepond.min.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
-import "./index.css";
+import './index.css';
 import { UPLOAD_API_PATH } from '../../constant';
 
 registerPlugin(FilePondPluginFileValidateType);
 
-type UploadProps = {
-  handleAddFile: (error: any, file: File) => void;
-  handleRemoveFile: () => void;
-  pondRef: React.RefObject<any>;
+interface FilePondFile {
+  serverId: string;
 }
 
+interface FilePondError {
+  message: string;
+  code: number;
+}
+
+type UploadProps = {
+  handleAddFile: (error: FilePondError | null, file: FilePondFile) => void;
+  handleRemoveFile: () => void;
+  pondRef: React.RefObject<any>;
+};
 
 function Upload(props: UploadProps) {
   return (
@@ -24,13 +31,15 @@ function Upload(props: UploadProps) {
         server={`${import.meta.env.VITE_BACKEND_HOST}${UPLOAD_API_PATH}`}
         name="file"
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-        acceptedFileTypes={["application/pdf"]}
+        acceptedFileTypes={['application/pdf']}
         credits={false}
-        onprocessfile={props.handleAddFile}
+        onprocessfile={(error, file) =>
+          props.handleAddFile(error as FilePondError, file as FilePondFile)
+        }
         onremovefile={props.handleRemoveFile}
       />
     </section>
-  )
+  );
 }
 
 export default Upload;
