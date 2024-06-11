@@ -1,9 +1,23 @@
-import time
+
 import pandas as pd
 import re
 import json
+import time
 from graph_creator import llm_handler
 
+def build_flattened_dataframe(entities_and_relations):
+        # flatten the list ba adding attribute chunk_id
+    flattened_data = []
+    for j in range(len(entities_and_relations)):
+        id = j
+        for i in range(len(entities_and_relations[j])):
+            entities_and_relations[j][i]["chunk_id"] = str(id)
+            flattened_data.append(entities_and_relations[j][i])
+
+    # convert data to dataframe
+    df_e_and_r = pd.DataFrame(flattened_data)
+
+    return df_e_and_r
 
 def connect_with_chunk_proximity(entity_and_relation_df):
     """
@@ -326,8 +340,9 @@ def connect_with_llm(data, text_chunks, rate_limit):
     entities = extract_entity_set(data)
     entities_dict, relations_list = index_entity_relation_table(data, entities)
     components = extract_components(relations_list)
+    number_components = len(components)
 
-    print("Before connecting {} components".format(len(components)))
+    print("Before connecting {} components".format(number_components))
 
     # get chunk information about contained entities
     entity_chunks_list = get_entities_by_chunk(data, entities_dict)
@@ -337,8 +352,12 @@ def connect_with_llm(data, text_chunks, rate_limit):
     components.sort(reverse=True, key=len)
     reverse_entities_dict = {v: k for k, v in entities_dict.items()}
 
-    # try connecting to the biggest component
-    counter = 0
+    #wait 60s so that available requests are refreshed
+    time.sleep(60)
+
+    # try connecting small components to the biggest component
+    connections = 0
+    llm_calls = 0
     connecting_relations = []
     for i in range(1, len(components)):
         main_component = components[0]
@@ -362,13 +381,15 @@ def connect_with_llm(data, text_chunks, rate_limit):
 
             # make call to llm with chunk and the entities of both components from that chunk
             text_chunk = text_chunks[int(key_shared_chunk)]
-            if counter == rate_limit:
+
+            # only make calls to the llm if request rate allows for it
+            if llm_calls > 0 and llm_calls % rate_limit == 0:
                 time.sleep(60)
-                counter = 0
+
             connecting_relation = llm_handler.check_for_connecting_relation(
                 text_chunk["page_content"], main_chunk_entities, current_chunk_entities
             )
-            counter += 1
+            llm_calls += 1
 
             relation = extract_relation_from_llm_output(
                 connecting_relation, main_chunk_entities, current_chunk_entities
@@ -378,9 +399,10 @@ def connect_with_llm(data, text_chunks, rate_limit):
             if relation is not None:
                 relation["chunk_id"] = key_shared_chunk
                 connecting_relations.append(relation)
+                connections += 1
                 break
 
-    #print("Tried to connect {} times")
+    print("Made {} new connections and thereby reduced the graph to {} components".format(connections, number_components - connections))
     data = add_relations_to_data(data, connecting_relations)
 
     return data
