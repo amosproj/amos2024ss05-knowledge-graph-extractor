@@ -5,7 +5,7 @@ import logo from '../../assets/team-logo.svg';
 import Upload from '../Upload';
 import './index.css';
 import { GENERATE_API_PATH, GRAPH_DELETE_API_PATH, GraphStatus } from '../../constant';
-import {toast} from "react-toastify";
+import CustomizedSnackbars from '../Snackbar';
 
 interface UploadedFile {
   serverId: string;
@@ -20,6 +20,7 @@ function Home() {
   const [fileId, setFileId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
   const pondRef = useRef(null);
 
 
@@ -31,15 +32,22 @@ function Home() {
       console.log('Error:', error.message);
     }
   };
-  const notifySuccess = () => {
-    toast.success('Success!', {
-      position: "bottom-right",
-      autoClose: 3000, // Set the auto-close duration
-      hideProgressBar: true, // Hide progress bar
-      closeOnClick: true, // Close the notification when clicked
-      draggable: true, // Make the notification draggable
-    });
+  const handleClick = () => {
+    setOpen(true);
   };
+
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const notifySuccess = () => {
+    handleClick();
+  };
+
 
   const handleRemoveFile = () => {
 
@@ -131,6 +139,7 @@ function Home() {
           </button>
         </div>
       </div>
+      <CustomizedSnackbars open={open} handleClick={handleClick} handleClose={handleClose} />
     </main>
   );
 }
