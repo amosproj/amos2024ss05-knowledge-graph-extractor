@@ -1,15 +1,12 @@
 import os
 import uuid
-
 import networkx as nx
 import numpy as np
 import pandas as pd
-
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
 scale_range = [1, 15]
-
 
 class NetXGraphDB:
     """
@@ -22,10 +19,6 @@ class NetXGraphDB:
     def create_graph_from_df(
         self, graph_job_id: uuid.UUID, data: pd.DataFrame = None
     ) -> nx.Graph:
-        # todo- This function needs to be adapted and changed accordingly
-        # Dummy DATA
-        import pandas as pd
-
         df = pd.DataFrame(data)
         graph = nx.Graph()
 
@@ -104,7 +97,6 @@ class NetXGraphDB:
         visited = set()
 
         for source, target in nx.bfs_edges(graph, node, depth_limit=adj_depth):
-
             if source not in visited:
                 visited.add(source)
                 nodes_data.append(
