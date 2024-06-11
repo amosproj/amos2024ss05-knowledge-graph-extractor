@@ -6,15 +6,26 @@ import Upload from '../Upload';
 import './index.css';
 import { GENERATE_API_PATH, GraphStatus } from '../../constant';
 
+interface UploadedFile {
+  serverId: string;
+}
+
+interface FilePondError {
+  message: string;
+  code: number;
+}
+
 function Home() {
   const [fileId, setFileId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
-  const handleAddFile = (error: any, file: any) => {
+  const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
     if (!error) {
-      const fileId = JSON.parse(file.serverId as any).id;
+      const fileId = JSON.parse(file.serverId).id;
       setFileId(fileId);
+    } else {
+      console.log('Error:', error.message);
     }
   };
 

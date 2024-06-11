@@ -22,18 +22,28 @@ export default function Graph() {
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
-        graphData?.nodes?.forEach((node: any) => {
-          const { id, ...rest } = node;
-          graph.addNode(id, {
-            ...rest,
-            x: Math.random() * 100,
-            y: Math.random() * 100,
-          });
-        });
-        graphData?.edges?.forEach((edge: any) => {
-          const { id, source, target, ...rest } = edge;
-          graph.addEdgeWithKey(id, source, target, rest);
-        });
+        graphData?.nodes?.forEach(
+          (node: {
+            id: string;
+            [key: string]: string | number | boolean | null;
+          }) => {
+            const { id, ...rest } = node;
+            graph.addNode(id, {
+              ...rest,
+              x: Math.random() * 100,
+              y: Math.random() * 100,
+            });
+          },
+        );
+        graphData?.edges?.forEach(
+          (edge: {
+            id: string;
+            [key: string]: string | number | boolean | null;
+          }) => {
+            const { id, source, target, ...rest } = edge;
+            graph.addEdgeWithKey(id, source, target, rest);
+          },
+        );
         indexParallelEdgesIndex(graph, {
           edgeIndexAttribute: 'parallelIndex',
           edgeMaxIndexAttribute: 'parallelMaxIndex',

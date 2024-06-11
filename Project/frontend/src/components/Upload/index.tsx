@@ -1,4 +1,4 @@
-import { FilePond, registerPlugin, File } from 'react-filepond';
+import { FilePond, registerPlugin } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
@@ -7,8 +7,17 @@ import { UPLOAD_API_PATH } from '../../constant';
 
 registerPlugin(FilePondPluginFileValidateType);
 
+interface FilePondFile {
+  serverId: string;
+}
+
+interface FilePondError {
+  message: string;
+  code: number;
+}
+
 type UploadProps = {
-  handleAddFile: (error: any, file: File) => void;
+  handleAddFile: (error: FilePondError | null, file: FilePondFile) => void;
   handleRemoveFile: () => void;
 };
 
@@ -22,7 +31,9 @@ function Upload(props: UploadProps) {
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
         acceptedFileTypes={['application/pdf']}
         credits={false}
-        onprocessfile={props.handleAddFile}
+        onprocessfile={(error, file) =>
+          props.handleAddFile(error as FilePondError, file as FilePondFile)
+        }
         onremovefile={props.handleRemoveFile}
       />
     </section>
