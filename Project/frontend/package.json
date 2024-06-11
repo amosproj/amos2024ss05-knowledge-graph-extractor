@@ -11,7 +11,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@emotion/react": "^11.11.4",
+    "@emotion/styled": "^11.11.5",
+    "@mui/material": "^5.15.19",
     "@react-sigma/core": "4.0.2",
+    "@sigma/edge-curve": "*",
     "filepond-plugin-file-validate-type": "^1.2.9",
     "graphology": "*",
     "loader-utils": "3.2.1",

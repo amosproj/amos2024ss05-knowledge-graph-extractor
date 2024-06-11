@@ -34,13 +34,8 @@ img {
   height: auto;
 }
 
-body {
-  background: white;
-  color: black;
-}
 
 #root {
-  max-width: 1280px;
   margin: 0 auto;
   text-align: center;
   min-width: 100vw;
@@ -48,8 +43,20 @@ body {
 }
 
 .logo {
-  height: 300px;
-  padding: 1.5em;
+  height: 50px;
+  width: 50px;
+}
+
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.title {
+  flex-grow: 1;
 }
 
 .main_wrapper {
@@ -58,4 +65,11 @@ body {
   align-items: center;
   gap: 20px;
   margin: 20px;
+  min-width: 100%;
+  min-height: 100%;
+}
+
+.nav_link_item {
+  text-decoration: none;
+  color: inherit;
 }
