@@ -3,15 +3,22 @@ import {
   Routes,
   Route,
   Link as NavLink,
-} from "react-router-dom";
-import { AppBar, Toolbar, Typography, CssBaseline, ThemeProvider, createTheme } from '@mui/material';
+} from 'react-router-dom';
+import {
+  AppBar,
+  Toolbar,
+  Typography,
+  CssBaseline,
+  ThemeProvider,
+  createTheme,
+} from '@mui/material';
 
-import logo from "../../assets/team-logo.png";
-import Home from "../Home";
-import Graph from "../Graph";
-import LandingPage from "../LandingPage";
+import logo from '../../assets/team-logo.png';
+import Home from '../Home';
+import Graph from '../Graph';
+import LandingPage from '../LandingPage';
 
-import "./index.css";
+import './index.css';
 
 const theme = createTheme({
   palette: {
@@ -26,7 +33,10 @@ function App() {
         <CssBaseline />
         <div>
           <AppBar position="sticky" className="appBar">
-            <Toolbar className="toolbar" sx={{ background: theme => theme.palette.background.default }}>
+            <Toolbar
+              className="toolbar"
+              sx={{ background: (theme) => theme.palette.background.default }}
+            >
               <img src={logo} alt="Logo" className="logo" />
               <Typography variant="h6" className="title">
                 Graph Masters
@@ -41,18 +51,9 @@ function App() {
         </div>
         <main className="main_wrapper">
           <Routes>
-            <Route
-              path="/"
-              element={<LandingPage />}
-            />
-            <Route
-              path="/upload"
-              element={<Home />}
-            />
-            <Route
-              path="/graph/:fileId"
-              element={<Graph />}
-            />
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/upload" element={<Home />} />
+            <Route path="/graph/:fileId" element={<Graph />} />
           </Routes>
         </main>
       </ThemeProvider>

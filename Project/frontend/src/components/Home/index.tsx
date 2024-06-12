@@ -4,7 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import logo from '../../assets/team-logo.svg';
 import Upload from '../Upload';
 import './index.css';
-import { GENERATE_API_PATH, GRAPH_DELETE_API_PATH, GraphStatus } from '../../constant';
+import {
+  GENERATE_API_PATH,
+  GRAPH_DELETE_API_PATH,
+  GraphStatus,
+} from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
 
 interface UploadedFile {
@@ -23,7 +27,6 @@ function Home() {
   const [open, setOpen] = useState(false);
   const pondRef = useRef(null);
 
-
   const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
     if (!error) {
       const fileId = JSON.parse(file.serverId).id;
@@ -36,7 +39,10 @@ function Home() {
     setOpen(true);
   };
 
-  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
     if (reason === 'clickaway') {
       return;
     }
@@ -48,9 +54,7 @@ function Home() {
     handleClick();
   };
 
-
   const handleRemoveFile = () => {
-
     setFileId('');
     if (pondRef.current) {
       pondRef.current.removeFiles();
@@ -83,20 +87,20 @@ function Home() {
   const handleDeleteGraph = () => {
     setIsLoading(true);
 
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(":fileId", fileId)}`;
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', fileId)}`;
     fetch(API, {
-      method: "DELETE",
+      method: 'DELETE',
       headers: {
-        "Content-type": "application/json; charset=UTF-8",
+        'Content-type': 'application/json; charset=UTF-8',
       },
     })
       .then((response) => response.json())
       .then(() => {
-          handleRemoveFile();
-          notifySuccess();
+        handleRemoveFile();
+        notifySuccess();
       })
       .catch((e) => {
-        console.log(e)
+        console.log(e);
       })
       .finally(() => {
         setIsLoading(false);
@@ -135,11 +139,19 @@ function Home() {
             disabled={!fileId || isLoading}
             onClick={handleDeleteGraph}
           >
-            {isLoading ? <span className="loading_spinner_home">Working...</span> : "Delete Graph"}
+            {isLoading ? (
+              <span className="loading_spinner_home">Working...</span>
+            ) : (
+              'Delete Graph'
+            )}
           </button>
         </div>
       </div>
-      <CustomizedSnackbars open={open} handleClick={handleClick} handleClose={handleClose} />
+      <CustomizedSnackbars
+        open={open}
+        handleClick={handleClick}
+        handleClose={handleClose}
+      />
     </main>
   );
 }
