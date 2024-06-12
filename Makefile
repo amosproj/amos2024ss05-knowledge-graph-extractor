@@ -1,6 +1,6 @@
 #Root Makefile 
 
-.PHONY: all start stop help backend
+.PHONY: all start stop help backend frontend lint format lint-all format-all
 
 all: help
 
@@ -16,18 +16,28 @@ stop-dev:
 backend-%:
 	@$(MAKE) -C Project/backend $*
 
+# Pass through to frontend Makefile
+frontend-%:
+	@$(MAKE) -C Project/frontend $*
+
+lint:
+	@$(MAKE) -C Project/backend lint
+	@$(MAKE) -C Project/frontend lint
+
+format:
+	@$(MAKE) -C Project/backend format
+	@$(MAKE) -C Project/frontend format
+
+lint-all: lint
+format-all: format
+
 help:
 	@echo "Usage: make [target]"
 	@echo "Targets:"
 	@echo "  build-dev          - Start both frontend and backend"
 	@echo "  stop-dev           - Stop both frontend and backend"
-	@echo "  backend-<cmd>  - Run a backend command (e.g., make backend-build-dev)"
-	@echo "    Available backend commands:"
-	@echo "      backend-build-dev    - Build the backend development environment"
-	@echo "      backend-stop-dev     - Stop the backend development environment"
-	@echo "      backend-lint         - Run linter on the backend"
-	@echo "      backend-format       - Run formatter on the backend"
-	@echo "      backend-test         - Run tests on the backend"
-	@echo "      backend-migrations   - Create migration files for the backend"
-	@echo "      backend-migrate      - Run migrations for the backend"
-	@echo "  help           - Show this help message"
+	@echo "  backend-<cmd>      - Run a backend command (e.g., make backend-build-dev)"
+	@echo "  frontend-<cmd>     - Run a frontend command (e.g., make frontend-start-dev)"
+	@echo "  lint               - Lint both frontend and backend"
+	@echo "  format             - Format both frontend and backend"
+	@echo "  help               - Show this help message"

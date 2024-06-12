@@ -1,41 +1,99 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
-import logo from "../../assets/team-logo.svg";
-import Upload from "../Upload";
-import "./index.css";
-import { GENERATE_API_PATH, GraphStatus } from "../../constant";
+import logo from '../../assets/team-logo.svg';
+import Upload from '../Upload';
+import './index.css';
+import { GENERATE_API_PATH, GRAPH_DELETE_API_PATH, GraphStatus } from '../../constant';
+import CustomizedSnackbars from '../Snackbar';
+
+interface UploadedFile {
+  serverId: string;
+}
+
+interface FilePondError {
+  message: string;
+  code: number;
+}
 
 function Home() {
-  const [fileId, setFileId] = useState("");
+  const [fileId, setFileId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [open, setOpen] = useState(false);
+  const pondRef = useRef(null);
 
-  const handleAddFile = (error: any, file: any) => {
+
+  const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
     if (!error) {
-      const fileId = JSON.parse(file.serverId as any).id;
+      const fileId = JSON.parse(file.serverId).id;
       setFileId(fileId);
+    } else {
+      console.log('Error:', error.message);
     }
   };
+  const handleClick = () => {
+    setOpen(true);
+  };
 
-  const handleRemoveFile = () => { setFileId(""); }
+  const handleClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+
+    setOpen(false);
+  };
+
+  const notifySuccess = () => {
+    handleClick();
+  };
+
+
+  const handleRemoveFile = () => {
+
+    setFileId('');
+    if (pondRef.current) {
+      pondRef.current.removeFiles();
+    }
+  };
 
   const handleGenerateGraph = () => {
     setIsLoading(true);
 
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(":fileId", fileId)}`;
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', fileId)}`;
     fetch(API, {
-      method: "POST",
+      method: 'POST',
+      headers: {
+        'Content-type': 'application/json; charset=UTF-8',
+      },
+    })
+      .then((response) => response.json())
+      .then((res) => {
+        if (res.status === GraphStatus.GRAPH_READY) {
+          navigate(`/graph/${fileId}`);
+        }
+      })
+      .catch((e) => {
+        console.log(e);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  };
+  const handleDeleteGraph = () => {
+    setIsLoading(true);
+
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(":fileId", fileId)}`;
+    fetch(API, {
+      method: "DELETE",
       headers: {
         "Content-type": "application/json; charset=UTF-8",
       },
     })
       .then((response) => response.json())
-      .then((res) => {
-
-        if (res.status === GraphStatus.GRAPH_READY) {
-          navigate(`/graph/${fileId}`);
-        }
+      .then(() => {
+          handleRemoveFile();
+          notifySuccess();
       })
       .catch((e) => {
         console.log(e)
@@ -53,6 +111,7 @@ function Home() {
         </header>
         <img className="logo" src={logo} alt="" />
         <Upload
+          pondRef={pondRef}
           handleAddFile={handleAddFile}
           handleRemoveFile={handleRemoveFile}
         />
@@ -62,10 +121,25 @@ function Home() {
             disabled={!fileId || isLoading}
             onClick={handleGenerateGraph}
           >
-            {isLoading ? <span className="loading_spinner_home">Generating graph...</span> : "Generate Graph"}
+            {isLoading ? (
+              <span className="loading_spinner_home">Working...</span>
+            ) : (
+              'Generate Graph'
+            )}
+          </button>
+        </div>
+
+        <div>
+          <button
+            className="primary_btn red_btn"
+            disabled={!fileId || isLoading}
+            onClick={handleDeleteGraph}
+          >
+            {isLoading ? <span className="loading_spinner_home">Working...</span> : "Delete Graph"}
           </button>
         </div>
       </div>
+      <CustomizedSnackbars open={open} handleClick={handleClick} handleClose={handleClose} />
     </main>
   );
 }

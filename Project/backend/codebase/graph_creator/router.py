@@ -7,7 +7,7 @@ from typing import Optional
 
 
 from fastapi import APIRouter, Depends
-from fastapi import UploadFile, File, HTTPException, BackgroundTasks
+from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
@@ -71,8 +71,7 @@ async def process_pdf(file: UploadFile = File(...)):
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
 async def upload_pdf(
-    file: UploadFile = File(...),
-    graph_job_dao: GraphJobDAO = Depends()
+    file: UploadFile = File(...), graph_job_dao: GraphJobDAO = Depends()
 ):
     """
     Uploads a PDF document.
@@ -214,8 +213,12 @@ async def read_graph_job_by_name(
     return graph_job
 
 
-@router.delete("/graph_jobs/name/{graph_job_name}")
-async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Depends()):
+@router.delete("/graph_jobs/{graph_job_id}")
+async def delete_graph_job(
+        graph_job_id: uuid.UUID,
+        graph_job_dao: GraphJobDAO = Depends(),
+        netx_services: NetXGraphDB = Depends(),
+):
     """
     Delete a graph job with the given name
 
@@ -226,10 +229,12 @@ async def delete_graph_job(graph_job_name: str, graph_job_dao: GraphJobDAO = Dep
     Raises:
         HTTPException: If there is no graph job with the given name.
     """
-    graph_job = await graph_job_dao.get_graph_job_by_name(graph_job_name)
+    graph_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
     if graph_job is None:
         raise HTTPException(status_code=404, detail="Graph job not found")
+    graph_job_id = graph_job.id
     await graph_job_dao.delete_graph_job(graph_job)
+    netx_services.delete_graph(graph_job_id)
 
 
 @router.post("/create_graph/{graph_job_id}")
@@ -243,7 +248,8 @@ async def create_graph(
         raise HTTPException(status_code=404, detail="Graph job not found")
     if g_job.status != GraphStatus.DOC_UPLOADED:
         raise HTTPException(
-            status_code=400, detail=f"Graph job status is not `{GraphStatus.DOC_UPLOADED}`"
+            status_code=400,
+            detail=f"Graph job status is not `{GraphStatus.DOC_UPLOADED}`",
         )
 
     # trigger graph creation
@@ -255,7 +261,7 @@ async def create_graph(
     await graph_job_dao.session.commit()
     return JSONResponse(
         content={"id": str(g_job.id), "status": GraphStatus.GRAPH_READY},
-        status_code=201
+        status_code=201,
     )
 
 
@@ -278,4 +284,3 @@ async def get_graph_data_for_visualization(
     return netx_services.graph_data_for_visualization(
         g_job.id, node=node, adj_depth=adj_depth
     )
-
