@@ -33,8 +33,8 @@ function Upload(props: UploadProps) {
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
         acceptedFileTypes={['application/pdf']}
         credits={false}
-        onprocessfile={(error, file) =>
-          props.handleAddFile(error as FilePondError, file as FilePondFile)
+        onprocessfile={(error: FilePondError, file: FilePondFile) =>
+          props.handleAddFile(error, file)
         }
         onremovefile={props.handleRemoveFile}
       />
