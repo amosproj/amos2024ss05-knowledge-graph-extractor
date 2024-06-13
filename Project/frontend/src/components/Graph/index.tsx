@@ -10,11 +10,14 @@ import EdgeCurveProgram, {
 import { EdgeArrowProgram } from 'sigma/rendering';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
+import { CircularProgress } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 
 export default function Graph() {
   const [graphData, setGraphData] = useState<MultiDirectedGraph | null>(null);
   const { fileId = '' } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const theme = useTheme();
 
   useEffect(() => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`;
@@ -55,7 +58,7 @@ export default function Graph() {
               curvature:
                 DEFAULT_EDGE_CURVATURE +
                 (3 * DEFAULT_EDGE_CURVATURE * parallelIndex) /
-                  (parallelMaxIndex || 1),
+                (parallelMaxIndex || 1),
             });
           } else {
             graph.setEdgeAttribute(edge, 'type', 'straight');
@@ -72,7 +75,10 @@ export default function Graph() {
   }, [fileId]);
 
   if (isLoading) {
-    return <div className="loading_spinner_graph">Loading graph...</div>;
+    return <div className="loader_container_graph">
+      <CircularProgress size={30} />;
+      <span>Loading graph...</span>
+    </div>
   }
   if (!graphData) {
     return (
@@ -87,6 +93,7 @@ export default function Graph() {
           height: 'calc(100vh - 50px)',
           width: '100vw',
           marginLeft: '-50%',
+          background: theme.palette.background.default
         }}
         graph={graphData}
         settings={{
@@ -99,6 +106,7 @@ export default function Graph() {
             straight: EdgeArrowProgram,
             curved: EdgeCurveProgram,
           },
+          labelColor: { color: "green" }
         }}
       ></SigmaContainer>
     </section>
