@@ -79,13 +79,13 @@ const GraphList = () => {
     const listURL = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
     fetchGraphs(listURL);
   }, [offset, limit, fetchGraphs]);
-  
+
   return (
     <TableContainer component={Paper}>
-      {loading && (
+      {isLoading && (
         <Box className="loading_graph_list">
           <CircularProgress />
-          <p>Existing knowledge graphs list is loading...</p>
+          <p>Loading existing knowledge graphs...</p>
         </Box>
       )}
       {error && (
