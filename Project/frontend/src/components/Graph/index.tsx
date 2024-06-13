@@ -76,7 +76,7 @@ export default function Graph() {
 
   if (isLoading) {
     return <div className="loader_container_graph">
-      <CircularProgress size={30} />;
+      <CircularProgress size={30} />
       <span>Loading graph...</span>
     </div>
   }
