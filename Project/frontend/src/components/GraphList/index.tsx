@@ -61,6 +61,25 @@ const GraphList = () => {
     }
   }, []);
 
+  const handleDeleteGraph = React.useCallback(async (graphId: string) => {
+    const requestURL = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH}/${graphId}`;
+    try {
+      const response = await fetch(requestURL, { method: 'DELETE' });
+      if (!response.ok) {
+        throw new Error('Failed to delete the knowledge graph');
+      }
+      const listURL = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
+      await fetchGraphs(listURL);
+    } catch (e: any) {
+      setError(e.message);
+    }
+  }, [offset, limit, fetchGraphs]);
+
+  React.useEffect(() => {
+    const listURL = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
+    fetchGraphs(listURL);
+  }, [offset, limit, fetchGraphs]);
+  
   return (
     <TableContainer component={Paper}>
       {loading && (
