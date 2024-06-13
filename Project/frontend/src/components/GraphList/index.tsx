@@ -9,8 +9,9 @@ import Paper from '@mui/material/Paper';
 import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 
-import { GRAPH_LIST_API_PATH, GraphStatus } from '../../constant';
+import { GRAPH_LIST_API_PATH, GraphStatus, GRAPH_DELETE_API_PATH } from '../../constant';
 
 import './index.css';
 
@@ -43,6 +44,10 @@ const GraphList = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
+    fetchItems(offset, limit)
+  }, [offset, limit]);
+
+  const fetchItems = async (offset: number, limit: number) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
 
     setLoading(true);
@@ -63,7 +68,23 @@ const GraphList = () => {
         setError(e.message);
         setLoading(false);
       });
-  }, [offset, limit]);
+  }
+
+  const handleDelete = async (id: string) => {
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', id)}`;
+    try {
+      await fetch(API, {
+        method: 'DELETE',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+      });
+      // Reload the list after deletion
+      fetchItems(offset, limit);
+    } catch (error) {
+      console.error('Error deleting item:', error);
+    }
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -85,6 +106,7 @@ const GraphList = () => {
               <TableCell>Name</TableCell>
               <TableCell>Created at</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
@@ -98,6 +120,11 @@ const GraphList = () => {
                 </TableCell>
                 <TableCell>{getDate(row.created_at)}</TableCell>
                 <TableCell>{getStatus(row.status)}</TableCell>
+                <TableCell>
+                  <Button color="error" variant="contained" onClick={() => handleDelete(row.id)}>
+                    Delete
+                  </Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
