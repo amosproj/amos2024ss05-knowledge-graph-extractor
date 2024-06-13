@@ -29,11 +29,8 @@ interface IGraphList {
   updated_at: string | null;
 }
 
-const getStatus = (status: GraphStatus) => {
-  if (status === GraphStatus.DOC_UPLOADED) {
-    return 'Document uploaded';
-  }
-  return 'Graph generated';
+const getStatusText = (status: GraphStatus) => {
+  return status === GraphStatus.DOC_UPLOADED ? 'Document uploaded' : 'Graph generated';
 };
 
 const getDate = (isoDate: string) => {
@@ -103,7 +100,7 @@ const GraphList = () => {
                   {row.name}
                 </TableCell>
                 <TableCell>{getDate(row.created_at)}</TableCell>
-                <TableCell>{getStatus(row.status)}</TableCell>
+                <TableCell>{getStatusText(row.status)}</TableCell>
               </TableRow>
             ))}
           </TableBody>
