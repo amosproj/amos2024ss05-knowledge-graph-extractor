@@ -93,26 +93,37 @@ const GraphList = () => {
           {error}
         </Alert>
       )}
-      {!loading && !error && (
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
+       {!isLoading && !error && (
+        <Table sx={{ minWidth: 650 }} aria-label="knowledge graph table">
           <TableHead>
             <TableRow>
               <TableCell>Name</TableCell>
               <TableCell>Created at</TableCell>
               <TableCell>Status</TableCell>
+              <TableCell>Actions</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
-            {list.map((row) => (
+            {graphs.map((graph) => (
               <TableRow
-                key={row.id}
+                key={graph.id}
                 sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
               >
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  {graph.name}
                 </TableCell>
-                <TableCell>{formatDate(row.created_at)}</TableCell>
-                <TableCell>{getStatusText(row.status)}</TableCell>
+                <TableCell>{formatDate(graph.created_at)}</TableCell>
+                <TableCell>{getStatusText(graph.status)}</TableCell>
+                <TableCell>
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      variant="contained"
+                      onClick={() => navigate(`/graph/${graph.id}`)}
+                    >
+                      View
+                    </Button>
+                  </Stack>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -123,3 +134,4 @@ const GraphList = () => {
 };
 
 export default GraphList;
+
