@@ -93,7 +93,7 @@ const GraphList = () => {
           {error}
         </Alert>
       )}
-       {!isLoading && !error && (
+      {!isLoading && !error && (
         <Table sx={{ minWidth: 650 }} aria-label="knowledge graph table">
           <TableHead>
             <TableRow>
@@ -140,4 +140,3 @@ const GraphList = () => {
 };
 
 export default GraphList;
-
