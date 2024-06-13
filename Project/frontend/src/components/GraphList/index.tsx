@@ -33,17 +33,18 @@ const getStatusText = (status: GraphStatus) => {
   return status === GraphStatus.DOC_UPLOADED ? 'Document uploaded' : 'Graph generated';
 };
 
-const getDate = (isoDate: string) => {
+const formatDate = (isoDate: string) => {
   const date = new Date(isoDate);
   return date.toLocaleString();
 };
 
 const GraphList = () => {
-  const [list, setList] = React.useState<IGraphList[]>([]);
+  const [graphs, setGraphs] = React.useState<IGraphList[]>([]);
   const [offset, setOffset] = React.useState<number>(0);
   const [limit, setLimit] = React.useState<number>(100);
-  const [loading, setLoading] = React.useState<boolean>(true);
+  const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
+  const navigate = useNavigate();
 
   React.useEffect(() => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
@@ -99,7 +100,7 @@ const GraphList = () => {
                 <TableCell component="th" scope="row">
                   {row.name}
                 </TableCell>
-                <TableCell>{getDate(row.created_at)}</TableCell>
+                <TableCell>{formatDate(row.created_at)}</TableCell>
                 <TableCell>{getStatusText(row.status)}</TableCell>
               </TableRow>
             ))}
