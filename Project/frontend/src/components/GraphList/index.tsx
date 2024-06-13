@@ -122,6 +122,12 @@ const GraphList = () => {
                     >
                       View
                     </Button>
+                    <Button
+                      variant="contained"
+                      onClick={() => handleDeleteGraph(graph.id)}
+                    >
+                      Delete
+                    </Button>
                   </Stack>
                 </TableCell>
               </TableRow>
