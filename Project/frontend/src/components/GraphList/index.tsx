@@ -46,28 +46,20 @@ const GraphList = () => {
   const [error, setError] = React.useState<string | null>(null);
   const navigate = useNavigate();
 
-  React.useEffect(() => {
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
-
-    setLoading(true);
-    setError(null);
-
-    fetch(API)
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error('Problem occured while loading the knowledge graph');
-        }
-        return res.json();
-      })
-      .then((graphData: IGraphList[]) => {
-        setList(graphData);
-        setLoading(false);
-      })
-      .catch((e) => {
-        setError(e.message);
-        setLoading(false);
-      });
-  }, [offset, limit]);
+  const fetchGraphs = React.useCallback(async (url: string) => {
+    try {
+      const response = await fetch(url);
+      if (!response.ok) {
+        throw new Error('Failed to load the knowledge graph');
+      }
+      const graphData = await response.json();
+      setGraphs(graphData);
+    } catch (e: any) {
+      setError(e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   return (
     <TableContainer component={Paper}>
