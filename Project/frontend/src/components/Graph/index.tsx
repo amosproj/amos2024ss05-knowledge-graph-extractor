@@ -15,6 +15,7 @@ export default function Graph() {
   const [graphData, setGraphData] = useState<MultiDirectedGraph | null>(null);
   const { fileId = '' } = useParams();
   const [isLoading, setIsLoading] = useState(true);
+  const [threshold, setThreshold] = useState(0);
 
   useEffect(() => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`;
@@ -22,12 +23,16 @@ export default function Graph() {
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
+        const sizes: number[] = [];
+
         graphData?.nodes?.forEach(
           (node: {
             id: string;
             [key: string]: string | number | boolean | null;
           }) => {
             const { id, ...rest } = node;
+            sizes.push(rest.size as number);
+
             graph.addNode(id, {
               ...rest,
               x: Math.random() * 100,
@@ -35,6 +40,12 @@ export default function Graph() {
             });
           },
         );
+
+        const minSize = Math.min(...sizes);
+        const maxSize = Math.max(...sizes);
+        const threshold = (minSize + maxSize) / 2;
+        setThreshold(threshold);
+        
         graphData?.edges?.forEach(
           (edge: {
             id: string;
@@ -55,7 +66,7 @@ export default function Graph() {
               curvature:
                 DEFAULT_EDGE_CURVATURE +
                 (3 * DEFAULT_EDGE_CURVATURE * parallelIndex) /
-                  (parallelMaxIndex || 1),
+                (parallelMaxIndex || 1),
             });
           } else {
             graph.setEdgeAttribute(edge, 'type', 'straight');
@@ -93,7 +104,7 @@ export default function Graph() {
           allowInvalidContainer: true,
           renderLabels: true,
           renderEdgeLabels: true,
-          labelRenderedSizeThreshold: 0,
+          labelRenderedSizeThreshold: threshold,
           defaultEdgeType: 'straight',
           edgeProgramClasses: {
             straight: EdgeArrowProgram,
