@@ -13,7 +13,12 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 
-import { GRAPH_LIST_API_PATH, GraphStatus, GRAPH_DELETE_API_PATH, VISUALIZE_API_PATH } from '../../constant';
+import {
+  GRAPH_LIST_API_PATH,
+  GraphStatus,
+  GRAPH_DELETE_API_PATH,
+  VISUALIZE_API_PATH,
+} from '../../constant';
 
 import './index.css';
 
@@ -46,9 +51,10 @@ const GraphList = () => {
   const [error, setError] = React.useState<string | null>(null);
 
   React.useEffect(() => {
-    fetchItems(offset, limit)
+    fetchItems(offset, limit);
   }, [offset, limit]);
 
+  // fetches the list of graphs from the backend via an api call
   const fetchItems = async (offset: number, limit: number) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
 
@@ -70,8 +76,9 @@ const GraphList = () => {
         setError(e.message);
         setLoading(false);
       });
-  }
+  };
 
+  // makes call to delete api endpoint with graph_job_id and after that reloads the graph list
   const handleDelete = async (id: string) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', id)}`;
     try {
@@ -86,7 +93,7 @@ const GraphList = () => {
     } catch (error) {
       console.error('Error deleting item:', error);
     }
-  }
+  };
 
   const navigate = useNavigate();
 
@@ -126,19 +133,19 @@ const GraphList = () => {
                 <TableCell>{getStatus(row.status)}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={2}>
-                    <Button 
-                      color="primary" 
-                      variant="contained" 
-                      size="small" 
+                    <Button
+                      color="primary"
+                      variant="contained"
+                      size="small"
                       onClick={() => navigate(`/graph/${row.id}`)}
                       disabled={row.status !== GraphStatus.GRAPH_READY}
                     >
                       View
                     </Button>
-                    <Button 
-                      color="error" 
-                      variant="contained" 
-                      size="small" 
+                    <Button
+                      color="error"
+                      variant="contained"
+                      size="small"
                       onClick={() => handleDelete(row.id)}
                     >
                       Delete
