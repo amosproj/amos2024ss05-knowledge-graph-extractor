@@ -66,14 +66,6 @@ def analyze_graph_structure(G):
     #  - Measures the overall probability for the network to have adjacent nodes interconnected
     transitivity = nx.transitivity(G)
 
-    # Edge Attributes
-    # You can analyze edge attributes and their impact on graph structure
-    # Example: types of relationships represented by edges
-
-    # Node Attributes
-    # You can analyze node attributes and their impact on graph structure
-    # Example: types of entities represented by nodes
-
     # Return a dictionary containing the structural information
     graph_info = {
         "num_nodes": num_nodes,
