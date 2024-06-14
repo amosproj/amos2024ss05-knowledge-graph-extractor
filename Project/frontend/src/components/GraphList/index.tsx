@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useNavigate } from 'react-router-dom';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -10,8 +11,9 @@ import CircularProgress from '@mui/material/CircularProgress';
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
+import Stack from '@mui/material/Stack';
 
-import { GRAPH_LIST_API_PATH, GraphStatus, GRAPH_DELETE_API_PATH } from '../../constant';
+import { GRAPH_LIST_API_PATH, GraphStatus, GRAPH_DELETE_API_PATH, VISUALIZE_API_PATH } from '../../constant';
 
 import './index.css';
 
@@ -86,6 +88,8 @@ const GraphList = () => {
     }
   }
 
+  const navigate = useNavigate();
+
   return (
     <TableContainer component={Paper}>
       {loading && (
@@ -121,9 +125,25 @@ const GraphList = () => {
                 <TableCell>{getDate(row.created_at)}</TableCell>
                 <TableCell>{getStatus(row.status)}</TableCell>
                 <TableCell>
-                  <Button color="error" variant="contained" onClick={() => handleDelete(row.id)}>
-                    Delete
-                  </Button>
+                  <Stack direction="row" spacing={2}>
+                    <Button 
+                      color="primary" 
+                      variant="contained" 
+                      size="small" 
+                      onClick={() => navigate(`/graph/${row.id}`)}
+                      disabled={row.status !== GraphStatus.GRAPH_READY}
+                    >
+                      View
+                    </Button>
+                    <Button 
+                      color="error" 
+                      variant="contained" 
+                      size="small" 
+                      onClick={() => handleDelete(row.id)}
+                    >
+                      Delete
+                    </Button>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
