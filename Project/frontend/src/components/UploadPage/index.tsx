@@ -109,7 +109,10 @@ function UploadPage() {
 
   return (
     <main className="main_wrapper_upload">
-      <Typography variant="h6" className="title" sx={{ color: (theme) => theme.palette.text.secondary }}
+      <Typography
+        variant="h6"
+        className="title"
+        sx={{ color: (theme) => theme.palette.text.secondary }}
       >
         Upload a PDF document to generate the graph
       </Typography>
@@ -121,7 +124,8 @@ function UploadPage() {
       />
       <div className="buttons_container">
         <Button
-          variant="outlined" color="error"
+          variant="outlined"
+          color="error"
           disabled={!fileId || isLoading}
           onClick={handleDeleteGraph}
         >
@@ -137,7 +141,8 @@ function UploadPage() {
         </Button>
 
         <Button
-          variant="outlined" color="success"
+          variant="outlined"
+          color="success"
           disabled={!fileId || isLoading}
           onClick={handleGenerateGraph}
         >

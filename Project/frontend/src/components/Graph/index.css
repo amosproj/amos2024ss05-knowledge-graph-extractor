@@ -7,7 +7,7 @@
 }
 
 .sigma_container {
-  background: var(--mui-palette-primary-main)
+  background: var(--mui-palette-primary-main);
 }
 .react-sigma-controls {
   margin-right: -45%;
@@ -26,7 +26,6 @@
   color: red;
 }
 
-
 .loader_container_graph {
   display: flex;
   flex-direction: column;
@@ -38,5 +37,5 @@
 
 .loader_container_graph span {
   margin-top: 20px;
-  font-size: 18px; 
+  font-size: 18px;
 }
