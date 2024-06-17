@@ -24,6 +24,8 @@ def analyze_graph_structure(G):
     degree_distribution = dict(G.degree())
     # Degree distribution can indicate the presence of hubs or important nodes
 
+    degree_centrality = nx.degree_centrality(G)
+
     """ Centrality Measures
     - Degree Centrality: Measures node connectivity
     - Nodes with high degree centrality are important in the network
@@ -33,15 +35,38 @@ def analyze_graph_structure(G):
     - Degree: node1 = 1, node2 = 2, node3 = 1
     - Degree Centrality: node1 = 0.33(1/3), node2 = 0.66(2/3), node3 = 0.33(1/3)
     """
-    degree_centrality = nx.degree_centrality(G)
 
-    #  - Betweenness Centrality: Measures node's control over information flow
     betweenness_centrality = nx.betweenness_centrality(G)
+
+    """ 
+    - Betweenness Centrality: Measures node's control over information flow
+    - Nodes with high betweenness centrality are important in the network
+    
+    Examples: 4 nodes are connected 
+    1
+ /    \
+2-----3
+ \   /
+    4
+
+    - Here, node 2 has the highest betweenness centrality because it lies on the shortest path between all other nodes
+    - Betweenness Centrality show the dependency of the network on a node
+
+    """
 
     #  - Closeness Centrality: Measures average length of the shortest path from a node to all other nodes
     closeness_centrality = nx.closeness_centrality(G)
+
+    """
+
+    """
+
     #  - Eigenvector Centrality: Measures influence of a node in a network
     eigenvector_centrality = nx.eigenvector_centrality(G)
+
+    """
+    
+    """
 
     # Community Structure
     #  - Louvain Algorithm (for community detection)
