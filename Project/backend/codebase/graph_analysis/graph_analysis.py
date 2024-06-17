@@ -83,7 +83,7 @@ def analyze_graph_structure(G):
  /    \
 2-----3
  \   /
-    4
+   4
 
     - Here, node 3 has the highest eigenvector centrality because it is connected to node 2 which has high eigenvector centrality
     - Eigenvector Centrality show the influence of a node in the network
@@ -98,6 +98,21 @@ def analyze_graph_structure(G):
     community_sizes = [len(community) for community in communities]
     num_communities = len(communities)
     # Communities can reveal modular structures in the graph
+    """
+    - Community Detection: Identifying groups of nodes that are more connected to each other than to the rest of the network
+    - Communities can reveal modular structures in the graph
+    - Communities can be used to identify groups of nodes that are more connected to each other than to the rest of the network
+
+    Examples: 7 nodes are connected
+    1
+ /    \
+2-----3
+ \   /     5
+   4-----/   \
+        6-----7
+
+    - Here, nodes 1, 2, 3, 4 are in one community and nodes 5, 6, 7 are in another community    
+    """
 
     # Graph Connectivity
     #  - Check if the graph is connected
