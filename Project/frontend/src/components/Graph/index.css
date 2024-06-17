@@ -1,13 +1,23 @@
 .graph_container {
+  display: flex;
   flex-direction: column;
   gap: 50px;
   text-align: center;
   justify-content: center;
   align-items: center;
+  height: 100vh;
+  width: 100vw; 
+  /* overflow: hidden;  */
 }
 
 .react-sigma-controls {
-  margin-right: -45%;
+  margin-right: auto; 
+}
+.sigma-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
 }
 
 .loading_spinner_graph {
@@ -38,7 +48,6 @@
   0% {
     transform: rotate(0deg);
   }
-
   100% {
     transform: rotate(360deg);
   }
@@ -55,4 +64,22 @@
   font-size: 20px;
   font-weight: 600;
   color: red;
+}
+
+.node-label {
+  fill: #ff0000;
+}
+
+.edge-label {
+  fill: #ffffff;
+}
+
+
+#tooltip {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: none;
+  pointer-events: none;
 }
