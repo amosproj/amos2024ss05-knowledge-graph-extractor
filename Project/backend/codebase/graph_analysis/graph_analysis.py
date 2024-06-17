@@ -50,6 +50,7 @@ def analyze_graph_structure(G):
     4
 
     - Here, node 2 has the highest betweenness centrality because it lies on the shortest path between all other nodes
+    - if node in not between any other nodes, its betweenness centrality is 0
     - Betweenness Centrality show the dependency of the network on a node
 
     """
@@ -65,7 +66,21 @@ def analyze_graph_structure(G):
     eigenvector_centrality = nx.eigenvector_centrality(G)
 
     """
-    
+    - Eigenvector Centrality: Measures influence of a node in a network
+    - Nodes with high eigenvector centrality are important in the network
+
+    Examples: 4 nodes are connected 
+    1
+ /    \
+2-----3
+ \   /
+    4
+
+    - Here, node 3 has the highest eigenvector centrality because it is connected to node 2 which has high eigenvector centrality
+    - Eigenvector Centrality show the influence of a node in the network
+    - Eigenvector Centrality is similar to PageRank algorithm
+    - in this measure every node has some values and the values are updated based on the values of the connected nodes (node value != 0)
+
     """
 
     # Community Structure
