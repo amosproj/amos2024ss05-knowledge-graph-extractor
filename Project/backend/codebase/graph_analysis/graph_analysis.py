@@ -59,7 +59,16 @@ def analyze_graph_structure(G):
     closeness_centrality = nx.closeness_centrality(G)
 
     """
+    - Closeness Centrality: Measures average length of the shortest path from a node to all other nodes
+    - Nodes with high closeness centrality are important in the network
 
+    Examples: 4 nodes are connected
+    0
+ / | \
+2--1--3
+
+    - Here, node 0, 1 (1.0) has the highest closeness centrality because it is connected to all other nodes (node 2, 3 = 0.75)
+    - Closeness Centrality show the average distance of a node to all other nodes in the network
     """
 
     #  - Eigenvector Centrality: Measures influence of a node in a network
