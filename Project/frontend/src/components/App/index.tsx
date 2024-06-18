@@ -14,8 +14,9 @@ import {
 } from '@mui/material';
 
 import logo from '../../assets/team-logo.png';
+import Home from '../Home';
+import Graph from '../Graph/index_visjs';
 import UploadPage from '../UploadPage';
-import Graph from '../Graph';
 import LandingPage from '../LandingPage';
 
 import './index.css';
