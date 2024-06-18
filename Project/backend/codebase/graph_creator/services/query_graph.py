@@ -44,7 +44,7 @@ class GraphQuery:
         groq_client = configure_groq()
         SYS_PROMPT = """
             The user has a knowledge graph and wants to query it. For that he needs entities.
-            You task is to extraxt all entities from the below query.
+            Your task is to extract all entities from the below query.
             Format you answer as below example:
             entity1, entity2, entity3
         """
