@@ -10,6 +10,9 @@
   /* overflow: hidden;  */
 }
 
+.sigma_container {
+  background: var(--mui-palette-primary-main);
+}
 .react-sigma-controls {
   margin-right: auto;
 }
@@ -20,7 +23,7 @@
   height: 100%;
 }
 
-.loading_spinner_graph {
+.error_container {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -30,7 +33,7 @@
   height: 100vh;
   font-size: 20px;
   font-weight: 600;
-  color: #333;
+  color: #red;
 }
 
 .loading_spinner_graph::after {
@@ -53,17 +56,18 @@
   }
 }
 
-.error_container {
+.loader_container_graph {
   display: flex;
-  align-items: center;
+  flex-direction: column;
   justify-content: center;
-  flex-direction: column-reverse;
-  gap: 10px;
-  width: 100vw;
+  align-items: center;
   height: 100vh;
-  font-size: 20px;
-  font-weight: 600;
-  color: red;
+  width: 100vw;
+}
+
+.loader_container_graph span {
+  margin-top: 20px;
+  font-size: 18px;
 }
 
 .node-label {

@@ -16,9 +16,7 @@ class NetXGraphDB:
     All the graphs operations will happen in memory.
     """
 
-    def create_graph_from_df(
-        self, graph_job_id: uuid.UUID, data: pd.DataFrame = None
-    ) -> nx.Graph:
+    def create_graph_from_df(self, data: pd.DataFrame = None) -> nx.Graph:
         df = pd.DataFrame(data)
         graph = nx.Graph()
 

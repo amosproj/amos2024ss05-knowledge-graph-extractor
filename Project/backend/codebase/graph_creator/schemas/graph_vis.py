@@ -21,3 +21,13 @@ class GraphEdge(BaseModel):
 class GraphVisData(BaseModel):
     nodes: list[GraphNode]
     edges: list[GraphEdge]
+
+
+class QueryInputData(BaseModel):
+    text: str
+
+
+class GraphQueryOutput(BaseModel):
+    llm_nodes: list[str]
+    spacy_nodes: list[str]
+    retrieved_info: dict[str, list[tuple[str, str]]]

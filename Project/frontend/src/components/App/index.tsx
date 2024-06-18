@@ -16,6 +16,7 @@ import {
 import logo from '../../assets/team-logo.png';
 import Home from '../Home';
 import Graph from '../Graph/index_visjs';
+import UploadPage from '../UploadPage';
 import LandingPage from '../LandingPage';
 
 import './index.css';
@@ -52,7 +53,7 @@ function App() {
         <main className="main_wrapper">
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/upload" element={<Home />} />
+            <Route path="/upload" element={<UploadPage />} />
             <Route path="/graph/:fileId" element={<Graph />} />
           </Routes>
         </main>
