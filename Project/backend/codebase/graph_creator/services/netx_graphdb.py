@@ -6,7 +6,7 @@ import pandas as pd
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
-scale_range = [1, 15]
+scale_range = [15, 35]
 
 class NetXGraphDB:
     """
@@ -17,7 +17,7 @@ class NetXGraphDB:
     """
 
     def create_graph_from_df(
-        self, graph_job_id: uuid.UUID, data: pd.DataFrame, chunks: dict
+        self, data: pd.DataFrame, chunks: dict
     ) -> nx.Graph:
         df = pd.DataFrame(data)
         graph = nx.Graph()

@@ -90,7 +90,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     graph_db_service = netx_graphdb.NetXGraphDB()
 
     # read entities and relations
-    graph = graph_db_service.create_graph_from_df(uuid, combined, chunks)
+    graph = graph_db_service.create_graph_from_df(combined, chunks)
 
     # save graph as file
     graph_db_service.save_graph(uuid, graph)
