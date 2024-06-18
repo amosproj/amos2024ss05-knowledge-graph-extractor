@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { MultiDirectedGraph } from 'graphology';
-import { SigmaContainer } from '@react-sigma/core';
+import { SigmaContainer, useSigma } from '@react-sigma/core';
 import { useParams } from 'react-router-dom';
 import '@react-sigma/core/lib/react-sigma.min.css';
 import EdgeCurveProgram, {
@@ -8,8 +8,41 @@ import EdgeCurveProgram, {
   indexParallelEdgesIndex,
 } from '@sigma/edge-curve';
 import { EdgeArrowProgram } from 'sigma/rendering';
+import forceAtlas2 from 'graphology-layout-forceatlas2';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
+
+const ForceAtlas2Layout = ({ maxIterations }) => {
+  const sigma = useSigma();
+  const graph = sigma.getGraph();
+  const [iterations, setIterations] = useState(0);
+
+  useEffect(() => {
+    const settings = {
+      iterations: maxIterations,
+      barnesHutOptimize: true,
+      barnesHutTheta: 0.5,
+      slowDown: 1,
+      gravity: 1,
+      scalingRatio: 10,  
+      edgeWeightInfluence: 1, 
+      strongGravityMode: true, 
+      adjustSizes: true,  
+    };
+
+    const applyLayout = () => {
+      forceAtlas2.assign(graph, settings);
+      setIterations((prev) => prev + 1);
+    };
+
+    if (iterations < maxIterations) {
+      const interval = setInterval(applyLayout, 100);
+      return () => clearInterval(interval);
+    }
+  }, [graph, iterations, maxIterations]);
+
+  return null;
+};
 
 export default function Graph() {
   const [graphData, setGraphData] = useState<MultiDirectedGraph | null>(null);
@@ -30,8 +63,9 @@ export default function Graph() {
             const { id, ...rest } = node;
             graph.addNode(id, {
               ...rest,
-              x: Math.random() * 100,
-              y: Math.random() * 100,
+              size: 15,  // just for testing, i am making all the same size 
+              x: Math.random() * 1000,  
+              y: Math.random() * 1000,  
             });
           },
         );
@@ -41,7 +75,10 @@ export default function Graph() {
             [key: string]: string | number | boolean | null;
           }) => {
             const { id, source, target, ...rest } = edge;
-            graph.addEdgeWithKey(id, source, target, rest);
+            graph.addEdgeWithKey(id, source, target, {
+              ...rest,
+              size: 2, // edge
+            });
           },
         );
         indexParallelEdgesIndex(graph, {
@@ -86,7 +123,6 @@ export default function Graph() {
         style={{
           height: 'calc(100vh - 50px)',
           width: '100vw',
-          marginLeft: '-50%',
         }}
         graph={graphData}
         settings={{
@@ -100,7 +136,9 @@ export default function Graph() {
             curved: EdgeCurveProgram,
           },
         }}
-      ></SigmaContainer>
+      >
+        <ForceAtlas2Layout maxIterations={200} />
+      </SigmaContainer>
     </section>
   );
 }
