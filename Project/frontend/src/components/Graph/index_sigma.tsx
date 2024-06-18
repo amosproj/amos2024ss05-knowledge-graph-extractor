@@ -24,10 +24,10 @@ const ForceAtlas2Layout = ({ maxIterations }) => {
       barnesHutTheta: 0.5,
       slowDown: 1,
       gravity: 1,
-      scalingRatio: 10,  
-      edgeWeightInfluence: 1, 
-      strongGravityMode: true, 
-      adjustSizes: true,  
+      scalingRatio: 10,
+      edgeWeightInfluence: 1,
+      strongGravityMode: true,
+      adjustSizes: true,
     };
 
     const applyLayout = () => {
@@ -63,9 +63,9 @@ export default function Graph() {
             const { id, ...rest } = node;
             graph.addNode(id, {
               ...rest,
-              size: 15,  // just for testing, i am making all the same size 
-              x: Math.random() * 1000,  
-              y: Math.random() * 1000,  
+              size: 15, // just for testing, i am making all the same size
+              x: Math.random() * 1000,
+              y: Math.random() * 1000,
             });
           },
         );
