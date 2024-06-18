@@ -6,42 +6,11 @@
   align-items: center;
 }
 
+.sigma_container {
+  background: var(--mui-palette-primary-main);
+}
 .react-sigma-controls {
   margin-right: -45%;
-}
-
-.loading_spinner_graph {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column-reverse;
-  gap: 10px;
-  width: 100vw;
-  height: 100vh;
-  font-size: 20px;
-  font-weight: 600;
-  color: #333;
-}
-
-.loading_spinner_graph::after {
-  content: '';
-  display: inline-block;
-  width: 40px;
-  height: 40px;
-  border: 2px solid #ccc;
-  border-top: 2px solid #333;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-
-@keyframes spin {
-  0% {
-    transform: rotate(0deg);
-  }
-
-  100% {
-    transform: rotate(360deg);
-  }
 }
 
 .error_container {
@@ -55,4 +24,18 @@
   font-size: 20px;
   font-weight: 600;
   color: red;
+}
+
+.loader_container_graph {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+}
+
+.loader_container_graph span {
+  margin-top: 20px;
+  font-size: 18px;
 }
