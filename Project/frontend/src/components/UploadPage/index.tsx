@@ -1,7 +1,6 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import logo from '../../assets/team-logo.svg';
 import Upload from '../Upload';
 import './index.css';
 import {
@@ -10,6 +9,7 @@ import {
   GraphStatus,
 } from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
+import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
 interface UploadedFile {
   serverId: string;
@@ -20,7 +20,7 @@ interface FilePondError {
   code: number;
 }
 
-function Home() {
+function UploadPage() {
   const [fileId, setFileId] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
@@ -108,44 +108,54 @@ function Home() {
   };
 
   return (
-    <main className="main_wrapper">
-      <div>
-        <header>
-          <h2>AMOS Project SS24 - Knowledge Graph Extractor</h2>
-        </header>
-        <img className="logo" src={logo} alt="" />
-        <Upload
-          pondRef={pondRef}
-          handleAddFile={handleAddFile}
-          handleRemoveFile={handleRemoveFile}
-        />
-        <div>
-          <button
-            className="primary_btn"
-            disabled={!fileId || isLoading}
-            onClick={handleGenerateGraph}
-          >
-            {isLoading ? (
-              <span className="loading_spinner_home">Working...</span>
-            ) : (
-              'Generate Graph'
-            )}
-          </button>
-        </div>
+    <main className="main_wrapper_upload">
+      <Typography
+        variant="h6"
+        className="title"
+        sx={{ color: (theme) => theme.palette.text.secondary }}
+      >
+        Upload a PDF document to generate the graph
+      </Typography>
 
-        <div>
-          <button
-            className="primary_btn red_btn"
-            disabled={!fileId || isLoading}
-            onClick={handleDeleteGraph}
-          >
-            {isLoading ? (
-              <span className="loading_spinner_home">Working...</span>
-            ) : (
-              'Delete Graph'
-            )}
-          </button>
-        </div>
+      <Upload
+        pondRef={pondRef}
+        handleAddFile={handleAddFile}
+        handleRemoveFile={handleRemoveFile}
+      />
+      <div className="buttons_container">
+        <Button
+          variant="outlined"
+          color="error"
+          disabled={!fileId || isLoading}
+          onClick={handleDeleteGraph}
+        >
+          {isLoading ? (
+            <>
+              <CircularProgress size={15} />
+
+              <Box sx={{ ml: 2 }}>Working...</Box>
+            </>
+          ) : (
+            'Delete Graph'
+          )}
+        </Button>
+
+        <Button
+          variant="outlined"
+          color="success"
+          disabled={!fileId || isLoading}
+          onClick={handleGenerateGraph}
+        >
+          {isLoading ? (
+            <>
+              <CircularProgress size={15} />
+
+              <Box sx={{ ml: 2 }}>Working...</Box>
+            </>
+          ) : (
+            'Generate Graph'
+          )}
+        </Button>
       </div>
       <CustomizedSnackbars
         open={open}
@@ -156,4 +166,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default UploadPage;

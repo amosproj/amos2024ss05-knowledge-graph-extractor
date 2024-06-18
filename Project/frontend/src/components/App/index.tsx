@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 
 import logo from '../../assets/team-logo.png';
-import Home from '../Home';
+import UploadPage from '../UploadPage';
 import Graph from '../Graph';
 import LandingPage from '../LandingPage';
 
@@ -52,7 +52,7 @@ function App() {
         <main className="main_wrapper">
           <Routes>
             <Route path="/" element={<LandingPage />} />
-            <Route path="/upload" element={<Home />} />
+            <Route path="/upload" element={<UploadPage />} />
             <Route path="/graph/:fileId" element={<Graph />} />
           </Routes>
         </main>
