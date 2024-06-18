@@ -6,7 +6,7 @@ import pandas as pd
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
-scale_range = [1, 15]
+scale_range = [15, 35]
 
 class NetXGraphDB:
     """
