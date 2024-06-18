@@ -38,8 +38,8 @@ const GraphVisualization = () => {
       .force('charge', forceManyBody().strength(-200))
       .force('center', forceCenter(width / 2, height / 2))
       .force('collide', forceCollide().radius(30).strength(1))
-      .alphaDecay(0.01)  // Langsameres Abklingen der Simulation
-      .alphaMin(0.001);  // Simulation läuft länger
+      .alphaDecay(0.01)  
+      .alphaMin(0.001);  
 
     const link = g
       .selectAll('line')
@@ -152,7 +152,7 @@ const GraphVisualization = () => {
         .attr('y', d => (d.source.y + d.target.y) / 2);
     });
 
-    // Tooltip hinzufügen
+
     svg.append('foreignObject')
       .attr('id', 'tooltip')
       .style('position', 'absolute')
