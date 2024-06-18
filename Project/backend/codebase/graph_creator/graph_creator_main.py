@@ -1,5 +1,4 @@
 import mimetypes
-import pandas
 
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
@@ -91,7 +90,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     graph_db_service = netx_graphdb.NetXGraphDB()
 
     # read entities and relations
-    graph = graph_db_service.create_graph_from_df(uuid, combined)
+    graph = graph_db_service.create_graph_from_df(uuid, combined, chunks)
 
     # save graph as file
     graph_db_service.save_graph(uuid, graph)
