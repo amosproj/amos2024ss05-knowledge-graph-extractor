@@ -6,10 +6,10 @@ import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
 import { CircularProgress, Typography, Box } from '@mui/material';
 
-const VisGraph = ({ graphData, options }) => {
+const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
   const containerRef = useRef(null);
+  const networkRef = useRef(null);
   const [stabilizationProgress, setStabilizationProgress] = useState(0);
-  const [stabilizationComplete, setStabilizationComplete] = useState(false);
 
   useEffect(() => {
     if (!graphData) return;
@@ -42,7 +42,12 @@ const VisGraph = ({ graphData, options }) => {
       })),
     };
 
+    if (networkRef.current) {
+      networkRef.current.destroy();
+    }
+
     const network = new Network(containerRef.current, data, options);
+    networkRef.current = network;
 
     network.on('stabilizationProgress', function (params) {
       const progress = (params.iterations / params.total) * 100;
@@ -50,13 +55,13 @@ const VisGraph = ({ graphData, options }) => {
     });
 
     network.on('stabilizationIterationsDone', function () {
-      setStabilizationComplete(true);
       setStabilizationProgress(100);
+      setStabilizationComplete(true);
     });
 
     network.on('stabilized', function () {
-      setStabilizationComplete(true);
       setStabilizationProgress(100);
+      setStabilizationComplete(true);
     });
 
     return () => network.destroy();
@@ -64,7 +69,7 @@ const VisGraph = ({ graphData, options }) => {
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: 'calc(100vh - 50px)', background: '#1A2130' }}>
-      {!stabilizationComplete && (
+      {stabilizationProgress < 100 && (
         <Box
           style={{
             position: 'absolute',
@@ -92,6 +97,7 @@ const GraphVisualization = () => {
   const [graphData, setGraphData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState('barnesHut');
+  const [stabilizationComplete, setStabilizationComplete] = useState(false);
   const [physicsOptions, setPhysicsOptions] = useState({
     gravitationalConstant: -20000,
     springLength: 100,
@@ -109,21 +115,21 @@ const GraphVisualization = () => {
     iterations: 1000, // Stabilization iterations
   });
 
-  useEffect(() => {
-    const fetchGraphData = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
-        );
-        const data = await response.json();
-        setGraphData(data);
-      } catch (error) {
-        console.error('Error fetching graph data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+  const fetchGraphData = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
+      );
+      const data = await response.json();
+      setGraphData(data);
+    } catch (error) {
+      console.error('Error fetching graph data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
+  useEffect(() => {
     fetchGraphData();
   }, [fileId]);
 
@@ -196,6 +202,7 @@ const GraphVisualization = () => {
       ...prevOptions,
       [name]: value,
     }));
+    setStabilizationComplete(false);
   };
 
   const options = {
@@ -277,10 +284,15 @@ const GraphVisualization = () => {
         setLayout={setLayout}
         physicsOptions={physicsOptions}
         handlePhysicsChange={handlePhysicsChange}
-        />
-        <VisGraph graphData={graphData} options={options} />
-      </section>
-    );
-  };
-  
-  export default GraphVisualization;
+        restartStabilization={() => setStabilizationComplete(false)}
+      />
+      <VisGraph 
+        graphData={graphData} 
+        options={options} 
+        setStabilizationComplete={setStabilizationComplete} 
+      />
+    </section>
+  );
+};
+
+export default GraphVisualization;

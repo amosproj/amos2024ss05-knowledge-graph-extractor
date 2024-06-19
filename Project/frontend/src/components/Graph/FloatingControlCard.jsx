@@ -1,7 +1,12 @@
 import React from 'react';
 import { Card, CardContent, FormControl, InputLabel, Select, MenuItem, Slider, Typography, Box } from '@mui/material';
 
-const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsChange }) => {
+const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsChange, restartStabilization }) => {
+  const handleSliderChange = (name) => (event, value) => {
+    handlePhysicsChange(name, value);
+    restartStabilization();
+  };
+
   const renderSliders = () => {
     switch (layout) {
       case 'barnesHut':
@@ -10,7 +15,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Gravitational Constant</Typography>
             <Slider
               value={physicsOptions.gravitationalConstant}
-              onChange={(e, value) => handlePhysicsChange('gravitationalConstant', value)}
+              onChange={handleSliderChange('gravitationalConstant')}
               min={-30000}
               max={0}
               step={1000}
@@ -20,7 +25,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Length</Typography>
             <Slider
               value={physicsOptions.springLength}
-              onChange={(e, value) => handlePhysicsChange('springLength', value)}
+              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
@@ -30,7 +35,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Constant</Typography>
             <Slider
               value={physicsOptions.springConstant}
-              onChange={(e, value) => handlePhysicsChange('springConstant', value)}
+              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -40,7 +45,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Damping</Typography>
             <Slider
               value={physicsOptions.damping}
-              onChange={(e, value) => handlePhysicsChange('damping', value)}
+              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
@@ -55,7 +60,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Gravitational Constant</Typography>
             <Slider
               value={physicsOptions.gravitationalConstant}
-              onChange={(e, value) => handlePhysicsChange('gravitationalConstant', value)}
+              onChange={handleSliderChange('gravitationalConstant')}
               min={-200}
               max={0}
               step={10}
@@ -65,7 +70,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Length</Typography>
             <Slider
               value={physicsOptions.springLength}
-              onChange={(e, value) => handlePhysicsChange('springLength', value)}
+              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
@@ -75,7 +80,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Constant</Typography>
             <Slider
               value={physicsOptions.springConstant}
-              onChange={(e, value) => handlePhysicsChange('springConstant', value)}
+              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -85,7 +90,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Damping</Typography>
             <Slider
               value={physicsOptions.damping}
-              onChange={(e, value) => handlePhysicsChange('damping', value)}
+              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
@@ -100,7 +105,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Level Separation</Typography>
             <Slider
               value={physicsOptions.levelSeparation}
-              onChange={(e, value) => handlePhysicsChange('levelSeparation', value)}
+              onChange={handleSliderChange('levelSeparation')}
               min={50}
               max={500}
               step={10}
@@ -110,7 +115,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Node Spacing</Typography>
             <Slider
               value={physicsOptions.nodeSpacing}
-              onChange={(e, value) => handlePhysicsChange('nodeSpacing', value)}
+              onChange={handleSliderChange('nodeSpacing')}
               min={50}
               max={200}
               step={10}
@@ -120,7 +125,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Tree Spacing</Typography>
             <Slider
               value={physicsOptions.treeSpacing}
-              onChange={(e, value) => handlePhysicsChange('treeSpacing', value)}
+              onChange={handleSliderChange('treeSpacing')}
               min={50}
               max={500}
               step={10}
@@ -130,7 +135,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Block Shifting</Typography>
             <Slider
               value={physicsOptions.blockShifting ? 1 : 0}
-              onChange={(e, value) => handlePhysicsChange('blockShifting', value === 1)}
+              onChange={handleSliderChange('blockShifting')}
               min={0}
               max={1}
               step={1}
@@ -141,7 +146,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Edge Minimization</Typography>
             <Slider
               value={physicsOptions.edgeMinimization ? 1 : 0}
-              onChange={(e, value) => handlePhysicsChange('edgeMinimization', value === 1)}
+              onChange={handleSliderChange('edgeMinimization')}
               min={0}
               max={1}
               step={1}
@@ -152,7 +157,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Parent Centralization</Typography>
             <Slider
               value={physicsOptions.parentCentralization ? 1 : 0}
-              onChange={(e, value) => handlePhysicsChange('parentCentralization', value === 1)}
+              onChange={handleSliderChange('parentCentralization')}
               min={0}
               max={1}
               step={1}
@@ -163,7 +168,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Direction</Typography>
             <Select
               value={physicsOptions.direction}
-              onChange={(e) => handlePhysicsChange('direction', e.target.value)}
+              onChange={(e) => {
+                handlePhysicsChange('direction', e.target.value);
+                restartStabilization();
+              }}
               style={{ color: '#fff' }}
             >
               <MenuItem value="UD">UD</MenuItem>
@@ -174,7 +182,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Sort Method</Typography>
             <Select
               value={physicsOptions.sortMethod}
-              onChange={(e) => handlePhysicsChange('sortMethod', e.target.value)}
+              onChange={(e) => {
+                handlePhysicsChange('sortMethod', e.target.value);
+                restartStabilization();
+              }}
               style={{ color: '#fff' }}
             >
               <MenuItem value="hubsize">Hubsize</MenuItem>
@@ -183,7 +194,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Shake Towards</Typography>
             <Select
               value={physicsOptions.shakeTowards}
-              onChange={(e) => handlePhysicsChange('shakeTowards', e.target.value)}
+              onChange={(e) => {
+                handlePhysicsChange('shakeTowards', e.target.value);
+                restartStabilization();
+              }}
               style={{ color: '#fff' }}
             >
               <MenuItem value="roots">Roots</MenuItem>
@@ -197,7 +211,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Node Distance</Typography>
             <Slider
               value={physicsOptions.nodeDistance}
-              onChange={(e, value) => handlePhysicsChange('nodeDistance', value)}
+              onChange={handleSliderChange('nodeDistance')}
               min={50}
               max={500}
               step={10}
@@ -207,7 +221,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Central Gravity</Typography>
             <Slider
               value={physicsOptions.centralGravity}
-              onChange={(e, value) => handlePhysicsChange('centralGravity', value)}
+              onChange={handleSliderChange('centralGravity')}
               min={0}
               max={1}
               step={0.01}
@@ -217,7 +231,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Length</Typography>
             <Slider
               value={physicsOptions.springLength}
-              onChange={(e, value) => handlePhysicsChange('springLength', value)}
+              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
@@ -227,7 +241,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Spring Constant</Typography>
             <Slider
               value={physicsOptions.springConstant}
-              onChange={(e, value) => handlePhysicsChange('springConstant', value)}
+              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -237,62 +251,65 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
             <Typography gutterBottom>Damping</Typography>
             <Slider
               value={physicsOptions.damping}
-              onChange={(e, value) => handlePhysicsChange('damping', value)}
+              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
               valueLabelDisplay="auto"
               style={{ color: '#fff' }}
+              />
+              </Box>
+            );
+          default:
+            return null;
+        }
+      };
+    
+      return (
+        <Card
+          style={{
+            position: 'absolute',
+            bottom: '16px',
+            left: '16px',
+            width: '300px',
+            padding: '16px',
+            background: '#121826',
+            color: '#fff',
+            zIndex: 1000,
+          }}
+        >
+          <CardContent>
+            <FormControl fullWidth margin="normal">
+              <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
+              <Select
+                value={layout}
+                onChange={(e) => {
+                  setLayout(e.target.value);
+                  restartStabilization();
+                }}
+                style={{ color: '#fff' }}
+              >
+                <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+                <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
+                <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
+                <MenuItem value="repulsion">Repulsion</MenuItem>
+                <MenuItem value="hierarchical">Hierarchical</MenuItem>
+              </Select>
+            </FormControl>
+            {renderSliders()}
+            <Typography gutterBottom>Stabilization Iterations</Typography>
+            <Slider
+              value={physicsOptions.iterations}
+              onChange={handleSliderChange('iterations')}
+              min={0}  // Minimum auf 0 gesetzt
+              max={5000}
+              step={100}
+              valueLabelDisplay="auto"
+              style={{ color: '#fff' }}
             />
-          </Box>
-        );
-      default:
-        return null;
-    }
-  };
-
-  return (
-    <Card
-      style={{
-        position: 'absolute',
-        bottom: '16px',
-        left: '16px',
-        width: '300px',
-        padding: '16px',
-        background: '#121826',
-        color: '#fff',
-        zIndex: 1000,
-      }}
-    >
-      <CardContent>
-        <FormControl fullWidth margin="normal">
-          <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
-          <Select
-            value={layout}
-            onChange={(e) => setLayout(e.target.value)}
-            style={{ color: '#fff' }}
-          >
-            <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-            <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-            <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
-            <MenuItem value="repulsion">Repulsion</MenuItem>
-            <MenuItem value="hierarchical">Hierarchical</MenuItem>
-          </Select>
-        </FormControl>
-        {renderSliders()}
-        <Typography gutterBottom>Stabilization Iterations</Typography>
-        <Slider
-          value={physicsOptions.iterations}
-          onChange={(e, value) => handlePhysicsChange('iterations', value)}
-          min={0}
-          max={5000}
-          step={100}
-          valueLabelDisplay="auto"
-          style={{ color: '#fff' }}
-        />
-      </CardContent>
-    </Card>
-  );
-};
-
-export default FloatingControlCard;
+          </CardContent>
+        </Card>
+      );
+    };
+    
+    export default FloatingControlCard;
