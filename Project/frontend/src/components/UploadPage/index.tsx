@@ -22,7 +22,8 @@ interface FilePondError {
 
 function UploadPage() {
   const [fileId, setFileId] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const pondRef = useRef(null);
@@ -35,6 +36,7 @@ function UploadPage() {
       console.log('Error:', error.message);
     }
   };
+
   const handleClick = () => {
     setOpen(true);
   };
@@ -62,7 +64,7 @@ function UploadPage() {
   };
 
   const handleGenerateGraph = () => {
-    setIsLoading(true);
+    setIsGenerating(true);
 
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', fileId)}`;
     fetch(API, {
@@ -81,11 +83,12 @@ function UploadPage() {
         console.log(e);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsGenerating(false);
       });
   };
+
   const handleDeleteGraph = () => {
-    setIsLoading(true);
+    setIsDeleting(true);
 
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', fileId)}`;
     fetch(API, {
@@ -103,7 +106,7 @@ function UploadPage() {
         console.log(e);
       })
       .finally(() => {
-        setIsLoading(false);
+        setIsDeleting(false);
       });
   };
 
@@ -126,13 +129,12 @@ function UploadPage() {
         <Button
           variant="outlined"
           color="error"
-          disabled={!fileId || isLoading}
+          disabled={!fileId || isDeleting}
           onClick={handleDeleteGraph}
         >
-          {isLoading ? (
+          {isDeleting ? (
             <>
               <CircularProgress size={15} />
-
               <Box sx={{ ml: 2 }}>Working...</Box>
             </>
           ) : (
@@ -143,13 +145,12 @@ function UploadPage() {
         <Button
           variant="outlined"
           color="success"
-          disabled={!fileId || isLoading}
+          disabled={!fileId || isGenerating}
           onClick={handleGenerateGraph}
         >
-          {isLoading ? (
+          {isGenerating ? (
             <>
               <CircularProgress size={15} />
-
               <Box sx={{ ml: 2 }}>Working...</Box>
             </>
           ) : (
