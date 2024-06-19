@@ -8,6 +8,7 @@ from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 # Scale range for min-max scaling the node sizes
 scale_range = [15, 35]
 
+
 class NetXGraphDB:
     """
     This class serves as a service to create, read, save and work with graphs
@@ -16,16 +17,14 @@ class NetXGraphDB:
     All the graphs operations will happen in memory.
     """
 
-    def create_graph_from_df(
-        self, data: pd.DataFrame, chunks: dict
-    ) -> nx.Graph:
+    def create_graph_from_df(self, data: pd.DataFrame, chunks: dict) -> nx.Graph:
         df = pd.DataFrame(data)
         graph = nx.Graph()
 
         chunk_to_page = {}
         for i, chunk in enumerate(chunks):
             chunk_id = i
-            page_number = chunk['metadata']['page']
+            page_number = chunk["metadata"]["page"]
             chunk_to_page[chunk_id] = page_number
 
         # Iterate over each row in the DataFrame
@@ -50,7 +49,9 @@ class NetXGraphDB:
 
         # Sort pages and save as a string
         for node in graph.nodes:
-            graph.nodes[node]["pages"] = ','.join(map(str, sorted(graph.nodes[node]["pages"])))
+            graph.nodes[node]["pages"] = ",".join(
+                map(str, sorted(graph.nodes[node]["pages"]))
+            )
 
         # Add min max log scaled sizes to nodes based on degree
         log_sizes = [np.log(graph.degree(node)) for node in graph.nodes()]
@@ -69,7 +70,7 @@ class NetXGraphDB:
 
         for i, node in enumerate(graph.nodes):
             graph.nodes[node]["size"] = scaled_sizes[i]
-            graph.nodes[node]["degree"] = graph.degree(node)  # Add node degree as an attribute
+            graph.nodes[node]["degree"] = graph.degree(node)
 
         return graph
 
@@ -136,7 +137,7 @@ class NetXGraphDB:
                         label=str(source),
                         size=graph.nodes[source].get("size", 1),
                         degree=graph.nodes[source].get("degree", 0),
-                        pages=graph.nodes[source].get("pages", "pages not found")
+                        pages=graph.nodes[source].get("pages", "pages not found"),
                     )
                 )
 
@@ -148,7 +149,7 @@ class NetXGraphDB:
                         label=str(target),
                         size=graph.nodes[target].get("size", 1),
                         degree=graph.nodes[target].get("degree", 0),
-                        pages=graph.nodes[source].get("pages", "pages not found")
+                        pages=graph.nodes[source].get("pages", "pages not found"),
                     )
                 )
             edge_properties = graph[source][target]
@@ -177,7 +178,7 @@ class NetXGraphDB:
                     label=str(node_id),
                     size=node_attrs.get("size", 1),
                     degree=node_attrs.get("degree", 0),
-                    pages=node_attrs.get("pages", "pages not found")
+                    pages=node_attrs.get("pages", "pages not found"),
                 )
             )
 
