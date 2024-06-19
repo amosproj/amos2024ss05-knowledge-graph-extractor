@@ -16,10 +16,11 @@ from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.gemini import process_chunks
 import shutil
 import mimetypes
-from graph_creator.schemas.graph_vis import GraphVisData
+from graph_creator.schemas.graph_vis import GraphVisData, QueryInputData, GraphQueryOutput
 from graph_creator.services.netx_graphdb import NetXGraphDB
 
 import graph_creator.graph_creator_main as graph_creator_main
+from graph_creator.services.query_graph import GraphQuery
 from graph_creator.utils.const import GraphStatus
 
 router = APIRouter()
@@ -284,3 +285,25 @@ async def get_graph_data_for_visualization(
     return netx_services.graph_data_for_visualization(
         g_job.id, node=node, adj_depth=adj_depth
     )
+
+
+@router.post("/query_graph/{graph_job_id}")
+async def query_graph(
+    graph_job_id: uuid.UUID,
+    input_data: QueryInputData,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
+    graph_query_services: GraphQuery = Depends(),
+) -> GraphQueryOutput:
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != GraphStatus.GRAPH_READY:
+        raise HTTPException(
+            status_code=400,
+            detail=f"No graph created for this job!",
+        )
+    graph = netx_services.load_graph(graph_job_id=graph_job_id)
+    data = graph_query_services.query_graph(graph=graph, query=input_data.text)
+    return data

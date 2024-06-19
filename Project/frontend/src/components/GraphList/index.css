@@ -1,18 +1,17 @@
 .loading_graph_list {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 40vh;
-    text-align: center;
-    padding: 20px;
-  }
-  
-  .loading_graph_list p {
-    margin-top: 20px;
-  }
-  
-  .error_graph_list {
-    margin: 20px;
-  }
-  
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 40vh;
+  text-align: center;
+  padding: 20px;
+}
+
+.loading_graph_list p {
+  margin-top: 20px;
+}
+
+.error_graph_list {
+  margin: 20px;
+}
