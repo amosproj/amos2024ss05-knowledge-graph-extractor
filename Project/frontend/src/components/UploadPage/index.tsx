@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-import Upload from '../Upload';
+import Upload, { FilePondFile } from '../Upload';
 import './index.css';
 import {
   GENERATE_API_PATH,
@@ -11,9 +11,6 @@ import {
 import CustomizedSnackbars from '../Snackbar';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-interface UploadedFile {
-  serverId: string;
-}
 
 interface FilePondError {
   message: string;
@@ -23,14 +20,13 @@ interface FilePondError {
 function UploadPage() {
   const [fileId, setFileId] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const pondRef = useRef(null);
 
-  const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
+  const handleAddFile = (error: FilePondError | null, file: FilePondFile) => {
     if (!error) {
-      const fileId = JSON.parse(file.serverId).id;
+      const fileId = JSON.parse(file.id);
       setFileId(fileId);
     } else {
       console.log('Error:', error.message);
@@ -58,9 +54,6 @@ function UploadPage() {
 
   const handleRemoveFile = () => {
     setFileId('');
-    if (pondRef.current) {
-      pondRef.current.removeFiles();
-    }
   };
 
   const handleGenerateGraph = () => {
@@ -88,27 +81,13 @@ function UploadPage() {
   };
 
   const handleDeleteGraph = () => {
-    setIsDeleting(true);
-
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', fileId)}`;
-    fetch(API, {
-      method: 'DELETE',
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-      .then((response) => response.json())
-      .then(() => {
         handleRemoveFile();
         notifySuccess();
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        setIsDeleting(false);
-      });
   };
+
+  function handleDeleteFile(): void {
+    throw new Error('Function not implemented.');
+  }
 
   return (
     <main className="main_wrapper_upload">
@@ -124,23 +103,9 @@ function UploadPage() {
         pondRef={pondRef}
         handleAddFile={handleAddFile}
         handleRemoveFile={handleRemoveFile}
+        handleDeleteFile={handleDeleteFile}
       />
       <div className="buttons_container">
-        <Button
-          variant="outlined"
-          color="error"
-          disabled={!fileId || isDeleting}
-          onClick={handleDeleteGraph}
-        >
-          {isDeleting ? (
-            <>
-              <CircularProgress size={15} />
-              <Box sx={{ ml: 2 }}>Working...</Box>
-            </>
-          ) : (
-            'Delete Graph'
-          )}
-        </Button>
 
         <Button
           variant="outlined"
