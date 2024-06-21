@@ -26,7 +26,6 @@
   justify-content: flex-start;
   height: 100vh;
   width: 100vw;
-  /* overflow: hidden;  */
 }
 
 .graph_info {
@@ -36,11 +35,23 @@
 }
 
 .graph_info h1 {
-  margin-bottom: 30px; /* Adds space between the heading and the file ID */
+  margin-bottom: 30px;
+  text-decoration: underline;
 }
 
 .graph_info p {
   margin-bottom: 50px;
+}
+
+.search_container {
+  position: relative;
+}
+
+.search_icon {
+  position: absolute;
+  top: 24%;
+  right: 10px;
+  color: #aaa;
 }
 
 .sigma_container {

@@ -3,6 +3,7 @@ import { Network } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
+import { FaSearch } from 'react-icons/fa';
 
 const VisGraph = ({ graphData, options }) => {
   const containerRef = useRef(null);
@@ -205,7 +206,7 @@ const GraphVisualization = () => {
 
   const searchGraph = (event) => {
     if (event.key === 'Enter') {
-        // Perform search logic based on searchQuery
+      // Perform the search
     }
   };
 
@@ -224,7 +225,7 @@ const GraphVisualization = () => {
     borderRadius: '8px',
     padding: '8px',
     width: '100%',
-    minHeight: '200px',
+    minHeight: '250px',
     border: '1px solid #ccc',
     boxSizing: 'border-box',
     fontSize: '16px',
@@ -239,6 +240,14 @@ const GraphVisualization = () => {
   if (!graphData) {
     return <div className="error_container">Sorry, an error has occurred!</div>;
   }
+
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
 
   return (
     <section className="main_graph_container">
@@ -256,16 +265,19 @@ const GraphVisualization = () => {
         <div className="graph_info">
           <h1>Graph Information</h1>
           <p>
-            File ID: <br /> {fileId}
+            Document Name: <br /> {graphData.document_name}
             <br /> <br />
-            Created at: <br /> xx.xx.xxxx
+            Created at: <br /> {formattedDate} {formattedTime}
           </p>
-          <input
-            type="text"
-            placeholder="Search for keywords"
-            style={inputStyle}
-            onKeyDown={searchGraph}
-          />
+          <div className="search_container">
+            <input
+              type="text"
+              placeholder="Search for keywords"
+              style={inputStyle}
+              onKeyDown={searchGraph}
+            />
+            <FaSearch className="search_icon" />
+          </div>
           <textarea
             rows={5}
             placeholder="Answer to your search will be displayed here!"
