@@ -1,25 +1,22 @@
 import logging
+import mimetypes
 import os
-import uuid
-
+import shutil
 import tempfile
+import uuid
 from typing import Optional
-
 
 from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
+import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
-from graph_creator.schemas.graph_job import GraphJobCreate
-from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.gemini import process_chunks
-import shutil
-import mimetypes
+from graph_creator.pdf_handler import process_pdf_into_chunks
+from graph_creator.schemas.graph_job import GraphJobCreate
 from graph_creator.schemas.graph_vis import GraphVisData, QueryInputData, GraphQueryOutput
 from graph_creator.services.netx_graphdb import NetXGraphDB
-
-import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.services.query_graph import GraphQuery
 from graph_creator.utils.const import GraphStatus
 
@@ -282,8 +279,8 @@ async def get_graph_data_for_visualization(
         raise HTTPException(
             status_code=400, detail="A graph needs to be created for this job first!"
         )
-    return netx_services.graph_data_for_visualization(
-        g_job.id, node=node, adj_depth=adj_depth
+    return await netx_services.graph_data_for_visualization(
+        graph_job=g_job, node=node, adj_depth=adj_depth
     )
 
 
