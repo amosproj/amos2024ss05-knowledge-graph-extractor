@@ -1,51 +1,40 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import Upload, { FilePondFile } from '../Upload';
-import './index.css';
-import {
-  GENERATE_API_PATH,
-  GRAPH_DELETE_API_PATH,
-  GraphStatus,
-} from '../../constant';
-import CustomizedSnackbars from '../Snackbar';
+import { FilePondProps } from 'react-filepond';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-
-interface FilePondError {
-  message: string;
-  code: number;
-}
+import { GENERATE_API_PATH, GraphStatus } from '../../constant';
+import CustomizedSnackbars from '../Snackbar';
+import Upload from '../Upload';
+import './index.css';
 
 function UploadPage() {
   const [fileId, setFileId] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const pondRef = useRef(null);
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
-  const handleAddFile = (error: FilePondError | null, file: FilePondFile) => {
+  const handleAddFile: FilePondProps['onprocessfile'] = (error, file) => {
     if (!error) {
-      const fileId = JSON.parse(file.id);
-      setFileId(fileId);
+      setFileId(file.id);
     } else {
-      console.log('Error:', error.message);
+      console.log('Error:', error);
     }
   };
 
   const handleClick = () => {
-    setOpen(true);
+    setShowSnackbar(true);
   };
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
+    _event?: React.SyntheticEvent | Event,
     reason?: string,
   ) => {
     if (reason === 'clickaway') {
       return;
     }
 
-    setOpen(false);
+    setShowSnackbar(false);
   };
 
   const notifySuccess = () => {
@@ -54,6 +43,11 @@ function UploadPage() {
 
   const handleRemoveFile = () => {
     setFileId('');
+  };
+
+  const handleDeleteGraph = () => {
+    handleRemoveFile();
+    notifySuccess();
   };
 
   const handleGenerateGraph = () => {
@@ -80,15 +74,6 @@ function UploadPage() {
       });
   };
 
-  const handleDeleteGraph = () => {
-        handleRemoveFile();
-        notifySuccess();
-  };
-
-  function handleDeleteFile(): void {
-    throw new Error('Function not implemented.');
-  }
-
   return (
     <main className="main_wrapper_upload">
       <Typography
@@ -100,13 +85,11 @@ function UploadPage() {
       </Typography>
 
       <Upload
-        pondRef={pondRef}
         handleAddFile={handleAddFile}
         handleRemoveFile={handleRemoveFile}
-        handleDeleteFile={handleDeleteFile}
+        handleDeleteFile={handleDeleteGraph}
       />
       <div className="buttons_container">
-
         <Button
           variant="outlined"
           color="success"
@@ -116,7 +99,7 @@ function UploadPage() {
           {isGenerating ? (
             <>
               <CircularProgress size={15} />
-              <Box sx={{ ml: 2 }}>Working...</Box>
+              <Box sx={{ ml: 2 }}>Generating...</Box>
             </>
           ) : (
             'Generate Graph'
@@ -124,7 +107,7 @@ function UploadPage() {
         </Button>
       </div>
       <CustomizedSnackbars
-        open={open}
+        open={showSnackbar}
         handleClick={handleClick}
         handleClose={handleClose}
       />
