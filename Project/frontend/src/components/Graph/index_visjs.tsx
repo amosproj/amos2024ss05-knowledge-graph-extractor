@@ -10,6 +10,8 @@ const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
   const containerRef = useRef(null);
   const networkRef = useRef(null);
   const [stabilizationProgress, setStabilizationProgress] = useState(0);
+  const [isStabilizing, setIsStabilizing] = useState(false);
+  const isStabilizingRef = useRef(false);
 
   useEffect(() => {
     if (!graphData) return;
@@ -49,6 +51,10 @@ const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
     const network = new Network(containerRef.current, data, options);
     networkRef.current = network;
 
+    setIsStabilizing(true);
+    setStabilizationProgress(0);
+    isStabilizingRef.current = true;
+
     network.on('stabilizationProgress', function (params) {
       const progress = (params.iterations / params.total) * 100;
       setStabilizationProgress(progress);
@@ -56,20 +62,29 @@ const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
 
     network.on('stabilizationIterationsDone', function () {
       setStabilizationProgress(100);
+      setIsStabilizing(false);
       setStabilizationComplete(true);
+      isStabilizingRef.current = false;
     });
 
     network.on('stabilized', function () {
-      setStabilizationProgress(100);
-      setStabilizationComplete(true);
+      if (isStabilizingRef.current) {
+        setStabilizationProgress(100);
+        setIsStabilizing(false);
+        setStabilizationComplete(true);
+        isStabilizingRef.current = false;
+      }
     });
 
-    return () => network.destroy();
+    return () => {
+      network.destroy();
+      networkRef.current = null;
+    };
   }, [graphData, options]);
 
   return (
     <div style={{ position: 'relative', width: '100vw', height: 'calc(100vh - 50px)', background: '#1A2130' }}>
-      {stabilizationProgress < 100 && (
+      {isStabilizing && (
         <Box
           style={{
             position: 'absolute',
@@ -243,14 +258,45 @@ const GraphVisualization = () => {
     },
     physics: {
       enabled: true,
-      barnesHut: layout === 'barnesHut' ? physicsOptions : {},
-      forceAtlas2Based: layout === 'forceAtlas2Based' ? physicsOptions : {},
-      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? { nodeDistance: physicsOptions.springLength } : {},
-      repulsion: layout === 'repulsion' ? { nodeDistance: physicsOptions.springLength, centralGravity: physicsOptions.gravitationalConstant, springLength: physicsOptions.springLength, springConstant: physicsOptions.springConstant, damping: physicsOptions.damping } : {},
-      solver: layout,
+      barnesHut: layout === 'barnesHut' ? {
+        gravitationalConstant: physicsOptions.gravitationalConstant,
+        centralGravity: 0.3,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+        avoidOverlap: 0.5,
+      } : undefined,
+      forceAtlas2Based: layout === 'forceAtlas2Based' ? {
+        gravitationalConstant: physicsOptions.gravitationalConstant,
+        centralGravity: 0.01,
+        springConstant: physicsOptions.springConstant,
+        springLength: physicsOptions.springLength,
+        damping: physicsOptions.damping,
+      } : undefined,
+      repulsion: layout === 'repulsion' ? {
+        nodeDistance: physicsOptions.nodeDistance,
+        centralGravity: physicsOptions.centralGravity,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+      } : undefined,
+      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? {
+        nodeDistance: physicsOptions.nodeDistance,
+        centralGravity: 0.0,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+      } : undefined,
+      solver: layout === 'hierarchical' ? 'hierarchicalRepulsion' : layout,
       stabilization: {
-        iterations: physicsOptions.iterations,  // Live Anpassung der Stabilisierung
+        enabled: true,
+        iterations: physicsOptions.iterations,
+        updateInterval: 50,
+        onlyDynamicEdges: false,
+        fit: true,
+        adaptiveTimestep: true,
       },
+      timestep: 0.5,
     },
     layout: layout === 'hierarchical' ? {
       hierarchical: {
@@ -263,7 +309,7 @@ const GraphVisualization = () => {
         edgeMinimization: physicsOptions.edgeMinimization,
         parentCentralization: physicsOptions.parentCentralization,
         shakeTowards: physicsOptions.shakeTowards,
-        improvedLayout: false  // Hier korrekt platziert
+        improvedLayout: false,
       }
     } : {}
   };
