@@ -95,7 +95,7 @@ class NetXGraphDB:
             os.remove(file_location)
 
     def graph_data_for_visualization(
-        self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
+        self, graph_job_id: uuid.UUID, node: str = None, adj_depth: int = 1
     ) -> GraphVisData:
         """
         Given a graph travers it and return a json format of all the nodes and edges they have
