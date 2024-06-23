@@ -1,10 +1,14 @@
+import logging
 import mimetypes
 
+from graph_creator import graph_handler
+from graph_creator import pdf_handler
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
-from graph_creator import pdf_handler
-from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def process_file_to_graph(g_job: GraphJob):
@@ -57,11 +61,9 @@ def process_file_to_entities_and_relations(file: str):
         ]  # Assuming chunk has 'page_content' attribute
 
         # Generate response using LLM
-        # response_json = process_chunks(text_chunks, prompt_template)
         response_json = groq_process_chunks(text_chunks)
-        print(response_json)
     except Exception as e:
-        print(e)
+        logging.error(e)
         response_json = None
 
     return response_json, chunks

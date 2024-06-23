@@ -1,6 +1,8 @@
 import os
 from datetime import datetime
+
 import google.generativeai as genai
+
 from graph_creator.services.json_handler import transform_llm_output_to_dict
 
 
@@ -74,9 +76,12 @@ def check_for_connecting_relation(
     """
     SYS_PROMPT = (
         "Only answer in JSON format. \n"
-        "Your task is to help create a knowledge graph by extracting one more relation between any entity of list_1 with any entity of list_2.\n"
-        "We want to connect the subgraphs of nodes and relations that were extracted from the given text chunk (delimited by ```)."
-        "For this one more relation needs to be extracted from the given text chunk between any entity of list_1 and list_2:\n"
+        "Your task is to help create a knowledge graph by extracting one more relation between any entity of list_1 "
+        "with any entity of list_2.\n "
+        "We want to connect the subgraphs of nodes and relations that were extracted from the given text chunk ("
+        "delimited by ```). "
+        "For this one more relation needs to be extracted from the given text chunk between any entity of list_1 and "
+        "list_2:\n "
         f"list_1: {entities_component_1}\n"
         f"list_2: {entities_component_2}\n"
         "Only use the exact entities given in the lists."
@@ -110,7 +115,7 @@ def check_for_connecting_relation_(
         The text chunk to be proccessed
     entities_component_1 : list
         List of entities
-    entities_component_1 : list
+    entities_component_2 : list
         List of entities
 
     Returns
