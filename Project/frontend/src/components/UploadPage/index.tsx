@@ -16,7 +16,7 @@ function UploadPage() {
 
   const handleAddFile: FilePondProps['onprocessfile'] = (error, file) => {
     if (!error) {
-      setFileId(file.id);
+      setFileId(file.serverId);
     } else {
       console.log('Error:', error);
     }
