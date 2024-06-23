@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Typography, Container, Box, Button, Stack } from '@mui/material';
+import { Button, Container, Stack, Typography } from '@mui/material';
 
 import GraphList from '../GraphList';
 import { useNavigate } from 'react-router-dom';

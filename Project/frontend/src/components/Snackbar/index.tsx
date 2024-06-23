@@ -3,7 +3,7 @@ import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 
-function CustomizedSnackbars({ open, handleClick, handleClose }) {
+function CustomizedSnackbars({ open, handleClose }) {
   return (
     <div>
       <Snackbar
