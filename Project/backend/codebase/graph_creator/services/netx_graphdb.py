@@ -1,8 +1,10 @@
 import os
 import uuid
+
 import networkx as nx
 import numpy as np
 import pandas as pd
+
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes

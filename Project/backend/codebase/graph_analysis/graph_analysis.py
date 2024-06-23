@@ -1,6 +1,7 @@
-import networkx as nx
-import os
 import json
+import os
+
+import networkx as nx
 
 
 def analyze_graph_structure(G):
