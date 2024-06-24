@@ -34,18 +34,11 @@
 }
 
 .graph_info p {
-  margin-bottom: 50px;
+  margin-bottom: 30px;
 }
 
 .search_container {
   position: relative;
-}
-
-.search_icon {
-  position: absolute;
-  top: 15%;
-  right: 10px;
-  color: #aaa;
 }
 
 .sigma_container {

@@ -4,6 +4,8 @@ import { useParams } from 'react-router-dom';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
+import TextField from '@mui/material/TextField';
+import { InputAdornment } from '@mui/material';
 
 const VisGraph = ({ graphData, options }) => {
   const containerRef = useRef(null);
@@ -210,27 +212,17 @@ const GraphVisualization = () => {
     }
   };
 
-  const inputStyle = {
-    borderRadius: '8px',
+  const searchBarStyle = {
     padding: '8px',
     width: '100%',
     marginBottom: '10px',
-    border: '1px solid #ccc',
-    boxSizing: 'border-box',
     fontSize: '16px',
-    fontFamily: 'Arial, sans-serif',
   };
 
-  const textareaStyle = {
-    borderRadius: '8px',
+  const answerAreaStyle = {
     padding: '8px',
     width: '100%',
-    minHeight: '250px',
-    border: '1px solid #ccc',
-    boxSizing: 'border-box',
     fontSize: '16px',
-    fontFamily: 'Arial, sans-serif',
-    resize: 'none',
   };
 
   if (isLoading) {
@@ -269,20 +261,28 @@ const GraphVisualization = () => {
             <br /> <br />
             Created at: <br /> {formattedDate} {formattedTime}
           </p>
-          <div className="search_container">
-            <input
-              type="text"
-              placeholder="Search for keywords"
-              style={inputStyle}
-              onKeyDown={searchGraph}
-            />
-            <SearchIcon className="search_icon" />
-          </div>
-          <textarea
-            rows={5}
+          <TextField
+            className="search_text_field"
+            placeholder="Search for keywords"
+            style={searchBarStyle}
+            onKeyDown={searchGraph}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            className="answer_text_field"
             placeholder="Answer to your search will be displayed here!"
-            style={textareaStyle}
-            readOnly
+            style={answerAreaStyle}
+            multiline
+            rows={8}
+            InputProps={{
+              readOnly: true,
+            }}
           />
         </div>
         <VisGraph graphData={graphData} options={options} />
