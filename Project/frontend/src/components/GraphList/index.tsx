@@ -18,6 +18,7 @@ import {
   GraphStatus,
   GRAPH_DELETE_API_PATH,
   VISUALIZE_API_PATH,
+  GENERATE_API_PATH
 } from '../../constant';
 
 import './index.css';
@@ -49,6 +50,7 @@ const GraphList = () => {
   const [limit, setLimit] = React.useState<number>(100);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
+  const [generating, setGenerating] = React.useState<string | null>(null);
 
   React.useEffect(() => {
     fetchItems(offset, limit);
@@ -95,6 +97,25 @@ const GraphList = () => {
     }
   };
 
+  const handleGenerate = async (id: string) => {
+    setGenerating(id);
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', id)}`;
+    try {
+      await fetch(API, {
+        method: 'POST',
+        headers: {
+          'Content-type': 'application/json; charset=UTF-8',
+        },
+        body: JSON.stringify({ id })
+      });
+      fetchItems(offset, limit);
+    } catch (error) {
+      console.error('Error generating graph:', error);
+    } finally {
+      setGenerating(null);
+    }
+  };
+
   const navigate = useNavigate();
 
   return (
@@ -133,15 +154,36 @@ const GraphList = () => {
                 <TableCell>{getStatus(row.status)}</TableCell>
                 <TableCell>
                   <Stack direction="row" spacing={2}>
-                    <Button
-                      color="primary"
-                      variant="contained"
-                      size="small"
-                      onClick={() => navigate(`/graph/${row.id}`)}
-                      disabled={row.status !== GraphStatus.GRAPH_READY}
-                    >
-                      View
-                    </Button>
+                    {row.status === GraphStatus.GRAPH_READY ? (
+                      <Button
+                        color="primary"
+                        variant="contained"
+                        size="small"
+                        className="main_action_button"
+                        onClick={() => navigate(`/graph/${row.id}`)}
+                        disabled={row.status !== GraphStatus.GRAPH_READY}
+                      >
+                        View
+                      </Button>
+                    ) : (
+                      <Button
+                        color="success"
+                        variant="contained"
+                        size="small"
+                        className="main_action_button"
+                        disabled={generating}
+                        onClick={() => handleGenerate(row.id)}
+                      >
+                        {generating === row.id ? (
+                          <>
+                            <CircularProgress size={15} />
+                            <Box sx={{ ml: 2 }}>Working...</Box>
+                          </>
+                        ) : (
+                          'Generate Graph'
+                        )}
+                      </Button>
+                    )}
                     <Button
                       color="error"
                       variant="contained"
