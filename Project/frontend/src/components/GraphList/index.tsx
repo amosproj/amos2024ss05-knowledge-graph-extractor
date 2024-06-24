@@ -18,10 +18,12 @@ import {
   GraphStatus,
   GRAPH_DELETE_API_PATH,
   VISUALIZE_API_PATH,
-  GENERATE_API_PATH
+  GENERATE_API_PATH, 
+  messageSeverity
 } from '../../constant';
 
 import './index.css';
+import CustomizedSnackbars from '../Snackbar';
 
 interface IGraphList {
   id: string;
@@ -30,6 +32,12 @@ interface IGraphList {
   location: string;
   created_at: string;
   updated_at: string | null;
+}
+
+interface notification {
+  show: boolean;
+  severity: messageSeverity;
+  message: string;
 }
 
 const getStatus = (status: GraphStatus) => {
@@ -51,6 +59,7 @@ const GraphList = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);
+  const [notification, setNotification] = React.useState<notification>({show: false, severity: messageSeverity.SUCCESS, message: ''});
 
   React.useEffect(() => {
     fetchItems(offset, limit);
@@ -78,6 +87,24 @@ const GraphList = () => {
         setError(e.message);
         setLoading(false);
       });
+  };
+
+  const handleClick = () => {
+    setNotification({show: true, severity: messageSeverity.SUCCESS, message: 'message'});
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotification({show: false, severity: notification.severity, message: notification.message});
+  };
+
+  const notify = (n : notification) => {
+    setNotification(n);
   };
 
   // makes call to delete api endpoint with graph_job_id and after that reloads the graph list
@@ -109,8 +136,10 @@ const GraphList = () => {
         body: JSON.stringify({ id })
       });
       fetchItems(offset, limit);
+      notify({show: true, severity: messageSeverity.SUCCESS, message: 'Success!'});
     } catch (error) {
       console.error('Error generating graph:', error);
+      notify({show: true, severity: messageSeverity.ERROR, message: 'Error!'});
     } finally {
       setGenerating(null);
     }
@@ -119,6 +148,7 @@ const GraphList = () => {
   const navigate = useNavigate();
 
   return (
+    <main>
     <TableContainer component={Paper}>
       {loading && (
         <Box className="loading_graph_list">
@@ -171,7 +201,7 @@ const GraphList = () => {
                         variant="contained"
                         size="small"
                         className="main_action_button"
-                        disabled={generating}
+                        disabled={generating !== null}
                         onClick={() => handleGenerate(row.id)}
                       >
                         {generating === row.id ? (
@@ -200,6 +230,14 @@ const GraphList = () => {
         </Table>
       )}
     </TableContainer>
+    <CustomizedSnackbars
+        open={notification.show}
+        handleClick={handleClick}
+        handleClose={handleClose}
+        message={notification.message}
+        severity_value={notification.severity}
+      />
+    </main>
   );
 };
 
