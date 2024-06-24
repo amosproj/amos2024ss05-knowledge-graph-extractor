@@ -18,8 +18,8 @@ import {
   GraphStatus,
   GRAPH_DELETE_API_PATH,
   VISUALIZE_API_PATH,
-  GENERATE_API_PATH, 
-  messageSeverity
+  GENERATE_API_PATH,
+  messageSeverity,
 } from '../../constant';
 
 import './index.css';
@@ -59,7 +59,11 @@ const GraphList = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);
-  const [notification, setNotification] = React.useState<notification>({show: false, severity: messageSeverity.SUCCESS, message: ''});
+  const [notification, setNotification] = React.useState<notification>({
+    show: false,
+    severity: messageSeverity.SUCCESS,
+    message: '',
+  });
 
   React.useEffect(() => {
     fetchItems(offset, limit);
@@ -90,9 +94,14 @@ const GraphList = () => {
   };
 
   const handleClick = () => {
-    setNotification({show: true, severity: messageSeverity.SUCCESS, message: 'message'});
+    setNotification({
+      show: true,
+      severity: messageSeverity.SUCCESS,
+      message: 'message',
+    });
   };
 
+  //close notification
   const handleClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string,
@@ -100,10 +109,15 @@ const GraphList = () => {
     if (reason === 'clickaway') {
       return;
     }
-    setNotification({show: false, severity: notification.severity, message: notification.message});
+    setNotification({
+      show: false,
+      severity: notification.severity,
+      message: notification.message,
+    });
   };
 
-  const notify = (n : notification) => {
+  //update notification variable to prompt notification
+  const notify = (n: notification) => {
     setNotification(n);
   };
 
@@ -124,6 +138,7 @@ const GraphList = () => {
     }
   };
 
+  // makes call to generate endpoint with graph_job_id, notifies user about result and reloads graph list
   const handleGenerate = async (id: string) => {
     setGenerating(id);
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', id)}`;
@@ -133,13 +148,21 @@ const GraphList = () => {
         headers: {
           'Content-type': 'application/json; charset=UTF-8',
         },
-        body: JSON.stringify({ id })
+        body: JSON.stringify({ id }),
       });
       fetchItems(offset, limit);
-      notify({show: true, severity: messageSeverity.SUCCESS, message: 'Success!'});
+      notify({
+        show: true,
+        severity: messageSeverity.SUCCESS,
+        message: 'Success!',
+      });
     } catch (error) {
       console.error('Error generating graph:', error);
-      notify({show: true, severity: messageSeverity.ERROR, message: 'Error!'});
+      notify({
+        show: true,
+        severity: messageSeverity.ERROR,
+        message: 'Error!',
+      });
     } finally {
       setGenerating(null);
     }
@@ -149,88 +172,88 @@ const GraphList = () => {
 
   return (
     <main>
-    <TableContainer component={Paper}>
-      {loading && (
-        <Box className="loading_graph_list">
-          <CircularProgress />
-          <p>Existing knowledge graphs list is loading...</p>
-        </Box>
-      )}
-      {error && (
-        <Alert severity="error" className="error_graph_list">
-          {error}
-        </Alert>
-      )}
-      {!loading && !error && (
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
-            <TableRow>
-              <TableCell>Name</TableCell>
-              <TableCell>Created at</TableCell>
-              <TableCell>Status</TableCell>
-              <TableCell>Actions</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {list.map((row) => (
-              <TableRow
-                key={row.id}
-                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-              >
-                <TableCell component="th" scope="row">
-                  {row.name}
-                </TableCell>
-                <TableCell>{getDate(row.created_at)}</TableCell>
-                <TableCell>{getStatus(row.status)}</TableCell>
-                <TableCell>
-                  <Stack direction="row" spacing={2}>
-                    {row.status === GraphStatus.GRAPH_READY ? (
-                      <Button
-                        color="primary"
-                        variant="contained"
-                        size="small"
-                        className="main_action_button"
-                        onClick={() => navigate(`/graph/${row.id}`)}
-                        disabled={row.status !== GraphStatus.GRAPH_READY}
-                      >
-                        View
-                      </Button>
-                    ) : (
-                      <Button
-                        color="success"
-                        variant="contained"
-                        size="small"
-                        className="main_action_button"
-                        disabled={generating !== null}
-                        onClick={() => handleGenerate(row.id)}
-                      >
-                        {generating === row.id ? (
-                          <>
-                            <CircularProgress size={15} />
-                            <Box sx={{ ml: 2 }}>Working...</Box>
-                          </>
-                        ) : (
-                          'Generate Graph'
-                        )}
-                      </Button>
-                    )}
-                    <Button
-                      color="error"
-                      variant="contained"
-                      size="small"
-                      onClick={() => handleDelete(row.id)}
-                    >
-                      Delete
-                    </Button>
-                  </Stack>
-                </TableCell>
+      <TableContainer component={Paper}>
+        {loading && (
+          <Box className="loading_graph_list">
+            <CircularProgress />
+            <p>Existing knowledge graphs list is loading...</p>
+          </Box>
+        )}
+        {error && (
+          <Alert severity="error" className="error_graph_list">
+            {error}
+          </Alert>
+        )}
+        {!loading && !error && (
+          <Table sx={{ minWidth: 650 }} aria-label="simple table">
+            <TableHead>
+              <TableRow>
+                <TableCell>Name</TableCell>
+                <TableCell>Created at</TableCell>
+                <TableCell>Status</TableCell>
+                <TableCell>Actions</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
-    </TableContainer>
-    <CustomizedSnackbars
+            </TableHead>
+            <TableBody>
+              {list.map((row) => (
+                <TableRow
+                  key={row.id}
+                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+                >
+                  <TableCell component="th" scope="row">
+                    {row.name}
+                  </TableCell>
+                  <TableCell>{getDate(row.created_at)}</TableCell>
+                  <TableCell>{getStatus(row.status)}</TableCell>
+                  <TableCell>
+                    <Stack direction="row" spacing={2}>
+                      {row.status === GraphStatus.GRAPH_READY ? (
+                        <Button
+                          color="primary"
+                          variant="contained"
+                          size="small"
+                          className="main_action_button"
+                          onClick={() => navigate(`/graph/${row.id}`)}
+                          disabled={row.status !== GraphStatus.GRAPH_READY}
+                        >
+                          View
+                        </Button>
+                      ) : (
+                        <Button
+                          color="success"
+                          variant="contained"
+                          size="small"
+                          className="main_action_button"
+                          disabled={generating !== null}
+                          onClick={() => handleGenerate(row.id)}
+                        >
+                          {generating === row.id ? (
+                            <>
+                              <CircularProgress size={15} />
+                              <Box sx={{ ml: 2 }}>Working...</Box>
+                            </>
+                          ) : (
+                            'Generate Graph'
+                          )}
+                        </Button>
+                      )}
+                      <Button
+                        color="error"
+                        variant="contained"
+                        size="small"
+                        onClick={() => handleDelete(row.id)}
+                      >
+                        Delete
+                      </Button>
+                    </Stack>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </TableContainer>
+      <CustomizedSnackbars
         open={notification.show}
         handleClick={handleClick}
         handleClose={handleClose}

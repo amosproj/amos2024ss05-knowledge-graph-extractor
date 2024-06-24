@@ -12,7 +12,13 @@ interface CustomizedSnackbarsProps {
   message?: string;
 }
 
-function CustomizedSnackbars({ open, handleClick, handleClose, message = "Success!", severity_value = messageSeverity.SUCCESS }: CustomizedSnackbarsProps) {
+function CustomizedSnackbars({
+  open,
+  handleClick,
+  handleClose,
+  message = 'Success!',
+  severity_value = messageSeverity.SUCCESS,
+}: CustomizedSnackbarsProps) {
   return (
     <div>
       <Snackbar
