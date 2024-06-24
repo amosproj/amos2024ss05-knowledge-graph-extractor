@@ -3,7 +3,7 @@ import { Network } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
-import { FaSearch } from 'react-icons/fa';
+import SearchIcon from '@mui/icons-material/Search';
 
 const VisGraph = ({ graphData, options }) => {
   const containerRef = useRef(null);
@@ -276,7 +276,7 @@ const GraphVisualization = () => {
               style={inputStyle}
               onKeyDown={searchGraph}
             />
-            <FaSearch className="search_icon" />
+            <SearchIcon className="search_icon" />
           </div>
           <textarea
             rows={5}
