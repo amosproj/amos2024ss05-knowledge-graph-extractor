@@ -27,7 +27,7 @@ class GraphQuery:
             try:
                 for neighbor in graph.neighbors(node):
                     edge_data = graph.get_edge_data(node, neighbor)
-                    relationship = edge_data.get('relation', 'is connected to')
+                    relationship = edge_data.get("relation", "is connected to")
                     edges_info.append((relationship, neighbor))
                 entities_relationships[node] = edges_info
             except NetworkXError:
@@ -61,7 +61,7 @@ class GraphQuery:
 
     @staticmethod
     def retrieve_entities_from_spacy(query: str):
-        nlp = spacy.load('en_core_web_sm')
+        nlp = spacy.load("en_core_web_sm")
         doc = nlp(query)
 
         entities = [(ent.text, ent.label_) for ent in doc.ents]
@@ -71,10 +71,10 @@ class GraphQuery:
         graph1 = NetworkxEntityGraph.from_gml(graph_path)
         chain = GraphQAChain.from_llm(
             ChatGroq(
-                temperature=0,
-                model="llama3-8b-8192",
-                api_key=os.getenv("GROQ_API_KEY")
-            ), graph=graph1, verbose=True
+                temperature=0, model="llama3-8b-8192", api_key=os.getenv("GROQ_API_KEY")
+            ),
+            graph=graph1,
+            verbose=True,
         )
         response = chain.invoke(query)
         return response
