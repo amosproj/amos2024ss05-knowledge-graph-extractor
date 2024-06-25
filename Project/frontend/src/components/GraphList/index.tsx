@@ -17,8 +17,7 @@ import {
   GRAPH_DELETE_API_PATH,
   GRAPH_LIST_API_PATH,
   GraphStatus,
-  GRAPH_DELETE_API_PATH,
-  VISUALIZE_API_PATH,
+  // VISUALIZE_API_PATH,
   GENERATE_API_PATH,
   messageSeverity,
 } from '../../constant';

@@ -72,7 +72,7 @@ def extract_entities_and_relations(chunk, groq_client):
 
 
 def check_for_connecting_relation(
-        chunk, entities_component_1, entities_component_2, groq_client
+    chunk, entities_component_1, entities_component_2, groq_client
 ):
     """
     Check for connecting relation between entities of two components.
@@ -107,7 +107,7 @@ def check_for_connecting_relation(
 
 
 def check_for_connecting_relation_(
-        text_chunk, entities_component_1, entities_component_2
+    text_chunk, entities_component_1, entities_component_2
 ):
     """
     Takes a text chunk, and two lists of entities (from each component in the graph)

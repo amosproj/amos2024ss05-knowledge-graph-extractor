@@ -38,6 +38,6 @@ const CustomizedSnackbars: React.FC<CustomizedSnackbarsProps> = ({
       </Snackbar>
     </div>
   );
-}
+};
 
 export default CustomizedSnackbars;
