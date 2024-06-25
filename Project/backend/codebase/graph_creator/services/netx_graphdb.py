@@ -36,9 +36,9 @@ class NetXGraphDB:
 
             # Add nodes with page attribute
             if edge["node_1"] not in graph:
-                graph.add_node(edge["node_1"], pages=set([]))
+                graph.add_node(edge["node_1"], pages=set([]), topic=edge["topic_node_1"])
             if edge["node_2"] not in graph:
-                graph.add_node(edge["node_2"], pages=set([]))
+                graph.add_node(edge["node_2"], pages=set([]), topic=edge["topic_node_2"])
 
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
@@ -138,6 +138,7 @@ class NetXGraphDB:
                         size=graph.nodes[source].get("size", 1),
                         degree=graph.nodes[source].get("degree", 0),
                         pages=graph.nodes[source].get("pages", "pages not found"),
+                        topic=graph.nodes[source].get("topic", "topic not found"),
                     )
                 )
 
@@ -150,6 +151,7 @@ class NetXGraphDB:
                         size=graph.nodes[target].get("size", 1),
                         degree=graph.nodes[target].get("degree", 0),
                         pages=graph.nodes[source].get("pages", "pages not found"),
+                        topic=graph.nodes[source].get("topic", "topic not found"),
                     )
                 )
             edge_properties = graph[source][target]
@@ -179,6 +181,7 @@ class NetXGraphDB:
                     size=node_attrs.get("size", 1),
                     degree=node_attrs.get("degree", 0),
                     pages=node_attrs.get("pages", "pages not found"),
+                    topic=node_attrs.get("topic", "topic not found"),
                 )
             )
 

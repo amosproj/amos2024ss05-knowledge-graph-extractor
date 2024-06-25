@@ -3,6 +3,7 @@ import re
 import json
 import time
 from graph_creator import llama3
+from bertopic import BERTopic
 
 
 def build_flattened_dataframe(entities_and_relations):
@@ -333,6 +334,21 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
     return entity_and_relation_df
 
 
+def add_topic(data: pd.DataFrame) -> pd.DataFrame:
+    documents = list(set(data['node_1']).union(set(data['node_2'])))
+
+    topic_model = BERTopic()
+    topics, probabilities = topic_model.fit_transform(documents)
+    topic_name_info = {row['Topic']: row['Name'] for _, row in topic_model.get_topic_info().iterrows()}
+    doc_topic_map = {doc: topic for doc, topic in zip(documents, topics)}
+    doc_topic_strings_map = {doc: topic_name_info.get(topic, "no_topic") for doc, topic in doc_topic_map.items()}
+
+    # Add new columns to the DataFrame and populate them
+    data['topic_node_1'] = [doc_topic_strings_map[node] for i, node in data['node_1'].items()]
+    data['topic_node_2'] = [doc_topic_strings_map[node] for i, node in data['node_2'].items()]
+    return data
+
+
 def connect_with_llm(data, text_chunks, rate_limit):
     """
     Connect the pieces of the knowlege graph by extracting new relations between disjoint
@@ -422,5 +438,6 @@ def connect_with_llm(data, text_chunks, rate_limit):
         )
     )
     data = add_relations_to_data(data, connecting_relations)
+    data = add_topic(data)
 
     return data
