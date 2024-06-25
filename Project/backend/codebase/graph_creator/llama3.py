@@ -38,23 +38,24 @@ def extract_entities_and_relations(chunk, groq_client):
     """
     SYS_PROMPT = (
         "Only answer in a JSON format. \n"
-        "You are a network graph maker who extracts terms and their relations from a given context. "
-        "You are provided with a context chunk (delimited by ```) Your task is to extract the ontology "
-        "of terms mentioned in the given context. These terms should represent the key concepts as per the context. \n"
-        "Thought 1: While traversing through each sentence, Think about the key terms mentioned in it.\n"
-        "\tTerms may include object, entity, location, organization, person, \n"
-        "\tcondition, acronym, documents, service, concept, etc.\n"
-        "\tTerms should be as atomistic as possible\n\n"
-        "Thought 2: Think about how these terms can have one on one relation with other terms.\n"
-        "\tTerms that are mentioned in the same sentence or the same paragraph are typically related to each other.\n"
-        "\tTerms can be related to many other terms\n\n"
-        "Thought 3: Find out the relation between each such related pair of terms. \n\n"
-        "Format your output as a list of JSON. Each element of the list contains a pair of terms"
+        "You are a network graph maker who extracts the most critical terms and their relations from a given context. "
+        "You are provided with a context chunk (delimited by ```). Your task is to extract the ontology "
+        "of the few key terms that are indispensable for understanding the given context. These terms should represent the core concepts as per the context. \n"
+        "Thought 1: Identify the few most critical terms in the entire context.\n"
+        "\tTerms may include only the most significant objects, entities, locations, organizations, people, conditions, acronyms, documents, services, concepts, etc.\n"
+        "\tExclude all terms that are not crucial to the core message.\n"
+        "\tDo not extract a term from every sentence; focus only on the most important terms across the entire context.\n\n"
+        "Thought 2: Determine how these indispensable terms are directly related to each other.\n"
+        "\tTerms that are mentioned in the same sentence or paragraph are typically related to each other.\n"
+        "\tFocus solely on relationships that reveal the most critical interactions or dependencies, ignoring all minor details.\n\n"
+        "Thought 3: Identify the specific type of relationship between each related pair of terms.\n"
+        "\tEnsure the relationship is crucial, highly relevant, and necessary for understanding the context.\n\n"
+        "Format your output as a list of JSON. Each element of the list contains a pair of terms "
         "and the relation between them, like the following: \n"
         "[\n"
         "   {\n"
-        '       "node_1": "A concept from extracted ontology",\n'
-        '       "node_2": "A related concept from extracted ontology",\n'
+        '       "node_1": "A core concept from extracted ontology",\n'
+        '       "node_2": "A related core concept from extracted ontology",\n'
         '       "edge": "relationship between the two concepts, node_1 and node_2"\n'
         "   }, {...}\n"
         "]"
@@ -71,7 +72,7 @@ def extract_entities_and_relations(chunk, groq_client):
 
 
 def check_for_connecting_relation(
-    chunk, entities_component_1, entities_component_2, groq_client
+        chunk, entities_component_1, entities_component_2, groq_client
 ):
     """
     Check for connecting relation between entities of two components.
@@ -106,7 +107,7 @@ def check_for_connecting_relation(
 
 
 def check_for_connecting_relation_(
-    text_chunk, entities_component_1, entities_component_2
+        text_chunk, entities_component_1, entities_component_2
 ):
     """
     Takes a text chunk, and two lists of entities (from each component in the graph)

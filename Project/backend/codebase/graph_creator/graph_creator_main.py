@@ -84,6 +84,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
 
     # combine knowledge graph pieces
     # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+    # combined['chunk_id'] = '1'
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
