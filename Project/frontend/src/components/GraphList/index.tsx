@@ -14,10 +14,10 @@ import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 
 import {
+  GRAPH_DELETE_API_PATH,
   GRAPH_LIST_API_PATH,
   GraphStatus,
-  GRAPH_DELETE_API_PATH,
-  VISUALIZE_API_PATH,
+  // VISUALIZE_API_PATH,
   GENERATE_API_PATH,
   messageSeverity,
 } from '../../constant';
@@ -54,8 +54,8 @@ const getDate = (isoDate: string) => {
 
 const GraphList = () => {
   const [list, setList] = React.useState<IGraphList[]>([]);
-  const [offset, setOffset] = React.useState<number>(0);
-  const [limit, setLimit] = React.useState<number>(100);
+  const [offset] = React.useState<number>(0);
+  const [limit] = React.useState<number>(100);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);

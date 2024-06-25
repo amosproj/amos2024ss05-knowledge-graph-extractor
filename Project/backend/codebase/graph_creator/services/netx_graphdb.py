@@ -1,8 +1,10 @@
 import os
 import uuid
+
 import networkx as nx
 import numpy as np
 import pandas as pd
+
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
@@ -95,7 +97,7 @@ class NetXGraphDB:
             os.remove(file_location)
 
     def graph_data_for_visualization(
-        self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
+        self, graph_job_id: uuid.UUID, node: str = None, adj_depth: int = 1
     ) -> GraphVisData:
         """
         Given a graph travers it and return a json format of all the nodes and edges they have

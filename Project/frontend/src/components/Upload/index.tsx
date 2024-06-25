@@ -19,7 +19,7 @@ interface FilePondError {
 type UploadProps = {
   handleAddFile: (error: FilePondError | null, file: FilePondFile) => void;
   handleRemoveFile: () => void;
-  pondRef: React.RefObject<any>;
+  pondRef: React.RefObject<never>;
 };
 
 function Upload(props: UploadProps) {
