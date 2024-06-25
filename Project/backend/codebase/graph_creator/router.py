@@ -15,7 +15,11 @@ from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.gemini import process_chunks
 from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.schemas.graph_job import GraphJobCreate
-from graph_creator.schemas.graph_vis import GraphVisData, QueryInputData, GraphQueryOutput
+from graph_creator.schemas.graph_vis import (
+    GraphVisData,
+    QueryInputData,
+    GraphQueryOutput,
+)
 from graph_creator.services.netx_graphdb import NetXGraphDB
 from graph_creator.services.query_graph import GraphQuery
 from graph_creator.utils.const import GraphStatus
@@ -99,7 +103,6 @@ async def upload_pdf(
     )
     if not os.path.exists(documents_directory):
         os.makedirs(documents_directory)
-    logger.info(documents_directory)
 
     # Define file path
     file_path = os.path.join(documents_directory, file.filename)
@@ -114,7 +117,7 @@ async def upload_pdf(
     # Save file
     with open(file_path, "wb") as f:
         f.write(file.file.read())
-    logger.info(file_path)
+    logger.info(f" Uploaded file is saved here {file_path}")
 
     graph_job = GraphJobCreate(
         name=file.filename, location=file_path, status=GraphStatus.DOC_UPLOADED
@@ -213,16 +216,17 @@ async def read_graph_job_by_name(
 
 @router.delete("/graph_jobs/{graph_job_id}")
 async def delete_graph_job(
-        graph_job_id: uuid.UUID,
-        graph_job_dao: GraphJobDAO = Depends(),
-        netx_services: NetXGraphDB = Depends(),
+    graph_job_id: uuid.UUID,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
 ):
     """
     Delete a graph job with the given name
 
     Args:
-        graph_job_name (str): Name
+        graph_job_id (uuid.UUID): ID of the graph job
         graph_job_dao (GraphJobDAO):
+        netx_services (NetXGraphDB):
 
     Raises:
         HTTPException: If there is no graph job with the given name.
@@ -251,7 +255,6 @@ async def create_graph(
         )
 
     # trigger graph creation
-    # background_tasks.add_task(graph_creator_main.process_file_to_graph, graph_job)
     graph_creator_main.process_file_to_graph(g_job)
 
     g_job.status = GraphStatus.GRAPH_READY
@@ -299,7 +302,7 @@ async def query_graph(
     if g_job.status != GraphStatus.GRAPH_READY:
         raise HTTPException(
             status_code=400,
-            detail=f"No graph created for this job!",
+            detail="No graph created for this job!",
         )
     graph = netx_services.load_graph(graph_job_id=graph_job_id)
     data = graph_query_services.query_graph(graph=graph, query=input_data.text)

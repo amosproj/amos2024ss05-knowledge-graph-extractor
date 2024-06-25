@@ -1,55 +1,40 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
-import Upload from '../Upload';
-import './index.css';
-import {
-  GENERATE_API_PATH,
-  GRAPH_DELETE_API_PATH,
-  GraphStatus,
-} from '../../constant';
-import CustomizedSnackbars from '../Snackbar';
+import { FilePondProps } from 'react-filepond';
 import { Box, Button, CircularProgress, Typography } from '@mui/material';
 
-interface UploadedFile {
-  serverId: string;
-}
-
-interface FilePondError {
-  message: string;
-  code: number;
-}
+import { GENERATE_API_PATH, GraphStatus } from '../../constant';
+import CustomizedSnackbars from '../Snackbar';
+import Upload from '../Upload';
+import './index.css';
 
 function UploadPage() {
   const [fileId, setFileId] = useState('');
   const [isGenerating, setIsGenerating] = useState(false);
-  const [isDeleting, setIsDeleting] = useState(false);
   const navigate = useNavigate();
-  const [open, setOpen] = useState(false);
-  const pondRef = useRef(null);
+  const [showSnackbar, setShowSnackbar] = useState(false);
 
-  const handleAddFile = (error: FilePondError | null, file: UploadedFile) => {
+  const handleAddFile: FilePondProps['onprocessfile'] = (error, file) => {
     if (!error) {
-      const fileId = JSON.parse(file.serverId).id;
-      setFileId(fileId);
+      setFileId(file.serverId);
     } else {
-      console.log('Error:', error.message);
+      console.log('Error:', error);
     }
   };
 
   const handleClick = () => {
-    setOpen(true);
+    setShowSnackbar(true);
   };
 
   const handleClose = (
-    event?: React.SyntheticEvent | Event,
+    _event?: React.SyntheticEvent | Event,
     reason?: string,
   ) => {
     if (reason === 'clickaway') {
       return;
     }
 
-    setOpen(false);
+    setShowSnackbar(false);
   };
 
   const notifySuccess = () => {
@@ -58,9 +43,11 @@ function UploadPage() {
 
   const handleRemoveFile = () => {
     setFileId('');
-    if (pondRef.current) {
-      pondRef.current.removeFiles();
-    }
+  };
+
+  const handleDeleteGraph = () => {
+    handleRemoveFile();
+    notifySuccess();
   };
 
   const handleGenerateGraph = () => {
@@ -87,29 +74,6 @@ function UploadPage() {
       });
   };
 
-  const handleDeleteGraph = () => {
-    setIsDeleting(true);
-
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', fileId)}`;
-    fetch(API, {
-      method: 'DELETE',
-      headers: {
-        'Content-type': 'application/json; charset=UTF-8',
-      },
-    })
-      .then((response) => response.json())
-      .then(() => {
-        handleRemoveFile();
-        notifySuccess();
-      })
-      .catch((e) => {
-        console.log(e);
-      })
-      .finally(() => {
-        setIsDeleting(false);
-      });
-  };
-
   return (
     <main className="main_wrapper_upload">
       <Typography
@@ -121,27 +85,11 @@ function UploadPage() {
       </Typography>
 
       <Upload
-        pondRef={pondRef}
         handleAddFile={handleAddFile}
         handleRemoveFile={handleRemoveFile}
+        handleDeleteFile={handleDeleteGraph}
       />
       <div className="buttons_container">
-        <Button
-          variant="outlined"
-          color="error"
-          disabled={!fileId || isDeleting}
-          onClick={handleDeleteGraph}
-        >
-          {isDeleting ? (
-            <>
-              <CircularProgress size={15} />
-              <Box sx={{ ml: 2 }}>Working...</Box>
-            </>
-          ) : (
-            'Delete Graph'
-          )}
-        </Button>
-
         <Button
           variant="outlined"
           color="success"
@@ -151,7 +99,7 @@ function UploadPage() {
           {isGenerating ? (
             <>
               <CircularProgress size={15} />
-              <Box sx={{ ml: 2 }}>Working...</Box>
+              <Box sx={{ ml: 2 }}>Generating...</Box>
             </>
           ) : (
             'Generate Graph'
@@ -159,7 +107,7 @@ function UploadPage() {
         </Button>
       </div>
       <CustomizedSnackbars
-        open={open}
+        open={showSnackbar}
         handleClick={handleClick}
         handleClose={handleClose}
       />
