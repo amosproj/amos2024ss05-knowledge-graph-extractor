@@ -16,7 +16,7 @@ export interface IFile {
 }
 
 type UploadProps = {
-  handleAddFile: (error: FilePondError | null, file: FilePondFile) => void;
+  handleAddFile: FilePondProps['onprocessfile'];
   handleRemoveFile: FilePondProps['onremovefile'];
   handleDeleteFile: () => void;
   pondRef: React.RefObject<never>;
