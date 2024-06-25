@@ -282,8 +282,8 @@ async def get_graph_data_for_visualization(
         raise HTTPException(
             status_code=400, detail="A graph needs to be created for this job first!"
         )
-    return netx_services.graph_data_for_visualization(
-        g_job.id, node=node, adj_depth=adj_depth
+    return await netx_services.graph_data_for_visualization(
+        graph_job=g_job, node=node, adj_depth=adj_depth
     )
 
 

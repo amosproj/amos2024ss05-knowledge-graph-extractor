@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -19,6 +21,8 @@ class GraphEdge(BaseModel):
 
 
 class GraphVisData(BaseModel):
+    document_name: str
+    graph_created_at: datetime
     nodes: list[GraphNode]
     edges: list[GraphEdge]
 
