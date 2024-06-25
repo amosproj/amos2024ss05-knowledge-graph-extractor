@@ -1,10 +1,9 @@
-// CustomizedSnackbars.js
+// CustomizedSnackbars.tsx
 import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { messageSeverity } from '../../constant';
 
-function CustomizedSnackbars({ open, handleClose }) {
 interface CustomizedSnackbarsProps {
   open: boolean;
   handleClick: () => void;
@@ -13,13 +12,13 @@ interface CustomizedSnackbarsProps {
   message?: string;
 }
 
-function CustomizedSnackbars({
+const CustomizedSnackbars: React.FC<CustomizedSnackbarsProps> = ({
   open,
   handleClick,
   handleClose,
   message = 'Success!',
   severity_value = messageSeverity.SUCCESS,
-}: CustomizedSnackbarsProps) {
+}) => {
   return (
     <div>
       <Snackbar
