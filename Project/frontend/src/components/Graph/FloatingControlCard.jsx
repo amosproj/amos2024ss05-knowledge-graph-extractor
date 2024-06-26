@@ -270,7 +270,7 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
           style={{
             position: 'absolute',
             bottom: '16px',
-            left: '16px',
+            right: '16px',
             width: '300px',
             padding: '16px',
             background: '#121826',
