@@ -1,3 +1,9 @@
+.container {
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+}
+
 .main_graph_container {
   flex: 1;
   display: flex;
@@ -20,6 +26,9 @@
   justify-content: flex-start;
   height: 100vh;
   width: 100vw;
+
+  /* overflow: hidden;  */
+
 }
 
 .graph_info {
