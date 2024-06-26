@@ -1,9 +1,24 @@
-// CustomizedSnackbars.js
+// CustomizedSnackbars.tsx
 import * as React from 'react';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
+import { messageSeverity } from '../../constant';
 
-function CustomizedSnackbars({ open, handleClick, handleClose }) {
+interface CustomizedSnackbarsProps {
+  open: boolean;
+  handleClick: () => void;
+  handleClose: (event?: React.SyntheticEvent | Event, reason?: string) => void;
+  severity_value?: messageSeverity;
+  message?: string;
+}
+
+const CustomizedSnackbars: React.FC<CustomizedSnackbarsProps> = ({
+  open,
+  handleClick,
+  handleClose,
+  message = 'Success!',
+  severity_value = messageSeverity.SUCCESS,
+}) => {
   return (
     <div>
       <Snackbar
@@ -14,15 +29,15 @@ function CustomizedSnackbars({ open, handleClick, handleClose }) {
       >
         <Alert
           onClose={handleClose}
-          severity="success"
+          severity={severity_value}
           variant="filled"
           sx={{ width: '100%' }}
         >
-          Success!
+          {message}
         </Alert>
       </Snackbar>
     </div>
   );
-}
+};
 
 export default CustomizedSnackbars;

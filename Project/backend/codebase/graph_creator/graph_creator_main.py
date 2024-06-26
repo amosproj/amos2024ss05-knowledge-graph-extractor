@@ -1,11 +1,14 @@
+import logging
 import mimetypes
-import pandas
 
+from graph_creator import graph_handler
+from graph_creator import pdf_handler
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
-from graph_creator import pdf_handler
-from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def process_file_to_graph(g_job: GraphJob):
@@ -58,11 +61,9 @@ def process_file_to_entities_and_relations(file: str):
         ]  # Assuming chunk has 'page_content' attribute
 
         # Generate response using LLM
-        # response_json = process_chunks(text_chunks, prompt_template)
         response_json = groq_process_chunks(text_chunks)
-        print(response_json)
     except Exception as e:
-        print(e)
+        logging.error(e)
         response_json = None
 
     return response_json, chunks
@@ -83,6 +84,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
 
     # combine knowledge graph pieces
     # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
+    # combined['chunk_id'] = '1'
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
@@ -91,7 +93,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     graph_db_service = netx_graphdb.NetXGraphDB()
 
     # read entities and relations
-    graph = graph_db_service.create_graph_from_df(combined)
+    graph = graph_db_service.create_graph_from_df(combined, chunks)
 
     # save graph as file
     graph_db_service.save_graph(uuid, graph)

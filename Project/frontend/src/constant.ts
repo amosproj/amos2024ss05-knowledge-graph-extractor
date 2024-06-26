@@ -8,3 +8,10 @@ export enum GraphStatus {
   DOC_UPLOADED = 'document_uploaded',
   GRAPH_READY = 'graph_ready',
 }
+
+export enum messageSeverity {
+  ERROR = 'error',
+  SUCCESS = 'success',
+  WARNING = 'info',
+  INFO = 'success',
+}

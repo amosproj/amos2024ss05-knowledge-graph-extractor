@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import BaseModel, Field
 
 
@@ -6,6 +8,8 @@ class GraphNode(BaseModel):
     label: str
     size: int = Field(default=1)
     color: str = Field(default="#7FFFD4", description="Color aquamarine")
+    topic: str
+    pages: str
 
 
 class GraphEdge(BaseModel):
@@ -19,6 +23,8 @@ class GraphEdge(BaseModel):
 
 
 class GraphVisData(BaseModel):
+    document_name: str
+    graph_created_at: datetime
     nodes: list[GraphNode]
     edges: list[GraphEdge]
 

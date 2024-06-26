@@ -1,6 +1,7 @@
 import os
-from langchain_text_splitters import RecursiveCharacterTextSplitter
+
 from langchain_community.document_loaders import PyPDFLoader
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 
 
 def process_pdf_into_chunks(filename):
@@ -10,7 +11,7 @@ def process_pdf_into_chunks(filename):
     Parameters
     ----------
     filename : str
-        The name of the pdf file to be proccessed
+        The name of the pdf file to be processed
 
     Returns
     -------
