@@ -1,6 +1,7 @@
-import networkx as nx
-import os
 import json
+import os
+
+import networkx as nx
 
 
 def analyze_graph_structure(G):
@@ -118,9 +119,11 @@ def analyze_graph_structure(G):
     #  - Check if the graph is connected
     is_connected = nx.is_connected(G)
     #  - Calculate diameter: Longest shortest path between any two nodes
-    diameter = nx.diameter(G) if is_connected else float('inf')
+    diameter = nx.diameter(G) if is_connected else float("inf")
     #  - Average shortest path length: Average of all shortest paths in the graph
-    average_shortest_path_length = nx.average_shortest_path_length(G) if is_connected else float('inf')
+    average_shortest_path_length = (
+        nx.average_shortest_path_length(G) if is_connected else float("inf")
+    )
 
     # Clustering Coefficient
     #  - Measures the degree to which nodes tend to cluster together
@@ -133,7 +136,7 @@ def analyze_graph_structure(G):
     # Graph Diameter and Radius
     #  - Diameter: Longest shortest path in the graph
     #  - Radius: Minimum eccentricity of any node
-    radius = nx.radius(G) if is_connected else float('inf')
+    radius = nx.radius(G) if is_connected else float("inf")
 
     # Graph Transitivity
     #  - Measures the overall probability for the network to have adjacent nodes interconnected
@@ -158,7 +161,7 @@ def analyze_graph_structure(G):
         "average_clustering_coefficient": average_clustering_coefficient,
         "assortativity": assortativity,
         "radius": radius,
-        "transitivity": transitivity
+        "transitivity": transitivity,
     }
 
     return graph_info

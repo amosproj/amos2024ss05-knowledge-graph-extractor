@@ -1,20 +1,19 @@
 import {
   BrowserRouter as Router,
-  Routes,
-  Route,
   Link as NavLink,
+  Route,
+  Routes,
 } from 'react-router-dom';
 import {
   AppBar,
-  Toolbar,
-  Typography,
+  createTheme,
   CssBaseline,
   ThemeProvider,
-  createTheme,
+  Toolbar,
+  Typography,
 } from '@mui/material';
 
 import logo from '../../assets/team-logo.png';
-import Home from '../Home';
 import Graph from '../Graph/index_visjs';
 import UploadPage from '../UploadPage';
 import LandingPage from '../LandingPage';

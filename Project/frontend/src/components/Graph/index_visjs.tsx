@@ -4,7 +4,13 @@ import { useParams } from 'react-router-dom';
 import FloatingControlCard from './FloatingControlCard';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
+<<<<<<< HEAD
 import { CircularProgress, Typography, Box } from '@mui/material';
+=======
+import SearchIcon from '@mui/icons-material/Search';
+import TextField from '@mui/material/TextField';
+import { InputAdornment } from '@mui/material';
+>>>>>>> origin/feat/split-view
 
 const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
   const containerRef = useRef(null);
@@ -343,6 +349,25 @@ const GraphVisualization = () => {
     resize: 'none',
   };
 
+  const searchGraph = (event) => {
+    if (event.key === 'Enter') {
+      // Perform the search
+    }
+  };
+
+  const searchBarStyle = {
+    padding: '8px',
+    width: '100%',
+    marginBottom: '10px',
+    fontSize: '16px',
+  };
+
+  const answerAreaStyle = {
+    padding: '8px',
+    width: '100%',
+    fontSize: '16px',
+  };
+
   if (isLoading) {
     return <div className="loading_spinner_graph">Loading graph...</div>;
   }
@@ -351,9 +376,21 @@ const GraphVisualization = () => {
     return <div className="error_container">Sorry, an error has occurred!</div>;
   }
 
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
+
   return (
     <section className="main_graph_container">
+<<<<<<< HEAD
       <h1>Graph Visualization</h1>
+=======
+      <h1>Graph Visualization </h1>
+>>>>>>> origin/feat/split-view
       <select onChange={(e) => setLayout(e.target.value)} value={layout}>
         <option value="barnesHut">Barnes Hut</option>
         <option value="forceAtlas2Based">Force Atlas 2 Based</option>
@@ -367,6 +404,7 @@ const GraphVisualization = () => {
         <div className="graph_info">
           <h1>Graph Information</h1>
           <p>
+<<<<<<< HEAD
             File ID: <br /> {fileId}
             <br /> <br />
             Created at: <br /> xx.xx.xxxx
@@ -397,6 +435,37 @@ const GraphVisualization = () => {
           restartStabilization={() => setStabilizationComplete(false)}
           style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}
         />
+=======
+            Document Name: <br /> {graphData.document_name}
+            <br /> <br />
+            Created at: <br /> {formattedDate} {formattedTime}
+          </p>
+          <TextField
+            className="search_text_field"
+            placeholder="Search for keywords"
+            style={searchBarStyle}
+            onKeyDown={searchGraph}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            className="answer_text_field"
+            placeholder="Answer to your search will be displayed here!"
+            style={answerAreaStyle}
+            multiline
+            rows={8}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </div>
+        <VisGraph graphData={graphData} options={options} />
+>>>>>>> origin/feat/split-view
       </section>
     </section>
   );
