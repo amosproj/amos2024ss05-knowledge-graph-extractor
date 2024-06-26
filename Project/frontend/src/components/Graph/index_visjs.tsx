@@ -3,6 +3,9 @@ import { Network } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
 import { VISUALIZE_API_PATH } from '../../constant';
+import SearchIcon from '@mui/icons-material/Search';
+import TextField from '@mui/material/TextField';
+import { InputAdornment } from '@mui/material';
 
 const VisGraph = ({ graphData, options }) => {
   const containerRef = useRef(null);
@@ -203,6 +206,25 @@ const GraphVisualization = () => {
                     },
   };
 
+  const searchGraph = (event) => {
+    if (event.key === 'Enter') {
+      // Perform the search
+    }
+  };
+
+  const searchBarStyle = {
+    padding: '8px',
+    width: '100%',
+    marginBottom: '10px',
+    fontSize: '16px',
+  };
+
+  const answerAreaStyle = {
+    padding: '8px',
+    width: '100%',
+    fontSize: '16px',
+  };
+
   if (isLoading) {
     return <div className="loading_spinner_graph">Loading graph...</div>;
   }
@@ -211,9 +233,17 @@ const GraphVisualization = () => {
     return <div className="error_container">Sorry, an error has occurred!</div>;
   }
 
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
+
   return (
-    <section className="graph_container">
-      <h1>Graph Visualization</h1>
+    <section className="main_graph_container">
+      <h1>Graph Visualization </h1>
       <select onChange={(e) => setLayout(e.target.value)} value={layout}>
         <option value="barnesHut">Barnes Hut</option>
         <option value="forceAtlas2Based">Force Atlas 2 Based</option>
@@ -223,7 +253,40 @@ const GraphVisualization = () => {
         <option value="grid">Grid</option>
         <option value="random">Random</option>
       </select>
-      <VisGraph graphData={graphData} options={options} />
+      <section className="graph_container">
+        <div className="graph_info">
+          <h1>Graph Information</h1>
+          <p>
+            Document Name: <br /> {graphData.document_name}
+            <br /> <br />
+            Created at: <br /> {formattedDate} {formattedTime}
+          </p>
+          <TextField
+            className="search_text_field"
+            placeholder="Search for keywords"
+            style={searchBarStyle}
+            onKeyDown={searchGraph}
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
+          />
+          <TextField
+            className="answer_text_field"
+            placeholder="Answer to your search will be displayed here!"
+            style={answerAreaStyle}
+            multiline
+            rows={8}
+            InputProps={{
+              readOnly: true,
+            }}
+          />
+        </div>
+        <VisGraph graphData={graphData} options={options} />
+      </section>
     </section>
   );
 };

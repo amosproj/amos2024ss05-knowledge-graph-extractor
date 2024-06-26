@@ -1,8 +1,11 @@
 import os
 import uuid
+
 import networkx as nx
 import numpy as np
 import pandas as pd
+
+from graph_creator.models.graph_job import GraphJob
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
@@ -94,19 +97,20 @@ class NetXGraphDB:
         if os.path.exists(file_location):
             os.remove(file_location)
 
-    def graph_data_for_visualization(
-        self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
+    async def graph_data_for_visualization(
+        self, graph_job: GraphJob, node: str = None, adj_depth: int = 1
     ) -> GraphVisData:
         """
         Given a graph travers it and return a json format of all the nodes and edges they have
         ready for visualization to FE
         """
-        graph = self.load_graph(graph_job_id)
+
+        graph = self.load_graph(graph_job.id)
 
         if node:
-            return self._graph_bfs_edges(graph, node, adj_depth)
+            return self._graph_bfs_edges(graph, graph_job, node, adj_depth)
 
-        return self._all_graph_data_for_visualization(graph)
+        return self._all_graph_data_for_visualization(graph, graph_job)
 
     @staticmethod
     def _get_graph_file_path_local_storage(graph_job_id: uuid.UUID) -> str:
@@ -123,7 +127,9 @@ class NetXGraphDB:
         return os.path.join(graphs_directory, f"{graph_job_id}.gml")
 
     @staticmethod
-    def _graph_bfs_edges(graph: nx.Graph, node: str, adj_depth: int) -> GraphVisData:
+    def _graph_bfs_edges(
+            graph: nx.Graph, graph_job: GraphJob, node: str, adj_depth: int
+    ) -> GraphVisData:
         nodes_data = []
         edges_data = []
         visited = set()
@@ -162,10 +168,15 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(nodes=nodes_data, edges=edges_data)
+        return GraphVisData(document_name=graph_job.name,
+                            graph_created_at=graph_job.updated_at,
+                            nodes=nodes_data,
+                            edges=edges_data)
 
     @staticmethod
-    def _all_graph_data_for_visualization(graph: nx.Graph) -> GraphVisData:
+    def _all_graph_data_for_visualization(
+            graph: nx.Graph, graph_job: GraphJob
+    ) -> GraphVisData:
         nodes_data = []
         edges_data = []
 
@@ -194,4 +205,7 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(nodes=nodes_data, edges=edges_data)
+        return GraphVisData(document_name=graph_job.name,
+                            graph_created_at=graph_job.updated_at,
+                            nodes=nodes_data,
+                            edges=edges_data)

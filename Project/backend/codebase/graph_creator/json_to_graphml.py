@@ -1,7 +1,8 @@
 import json
+import logging
+
 import networkx as nx
 import pandas as pd
-import logging
 
 
 def json_string_to_graph(json_string):

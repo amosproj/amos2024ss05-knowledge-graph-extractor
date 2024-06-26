@@ -1,4 +1,5 @@
-.graph_container {
+.main_graph_container {
+  flex: 1;
   display: flex;
   flex-direction: column;
   gap: 50px;
@@ -8,6 +9,36 @@
   height: 100vh;
   width: 100vw;
   /* overflow: hidden;  */
+}
+
+.graph_container {
+  flex: 1;
+  display: flex;
+  flex-direction: row;
+  gap: 50px;
+  text-align: center;
+  justify-content: flex-start;
+  height: 100vh;
+  width: 100vw;
+}
+
+.graph_info {
+  width: 25%;
+  padding: 20px;
+  overflow-y: auto;
+}
+
+.graph_info h1 {
+  margin-bottom: 30px;
+  text-decoration: underline;
+}
+
+.graph_info p {
+  margin-bottom: 30px;
+}
+
+.search_container {
+  position: relative;
 }
 
 .sigma_container {
