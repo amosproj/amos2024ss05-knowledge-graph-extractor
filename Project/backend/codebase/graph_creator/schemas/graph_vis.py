@@ -8,6 +8,8 @@ class GraphNode(BaseModel):
     label: str
     size: int = Field(default=1)
     color: str = Field(default="#7FFFD4", description="Color aquamarine")
+    topic: str
+    pages: str
 
 
 class GraphEdge(BaseModel):
