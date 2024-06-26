@@ -314,6 +314,35 @@ const GraphVisualization = () => {
     } : {}
   };
 
+  const searchGraph = (event) => {
+    if (event.key === 'Enter') {
+        // Perform search logic based on searchQuery
+    }
+  };
+
+  const inputStyle = {
+    borderRadius: '8px',
+    padding: '8px',
+    width: '100%',
+    marginBottom: '10px',
+    border: '1px solid #ccc',
+    boxSizing: 'border-box',
+    fontSize: '16px',
+    fontFamily: 'Arial, sans-serif',
+  };
+
+  const textareaStyle = {
+    borderRadius: '8px',
+    padding: '8px',
+    width: '100%',
+    minHeight: '200px',
+    border: '1px solid #ccc',
+    boxSizing: 'border-box',
+    fontSize: '16px',
+    fontFamily: 'Arial, sans-serif',
+    resize: 'none',
+  };
+
   if (isLoading) {
     return <div className="loading_spinner_graph">Loading graph...</div>;
   }
@@ -323,20 +352,52 @@ const GraphVisualization = () => {
   }
 
   return (
-    <section className="graph_container">
+    <section className="main_graph_container">
       <h1>Graph Visualization</h1>
-      <FloatingControlCard
-        layout={layout}
-        setLayout={setLayout}
-        physicsOptions={physicsOptions}
-        handlePhysicsChange={handlePhysicsChange}
-        restartStabilization={() => setStabilizationComplete(false)}
-      />
-      <VisGraph 
-        graphData={graphData} 
-        options={options} 
-        setStabilizationComplete={setStabilizationComplete} 
-      />
+      <select onChange={(e) => setLayout(e.target.value)} value={layout}>
+        <option value="barnesHut">Barnes Hut</option>
+        <option value="forceAtlas2Based">Force Atlas 2 Based</option>
+        <option value="hierarchicalRepulsion">Hierarchical Repulsion</option>
+        <option value="repulsion">Repulsion</option>
+        <option value="hierarchical">Hierarchical</option>
+        <option value="grid">Grid</option>
+        <option value="random">Random</option>
+      </select>
+      <section className="graph_container">
+        <div className="graph_info">
+          <h1>Graph Information</h1>
+          <p>
+            File ID: <br /> {fileId}
+            <br /> <br />
+            Created at: <br /> xx.xx.xxxx
+          </p>
+          <input
+            type="text"
+            placeholder="Search for keywords"
+            style={inputStyle}
+            onKeyDown={searchGraph}
+          />
+          <textarea
+            rows={5}
+            placeholder="Answer to your search will be displayed here!"
+            style={textareaStyle}
+            readOnly
+          />
+        </div>
+        <VisGraph 
+          graphData={graphData} 
+          options={options} 
+          setStabilizationComplete={setStabilizationComplete} 
+        />
+        <FloatingControlCard
+          layout={layout}
+          setLayout={setLayout}
+          physicsOptions={physicsOptions}
+          handlePhysicsChange={handlePhysicsChange}
+          restartStabilization={() => setStabilizationComplete(false)}
+          style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}
+        />
+      </section>
     </section>
   );
 };
