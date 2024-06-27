@@ -25,8 +25,9 @@ const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
         label: node.id,
         shape: 'dot',
         size: 25,
+        title: `Found in pages: ${node.pages}`,
         color: {
-          background: '#69b3a2',
+          background: '#000000',
           border: '#508e7f',
           highlight: {
             background: '#69b3a2',
@@ -255,6 +256,7 @@ const GraphVisualization = () => {
     },
     interaction: {
       hover: true,
+      tooltipDelay: 30,
       zoomView: true,
       dragView: true,
       selectConnectedEdges: false,
@@ -387,10 +389,10 @@ const GraphVisualization = () => {
             }}
           />
         </div>
-        <VisGraph 
-          graphData={graphData} 
-          options={options} 
-          setStabilizationComplete={setStabilizationComplete} 
+        <VisGraph
+          graphData={graphData}
+          options={options}
+          setStabilizationComplete={setStabilizationComplete}
         />
         <FloatingControlCard
           layout={layout}
