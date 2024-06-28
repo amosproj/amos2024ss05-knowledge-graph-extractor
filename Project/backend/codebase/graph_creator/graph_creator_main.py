@@ -6,7 +6,7 @@ from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
 from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
-
+from graph_creator.deduplication_handler import deduplicate_entities_and_relations  # New import for deduplication
 
 def process_file_to_graph(g_job: GraphJob):
     """
@@ -86,6 +86,12 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
+
+    # Deduplicate entities and relations
+    deduplicated_combined = deduplicate_entities_and_relations(combined.to_dict('records'))
+
+    # Convert deduplicated_combined back to DataFrame
+    deduplicated_combined_df = pd.DataFrame(deduplicated_combined)
 
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()

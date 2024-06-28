@@ -84,5 +84,9 @@ typing-inspect==0.9.0
 urllib3==2.2.1
 google-generativeai==0.5.4
 groq==0.8.0
-spacy
+
 langchain-groq
+sentence-transformers==2.2.2
+torch==2.0.0
+
+spacy
