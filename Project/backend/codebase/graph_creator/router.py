@@ -23,6 +23,7 @@ from graph_creator.schemas.graph_vis import (
 from graph_creator.services.netx_graphdb import NetXGraphDB
 from graph_creator.services.query_graph import GraphQuery
 from graph_creator.utils.const import GraphStatus
+from graph_analysis.graph_analysis import analyze_graph_structure
 
 router = APIRouter()
 
@@ -307,3 +308,38 @@ async def query_graph(
     graph = netx_services.load_graph(graph_job_id=graph_job_id)
     data = graph_query_services.query_graph(graph=graph, query=input_data.text)
     return data
+
+
+@router.get("/graph_keywords/{graph_job_id}")
+async def query_graph(
+    graph_job_id: uuid.UUID,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
+):
+    """
+    Reads a graph job by id and returns important nodes.
+
+    Args:   
+        graph_job_id (uuid.UUID): ID of the graph job to be read.
+        graph_job_dao (GraphJobDAO):
+        netx_services (NetXGraphDB):
+
+    Returns:
+        GraphJob:
+
+    Raises:
+        HTTPException: If there is no graph job with the given ID.
+    """
+
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != GraphStatus.GRAPH_READY:
+        raise HTTPException(
+            status_code=400,
+            detail="No graph created for this job!",
+        )
+    graph = netx_services.load_graph(graph_job_id=graph_job_id)
+    graph_keywords = analyze_graph_structure(graph)
+    return graph_keywords
