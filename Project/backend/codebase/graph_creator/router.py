@@ -13,7 +13,7 @@ from starlette.responses import JSONResponse
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
 from graph_creator.pdf_handler import process_pdf_into_chunks
-from graph_creator.gemini import process_chunks
+from graph_creator.services.llm.llama3 import llama3
 import shutil
 import mimetypes
 from graph_creator.schemas.graph_vis import GraphVisData, QueryInputData, GraphQueryOutput
@@ -62,7 +62,8 @@ async def process_pdf(file: UploadFile = File(...)):
         prompt_template = "Give all valid relation in the given: {text_content}"
 
         # Generate response using LLM
-        response_json = process_chunks(text_chunks, prompt_template)
+        llm_handler = llama3()
+        response_json = llm_handler.process_chunks(text_chunks, prompt_template)
 
         return {"response": response_json}
     finally:

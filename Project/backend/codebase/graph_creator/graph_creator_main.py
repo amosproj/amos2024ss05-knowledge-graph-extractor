@@ -1,6 +1,6 @@
 import mimetypes
 
-from graph_creator.llama3 import process_chunks as groq_process_chunks
+from graph_creator.services.llm.llama3 import llama3
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
 from graph_creator import graph_handler
@@ -17,9 +17,11 @@ def process_file_to_graph(g_job: GraphJob):
     Returns:
         None
     """
+    llm_handler = llama3()
     # extract entities and relations
     entities_and_relations, chunks = process_file_to_entities_and_relations(
-        g_job.location
+        g_job.location,
+        llm_handler
     )
 
     # check for error
@@ -28,10 +30,10 @@ def process_file_to_graph(g_job: GraphJob):
 
     # connect graph pieces
     uuid = g_job.id
-    create_and_store_graph(uuid, entities_and_relations, chunks)
+    create_and_store_graph(uuid, entities_and_relations, chunks, llm_handler)
 
 
-def process_file_to_entities_and_relations(file: str):
+def process_file_to_entities_and_relations(file: str, llm_handler):
     """
     Process the given file to extract entities and relations.
 
@@ -58,7 +60,7 @@ def process_file_to_entities_and_relations(file: str):
 
         # Generate response using LLM
         # response_json = process_chunks(text_chunks, prompt_template)
-        response_json = groq_process_chunks(text_chunks)
+        response_json = llm_handler.process_chunks(text_chunks)
         print(response_json)
     except Exception as e:
         print(e)
@@ -67,7 +69,7 @@ def process_file_to_entities_and_relations(file: str):
     return response_json, chunks
 
 
-def create_and_store_graph(uuid, entities_and_relations, chunks):
+def create_and_store_graph(uuid, entities_and_relations, chunks, llm_handler):
     """
     Create and store a graph based on the given entities and relations.
 
@@ -84,7 +86,7 @@ def create_and_store_graph(uuid, entities_and_relations, chunks):
     # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
-    combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
+    combined = graph_handler.connect_with_llm(df_e_and_r, chunks, llm_handler)
 
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()

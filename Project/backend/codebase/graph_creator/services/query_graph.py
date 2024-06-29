@@ -7,7 +7,7 @@ from langchain_community.graphs import NetworkxEntityGraph
 from langchain_groq import ChatGroq
 from networkx import NetworkXError
 
-from graph_creator.llama3 import configure_groq
+from graph_creator.services.llm.llama3 import llama3
 from graph_creator.schemas.graph_vis import GraphQueryOutput
 
 
@@ -41,7 +41,8 @@ class GraphQuery:
 
     @staticmethod
     def retrieve_entities_from_llm(query: str):
-        groq_client = configure_groq()
+        llm_handler = llama3()
+        groq_client = llm_handler.configure_groq()
         SYS_PROMPT = """
             The user has a knowledge graph and wants to query it. For that he needs entities.
             Your task is to extract all entities from the below query.
