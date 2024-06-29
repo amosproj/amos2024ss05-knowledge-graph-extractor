@@ -2,10 +2,10 @@ import React, { useEffect, useState, useRef } from 'react';
 import { Network } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
-import { VISUALIZE_API_PATH } from '../../constant';
+import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
-import { InputAdornment } from '@mui/material';
+import { InputAdornment, Chip, Box } from '@mui/material';
 
 const VisGraph = ({ graphData, options }) => {
   const containerRef = useRef(null);
@@ -70,6 +70,9 @@ const GraphVisualization = () => {
   const [graphData, setGraphData] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState('barnesHut');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [keywords, setKeywords] = useState([]);
+  
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -86,7 +89,20 @@ const GraphVisualization = () => {
       }
     };
 
+  const fetchKeywords = async () => {
+    try {
+      const response = await fetch(
+        `${import.meta.env.VITE_BACKEND_HOST}${KEYWORDS_API_PATH.replace(':fileId', fileId)}`,
+      );
+      const data = await response.json();
+      setKeywords(data);
+    } catch (error) {
+      console.error('Error fetching keywords:', error);
+    }
+  };
+
     fetchGraphData();
+    fetchKeywords();
   }, [fileId]);
 
   const options = {
@@ -208,8 +224,13 @@ const GraphVisualization = () => {
 
   const searchGraph = (event) => {
     if (event.key === 'Enter') {
-      // Perform the search
+      performSearch();
     }
+  };
+
+  const performSearch = () => {
+    // Perform the search based on searchQuery
+    console.log('Searching for:', searchQuery);
   };
 
   const searchBarStyle = {
@@ -243,7 +264,7 @@ const GraphVisualization = () => {
 
   return (
     <section className="main_graph_container">
-      <h1>Graph Visualization </h1>
+      <h1>Graph Visualization</h1>
       <select onChange={(e) => setLayout(e.target.value)} value={layout}>
         <option value="barnesHut">Barnes Hut</option>
         <option value="forceAtlas2Based">Force Atlas 2 Based</option>
@@ -260,11 +281,26 @@ const GraphVisualization = () => {
             Document Name: <br /> {graphData.document_name}
             <br /> <br />
             Created at: <br /> {formattedDate} {formattedTime}
+          <br /> <br />
+          Graph keywords: <br />          
+          <Box sx={{ marginBottom: 1 }}>
+            {keywords.map((keyword) => (
+              <Chip
+                key={keyword}
+                label={keyword}
+                onClick={() => setSearchQuery(keyword)}
+                sx={{ marginRight: 1, marginBottom: 1 }}
+                clickable
+              />
+            ))}
+          </Box>
           </p>
           <TextField
             className="search_text_field"
             placeholder="Search for keywords"
             style={searchBarStyle}
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={searchGraph}
             InputProps={{
               endAdornment: (
@@ -292,3 +328,4 @@ const GraphVisualization = () => {
 };
 
 export default GraphVisualization;
+
