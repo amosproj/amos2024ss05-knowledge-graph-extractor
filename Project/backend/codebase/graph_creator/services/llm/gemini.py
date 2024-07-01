@@ -6,6 +6,7 @@ from graph_creator.services.llm.llm_Interface import LlmInterface
 from graph_creator.services.json_handler import transform_llm_output_to_dict
 from google.generativeai.types.generation_types import StopCandidateException
 
+
 class gemini(LlmInterface):
     """
     Gemini llm handler
@@ -28,7 +29,7 @@ class gemini(LlmInterface):
 
     def get_genai_client(self):
         genai_client = genai.GenerativeModel(
-            #model_name="gemini-1.5-pro-latest",
+            # model_name="gemini-1.5-pro-latest",
             model_name="gemini-1.5-flash-latest",
             safety_settings=[
                 {
@@ -59,7 +60,6 @@ class gemini(LlmInterface):
 
         return genai_client
 
-
     def serialize_chat_history(self, history):
         """
         Convert the chat history to a serializable format.
@@ -73,14 +73,13 @@ class gemini(LlmInterface):
             }
             serialized_history.append(serialized_entry)
         return serialized_history
-    
+
     def execute_llm_call(self, chat_session, message):
         """
         Execute the prompt with the gemini client
         """
         logging.info("Run prompt with gemini")
         return chat_session.send_message(message)
-
 
     def extract_entities_and_relations(self, chunk):
         """
@@ -117,9 +116,8 @@ class gemini(LlmInterface):
 
         return response.text
 
-
-    def check_for_connecting_relation(self, 
-        chunk, entities_component_1, entities_component_2
+    def check_for_connecting_relation(
+        self, chunk, entities_component_1, entities_component_2
     ):
         """
         Check for connecting relation between entities of two components.
@@ -143,7 +141,7 @@ class gemini(LlmInterface):
 
         chat_session = self.genai_client.start_chat(history=[])
         message = SYS_PROMPT + USER_PROMPT
-        result = ''
+        result = ""
         try:
             response = self.execute_llm_call(chat_session, message)
             result = response.text
@@ -151,7 +149,6 @@ class gemini(LlmInterface):
             logging.error(googleException)
 
         return result
-
 
     def process_chunks(self, chunks):
         """

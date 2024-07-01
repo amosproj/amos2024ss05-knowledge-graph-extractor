@@ -2,7 +2,6 @@ import logging
 import os
 import uuid
 
-import tempfile
 from typing import Optional
 
 
@@ -12,11 +11,11 @@ from starlette.responses import JSONResponse
 
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
-from graph_creator.pdf_handler import process_pdf_into_chunks
-from graph_creator.services.llm.llama3 import llama3
-import shutil
-import mimetypes
-from graph_creator.schemas.graph_vis import GraphVisData, QueryInputData, GraphQueryOutput
+from graph_creator.schemas.graph_vis import (
+    GraphVisData,
+    QueryInputData,
+    GraphQueryOutput,
+)
 from graph_creator.services.netx_graphdb import NetXGraphDB
 
 import graph_creator.graph_creator_main as graph_creator_main
@@ -27,6 +26,7 @@ router = APIRouter()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
 
 # Endpoint for uploading PDF documents
 @router.post("/upload/")
@@ -175,9 +175,9 @@ async def read_graph_job_by_name(
 
 @router.delete("/graph_jobs/{graph_job_id}")
 async def delete_graph_job(
-        graph_job_id: uuid.UUID,
-        graph_job_dao: GraphJobDAO = Depends(),
-        netx_services: NetXGraphDB = Depends(),
+    graph_job_id: uuid.UUID,
+    graph_job_dao: GraphJobDAO = Depends(),
+    netx_services: NetXGraphDB = Depends(),
 ):
     """
     Delete a graph job with the given name
@@ -261,7 +261,7 @@ async def query_graph(
     if g_job.status != GraphStatus.GRAPH_READY:
         raise HTTPException(
             status_code=400,
-            detail=f"No graph created for this job!",
+            detail="No graph created for this job!",
         )
     graph = netx_services.load_graph(graph_job_id=graph_job_id)
     data = graph_query_services.query_graph(graph=graph, query=input_data.text)

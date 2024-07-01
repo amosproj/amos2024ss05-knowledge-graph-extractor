@@ -6,6 +6,7 @@ from groq import Groq
 from graph_creator.services.llm.llm_Interface import LlmInterface
 from graph_creator.services.json_handler import transform_llm_output_to_dict
 
+
 class llama3(LlmInterface):
     """
     Llama3 llm handler that works with the provider groq
@@ -20,13 +21,13 @@ class llama3(LlmInterface):
 
     def get_llm_calls(self):
         return self.llm_calls
-    
+
     def get_llm_rate_limit(self):
         return self.llm_rate_limit
-    
+
     def get_rate_timeout(self):
         return self.rate_timeout
-    
+
     def reset_llm_call_count(self):
         """
         Reset llm call tracking because groq limits the request rate
@@ -42,7 +43,6 @@ class llama3(LlmInterface):
         if not api_key:
             raise ValueError("API key not found in environment variables")
         return Groq(api_key=api_key)
-
 
     def serialize_chat_history(self, history):
         """
@@ -74,7 +74,6 @@ class llama3(LlmInterface):
 
         return result
 
-
     def extract_entities_and_relations(self, chunk):
         """
         Extract entities and relations from a chunk using the Groq client.
@@ -103,16 +102,15 @@ class llama3(LlmInterface):
             "]"
         )
         USER_PROMPT = f"context: ```{chunk}``` \n\n output: "
-        messages=[
-                {"role": "system", "content": SYS_PROMPT},
-                {"role": "user", "content": USER_PROMPT},
-            ]
+        messages = [
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": USER_PROMPT},
+        ]
         chat_completion = self.execute_llm_call(messages)
         return chat_completion.choices[0].message.content
 
-
-    def check_for_connecting_relation(self, 
-        chunk, entities_component_1, entities_component_2
+    def check_for_connecting_relation(
+        self, chunk, entities_component_1, entities_component_2
     ):
         """
         Check for connecting relation between entities of two components.
@@ -133,13 +131,12 @@ class llama3(LlmInterface):
             "}"
         )
         USER_PROMPT = f"text chunk: ```{chunk}``` \n\n output: "
-        messages=[
-                {"role": "system", "content": SYS_PROMPT},
-                {"role": "user", "content": USER_PROMPT},
-            ]
+        messages = [
+            {"role": "system", "content": SYS_PROMPT},
+            {"role": "user", "content": USER_PROMPT},
+        ]
         chat_completion = self.execute_llm_call(messages)
         return chat_completion.choices[0].message.content
-
 
     def process_chunks(self, chunks):
         """
