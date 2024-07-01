@@ -86,7 +86,7 @@ google-generativeai==0.5.4
 groq==0.8.0
 
 langchain-groq
-sentence-transformers==2.2.2
-torch==2.0.0
-
-spacy
+bertopic
+langchain
+faiss-cpu
+sentence-transformers 
