@@ -1,4 +1,7 @@
+from requests import patch
+from graph_creator.services.llm.llama_gemini_combination import llama_gemini_combination
 from graph_creator import graph_handler
+from unittest.mock import patch, MagicMock
 
 import json
 import pandas as pd
@@ -71,7 +74,6 @@ def test_relation_extraction_from_llm_entity_not_in_lists():
     # Assert
     assert relation is None
 
-
 def test_component_connection_with_llm(mocker):
     """
     Tests if component combination with llm works
@@ -86,11 +88,12 @@ def test_component_connection_with_llm(mocker):
             }
         ]
     """
-    mocker.patch(
-        "graph_creator.llama3.check_for_connecting_relation_",
-        return_value=llm_response,
-    )
-    mocker.patch("time.sleep")
+
+    patcher = patch('graph_creator.services.llm.llama_gemini_combination')
+    MockLlama3 = patcher.start()
+    mock_instance = MockLlama3.return_value
+
+    mock_instance.check_for_connecting_relation.return_value = llm_response
 
     with open("tests/data/llmExtractedInformation.json") as file:
         entities_and_relations = json.load(file)
@@ -108,9 +111,9 @@ def test_component_connection_with_llm(mocker):
 
     # Act
     # do one processing step to combine two disjoint components of the knowledge graph
-    rate_limit = 1
+    limit_attempts = 2
     result_entity_and_relations = graph_handler.connect_with_llm(
-        df_entities_and_relations, chunks, rate_limit
+        df_entities_and_relations, chunks, mock_instance, limit_attempts
     )
 
     # Assert
