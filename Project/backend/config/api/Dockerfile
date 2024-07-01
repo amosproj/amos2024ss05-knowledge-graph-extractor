@@ -13,7 +13,6 @@ RUN : \
     && pip install pip --upgrade \
     && pip install setuptools --upgrade \
     && pip install -r requirements.txt \
-    && python -m spacy download en_core_web_sm \
     && :
 
 COPY codebase/ ./

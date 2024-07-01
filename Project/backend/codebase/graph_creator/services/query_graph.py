@@ -1,7 +1,6 @@
 import os
 
 import networkx as nx
-import spacy
 from langchain.chains.graph_qa.base import GraphQAChain
 from langchain_community.graphs import NetworkxEntityGraph
 from langchain_groq import ChatGroq
@@ -15,10 +14,8 @@ class GraphQuery:
 
     def query_graph(self, graph: nx.Graph, query: str) -> GraphQueryOutput:
         entities_from_llm = self.retrieve_entities_from_llm(query)
-        entities_from_spacy = self.retrieve_entities_from_spacy(query)
         all_entities = set()
         all_entities.update(entities_from_llm)
-        all_entities.update(entities_from_spacy)
 
         entities_relationships = {}
 
@@ -35,7 +32,6 @@ class GraphQuery:
 
         return GraphQueryOutput(
             llm_nodes=entities_from_llm,
-            spacy_nodes=entities_from_spacy,
             retrieved_info=entities_relationships,
         )
 
@@ -58,14 +54,6 @@ class GraphQuery:
         )
         response = chat_completion.choices[0].message.content
         return [entity.strip() for entity in response.split(",")]
-
-    @staticmethod
-    def retrieve_entities_from_spacy(query: str):
-        nlp = spacy.load("en_core_web_sm")
-        doc = nlp(query)
-
-        entities = [(ent.text, ent.label_) for ent in doc.ents]
-        return entities
 
     def query_graph_via_langchain(self, query: str, graph_path: str):
         graph1 = NetworkxEntityGraph.from_gml(graph_path)

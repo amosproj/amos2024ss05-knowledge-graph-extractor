@@ -1,7 +1,14 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FilePondProps } from 'react-filepond';
-import { Box, Button, CircularProgress, Typography } from '@mui/material';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Tooltip,
+  Typography,
+} from '@mui/material';
+import InfoIcon from '@mui/icons-material/Info'; // Import InfoIcon for hint button
 
 import { GENERATE_API_PATH, GraphStatus } from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
@@ -73,6 +80,9 @@ function UploadPage() {
         setIsGenerating(false);
       });
   };
+  const hintText = `
+    Formats: .pdf .pptx .docx .txt .json
+  `;
 
   return (
     <main className="main_wrapper_upload">
@@ -81,7 +91,10 @@ function UploadPage() {
         className="title"
         sx={{ color: (theme) => theme.palette.text.secondary }}
       >
-        Upload a PDF document to generate the graph
+        Upload a document to generate the graph
+        <Tooltip title={<Typography>{hintText}</Typography>}>
+          <InfoIcon color="action" sx={{ mr: 1, cursor: 'pointer' }} />
+        </Tooltip>
       </Typography>
 
       <Upload
