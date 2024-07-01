@@ -31,13 +31,15 @@ function App() {
     <Router>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div>
+        <div className='Appcontainer'>
           <AppBar position="sticky" className="appBar">
             <Toolbar
               className="toolbar"
               sx={{ background: (theme) => theme.palette.background.default }}
             >
+              <NavLink to="/">
               <img src={logo} alt="Logo" className="logo" />
+              </NavLink>
               <Typography variant="h6" className="title">
                 Graph Masters
               </Typography>
@@ -48,7 +50,7 @@ function App() {
               </NavLink>
             </Toolbar>
           </AppBar>
-        </div>
+        
         <main className="main_wrapper">
           <Routes>
             <Route path="/" element={<LandingPage />} />
@@ -56,6 +58,7 @@ function App() {
             <Route path="/graph/:fileId" element={<Graph />} />
           </Routes>
         </main>
+        </div>
       </ThemeProvider>
     </Router>
   );
