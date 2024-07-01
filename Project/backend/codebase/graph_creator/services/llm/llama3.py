@@ -94,13 +94,6 @@ class llama3(LlmInterface):
             "]"
         )
         USER_PROMPT = f"context: ```{chunk}``` \n\n output: "
-        '''chat_completion = groq_client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": SYS_PROMPT},
-                {"role": "user", "content": USER_PROMPT},
-            ],
-            model="llama3-8b-8192",
-        )'''
         messages=[
                 {"role": "system", "content": SYS_PROMPT},
                 {"role": "user", "content": USER_PROMPT},
@@ -131,13 +124,6 @@ class llama3(LlmInterface):
             "}"
         )
         USER_PROMPT = f"text chunk: ```{chunk}``` \n\n output: "
-        '''chat_completion = groq_client.chat.completions.create(
-            messages=[
-                {"role": "system", "content": SYS_PROMPT},
-                {"role": "user", "content": USER_PROMPT},
-            ],
-            model="llama3-8b-8192",
-        )'''
         messages=[
                 {"role": "system", "content": SYS_PROMPT},
                 {"role": "user", "content": USER_PROMPT},

@@ -3,6 +3,7 @@ from datetime import datetime
 import google.generativeai as genai
 from graph_creator.services.llm.llm_Interface import LlmInterface
 from graph_creator.services.json_handler import transform_llm_output_to_dict
+from google.generativeai.types.generation_types import StopCandidateException
 
 class gemini(LlmInterface):
 
@@ -23,7 +24,8 @@ class gemini(LlmInterface):
 
     def get_genai_client(self):
         genai_client = genai.GenerativeModel(
-            model_name="gemini-1.5-pro-latest",
+            #model_name="gemini-1.5-pro-latest",
+            model_name="gemini-1.5-flash-latest",
             safety_settings=[
                 {
                     "category": "HARM_CATEGORY_HARASSMENT",
@@ -103,7 +105,6 @@ class gemini(LlmInterface):
 
         chat_session = self.genai_client.start_chat(history=[])
         message = SYS_PROMPT + USER_PROMPT
-        #response = chat_session.send_message(message)
         response = self.execute_llm_call(chat_session, message)
 
         return response.text
@@ -134,10 +135,14 @@ class gemini(LlmInterface):
 
         chat_session = self.genai_client.start_chat(history=[])
         message = SYS_PROMPT + USER_PROMPT
-        #response = chat_session.send_message(message)
-        response = self.execute_llm_call(chat_session, message)
+        result = ''
+        try:
+            response = self.execute_llm_call(chat_session, message)
+            result = response.text
+        except StopCandidateException as googleException:
+            print(googleException)
 
-        return response.text
+        return result
 
 
     def process_chunks(self, chunks):

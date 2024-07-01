@@ -16,10 +16,11 @@ class llama_gemini_combination(LlmInterface):
     def orchestrate_llm_calls(self, function, *args):
 
         if self.currently_waiting:
-            rate_timeout = self.llama3.get_rate_timeout
+            rate_timeout = self.llama3.get_rate_timeout()
             waiting_time = time.time() - self.start_waiting_time
             if waiting_time > rate_timeout:
                 self.llama3.reset_llm_call_count()
+                self.currently_waiting = False
 
         llama_rate_limit = self.llama3.get_llm_rate_limit()
         current_llm_call_count = self.llama3.get_llm_calls()
@@ -30,15 +31,15 @@ class llama_gemini_combination(LlmInterface):
         if current_llm_call_count < llama_rate_limit:
             match function:
                 case self.extract_entities_and_relations:
-                    result = self.llama3.extract_entities_and_relations(args)
+                    result = self.llama3.extract_entities_and_relations(args[0])
                 case self.check_for_connecting_relation:
-                    result = self.llama3.extract_entities_and_relations(args)
+                    result = self.llama3.check_for_connecting_relation(args[0], args[1], args[2])
         else:
             match function:
                 case self.extract_entities_and_relations:
-                    result = self.gemini.extract_entities_and_relations(args)
+                    result = self.gemini.extract_entities_and_relations(args[0])
                 case self.check_for_connecting_relation:
-                    result = self.gemini.extract_entities_and_relations(args)
+                    result = self.gemini.check_for_connecting_relation(args[0], args[1], args[2])
         
         if captureTime:
             self.start_waiting_time = time.time()
@@ -46,8 +47,8 @@ class llama_gemini_combination(LlmInterface):
 
         return result
 
-    def extract_entities_and_relations(self, chunk, genai_client):
-        return self.orchestrate_llm_calls(self.extract_entities_and_relations, chunk, genai_client)
+    def extract_entities_and_relations(self, chunk):
+        return self.orchestrate_llm_calls(self.extract_entities_and_relations, chunk)
 
     def check_for_connecting_relation(self, text_chunk, entities_component_1, entities_component_2):
         return self.orchestrate_llm_calls(self.check_for_connecting_relation, text_chunk, entities_component_1, entities_component_2)
@@ -63,3 +64,6 @@ class llama_gemini_combination(LlmInterface):
             responses.append(transform_llm_output_to_dict(response_json))
 
         return responses
+    
+    def execute_llm_call(self, chat_session, message):
+        pass #not used

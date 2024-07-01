@@ -7,7 +7,7 @@ class LlmInterface(ABC):
         pass
 
     @abstractmethod
-    def extract_entities_and_relations(self, chunk, genai_client):
+    def extract_entities_and_relations(self, chunk):
         pass
     
     @abstractmethod

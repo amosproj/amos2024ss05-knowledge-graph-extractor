@@ -1,6 +1,6 @@
 import mimetypes
 
-from graph_creator.services.llm.llama3 import llama3
+from graph_creator.services.llm.llama_gemini_combination import llama_gemini_combination
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
 from graph_creator import graph_handler
@@ -17,7 +17,7 @@ def process_file_to_graph(g_job: GraphJob):
     Returns:
         None
     """
-    llm_handler = llama3()
+    llm_handler = llama_gemini_combination()
     # extract entities and relations
     entities_and_relations, chunks = process_file_to_entities_and_relations(
         g_job.location,
