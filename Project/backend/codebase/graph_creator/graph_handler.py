@@ -335,7 +335,7 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
     return entity_and_relation_df
 
 
-def connect_with_llm(data, text_chunks, llm_handler):
+def connect_with_llm(data, text_chunks, llm_handler, restrict_attempts=-1):
     """
     Connect the pieces of the knowlege graph by extracting new relations between disjoint
     graph pieces from the text chunks using the llm
@@ -372,7 +372,8 @@ def connect_with_llm(data, text_chunks, llm_handler):
     connections = 0
     llm_calls = 0
     connecting_relations = []
-    for i in range(1, len(components)):
+    connect_components = len(components) if restrict_attempts < 0 else restrict_attempts
+    for i in range(1, connect_components):
         main_component = components[0]
         current_component = components[i]
 
