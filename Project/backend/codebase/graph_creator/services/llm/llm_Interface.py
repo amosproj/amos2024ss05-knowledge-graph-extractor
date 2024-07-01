@@ -1,6 +1,9 @@
 from abc import ABC, abstractmethod
 
 class LlmInterface(ABC):
+    """
+    Llm handler interface for all llm handlers to implement
+    """
 
     @abstractmethod
     def execute_llm_call(self, chat_session, message):

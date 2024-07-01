@@ -1,4 +1,5 @@
 import os
+import logging
 from datetime import datetime
 import google.generativeai as genai
 from graph_creator.services.llm.llm_Interface import LlmInterface
@@ -6,6 +7,9 @@ from graph_creator.services.json_handler import transform_llm_output_to_dict
 from google.generativeai.types.generation_types import StopCandidateException
 
 class gemini(LlmInterface):
+    """
+    Gemini llm handler
+    """
 
     def __init__(self) -> None:
         super().__init__()
@@ -71,6 +75,10 @@ class gemini(LlmInterface):
         return serialized_history
     
     def execute_llm_call(self, chat_session, message):
+        """
+        Execute the prompt with the gemini client
+        """
+        logging.info("Run prompt with gemini")
         return chat_session.send_message(message)
 
 
@@ -140,7 +148,7 @@ class gemini(LlmInterface):
             response = self.execute_llm_call(chat_session, message)
             result = response.text
         except StopCandidateException as googleException:
-            print(googleException)
+            logging.error(googleException)
 
         return result
 

@@ -17,7 +17,9 @@ def process_file_to_graph(g_job: GraphJob):
     Returns:
         None
     """
+    # llm handler that is used for all llm calls during knowledge graph creation
     llm_handler = llama_gemini_combination()
+    
     # extract entities and relations
     entities_and_relations, chunks = process_file_to_entities_and_relations(
         g_job.location,

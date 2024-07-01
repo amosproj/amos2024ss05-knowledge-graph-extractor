@@ -7,6 +7,9 @@ from graph_creator.services.llm.llm_Interface import LlmInterface
 from graph_creator.services.json_handler import transform_llm_output_to_dict
 
 class llama3(LlmInterface):
+    """
+    Llama3 llm handler that works with the provider groq
+    """
 
     def __init__(self) -> None:
         self.llm_calls = 0
@@ -25,7 +28,10 @@ class llama3(LlmInterface):
         return self.rate_timeout
     
     def reset_llm_call_count(self):
-         self.llm_calls = 0
+        """
+        Reset llm call tracking because groq limits the request rate
+        """
+        self.llm_calls = 0
 
     def configure_groq(self):
         """
@@ -53,6 +59,9 @@ class llama3(LlmInterface):
         return serialized_history
 
     def execute_llm_call(self, message):
+        """
+        Execute a prompt with the groq client
+        """
         # only make calls to the llm if request rate allows for it
         if self.llm_calls > 0 and self.llm_calls % self.llm_rate_limit == 0:
             # wait 60s so that available requests are refreshed
