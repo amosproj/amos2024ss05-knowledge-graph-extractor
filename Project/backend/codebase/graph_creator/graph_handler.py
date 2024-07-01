@@ -115,6 +115,8 @@ def index_entity_relation_table(entity_and_relation_df, entities):
         A List containing all relations as tuples of entity indexes
     """
     entities_dict = {}
+    #make sure all entities are strings
+    entities = [entity if isinstance(entity, str) else str(entity) for entity in entities]
     # for reproducable results
     entities = sorted(entities)
     for i in range(len(entities)):
