@@ -1,14 +1,32 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Network } from 'vis-network/standalone/esm/vis-network';
+import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
 import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
-import { InputAdornment, Chip, Box } from '@mui/material';
+import {
+  InputAdornment,
+  Chip,
+  Box,
+  CircularProgress,
+  MenuItem,
+  Select,
+  Typography,
+} from '@mui/material';
 
-const VisGraph = ({ graphData, options }) => {
-  const containerRef = useRef(null);
+interface GraphData {
+  nodes: Array<{ id: string; label?: string; [key: string]: any }>;
+  edges: Array<{ source: string; target: string; [key: string]: any }>;
+  document_name: string;
+  graph_created_at: string;
+}
+
+const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
+  graphData,
+  options,
+}) => {
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!graphData) return;
@@ -16,7 +34,7 @@ const VisGraph = ({ graphData, options }) => {
     const data = {
       nodes: graphData.nodes.map((node) => ({
         id: node.id,
-        label: node.id,
+        label: node.label || node.id,
         shape: 'dot',
         size: 25,
         color: {
@@ -41,7 +59,11 @@ const VisGraph = ({ graphData, options }) => {
       })),
     };
 
-    const network = new Network(containerRef.current, data, options);
+    const network = new Network(
+      containerRef.current as HTMLElement,
+      data,
+      options,
+    );
 
     network.on('selectNode', function (params) {
       network.setSelection({
@@ -65,14 +87,13 @@ const VisGraph = ({ graphData, options }) => {
   );
 };
 
-const GraphVisualization = () => {
-  const { fileId = '' } = useParams();
-  const [graphData, setGraphData] = useState(null);
+const GraphVisualization: React.FC = () => {
+  const { fileId = '' } = useParams<{ fileId: string }>();
+  const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState('barnesHut');
   const [searchQuery, setSearchQuery] = useState('');
-  const [keywords, setKeywords] = useState([]);
-  
+  const [keywords, setKeywords] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -89,23 +110,23 @@ const GraphVisualization = () => {
       }
     };
 
-  const fetchKeywords = async () => {
-    try {
-      const response = await fetch(
-        `${import.meta.env.VITE_BACKEND_HOST}${KEYWORDS_API_PATH.replace(':fileId', fileId)}`,
-      );
-      const data = await response.json();
-      setKeywords(data);
-    } catch (error) {
-      console.error('Error fetching keywords:', error);
-    }
-  };
+    const fetchKeywords = async () => {
+      try {
+        const response = await fetch(
+          `${import.meta.env.VITE_BACKEND_HOST}${KEYWORDS_API_PATH.replace(':fileId', fileId)}`,
+        );
+        const data = await response.json();
+        setKeywords(data);
+      } catch (error) {
+        console.error('Error fetching keywords:', error);
+      }
+    };
 
     fetchGraphData();
     fetchKeywords();
   }, [fileId]);
 
-  const options = {
+  const options: Options = {
     nodes: {
       shape: 'dot',
       size: 25,
@@ -222,7 +243,7 @@ const GraphVisualization = () => {
                     },
   };
 
-  const searchGraph = (event) => {
+  const searchGraph = (event: React.KeyboardEvent<HTMLDivElement>) => {
     if (event.key === 'Enter') {
       performSearch();
     }
@@ -233,21 +254,28 @@ const GraphVisualization = () => {
     console.log('Searching for:', searchQuery);
   };
 
-  const searchBarStyle = {
+  const searchBarStyle: React.CSSProperties = {
     padding: '8px',
     width: '100%',
     marginBottom: '10px',
     fontSize: '16px',
   };
 
-  const answerAreaStyle = {
+  const answerAreaStyle: React.CSSProperties = {
     padding: '8px',
     width: '100%',
     fontSize: '16px',
   };
 
   if (isLoading) {
-    return <div className="loading_spinner_graph">Loading graph...</div>;
+    return (
+      <div className="loading_spinner_graph">
+        <CircularProgress />
+        <Typography variant="h6" style={{ marginLeft: '10px' }}>
+          Loading graph...
+        </Typography>
+      </div>
+    );
   }
 
   if (!graphData) {
@@ -257,44 +285,53 @@ const GraphVisualization = () => {
   const formattedDate = new Date(
     graphData.graph_created_at,
   ).toLocaleDateString();
-
   const formattedTime = new Date(
     graphData.graph_created_at,
   ).toLocaleTimeString();
 
   return (
     <section className="main_graph_container">
-      <h1>Graph Visualization</h1>
-      <select onChange={(e) => setLayout(e.target.value)} value={layout}>
-        <option value="barnesHut">Barnes Hut</option>
-        <option value="forceAtlas2Based">Force Atlas 2 Based</option>
-        <option value="hierarchicalRepulsion">Hierarchical Repulsion</option>
-        <option value="repulsion">Repulsion</option>
-        <option value="hierarchical">Hierarchical</option>
-        <option value="grid">Grid</option>
-        <option value="random">Random</option>
-      </select>
+      <Typography variant="h4" gutterBottom>
+        Graph Visualization
+      </Typography>
+      <Select
+        value={layout}
+        onChange={(e) => setLayout(e.target.value as string)}
+        style={{ marginBottom: '20px' }}
+      >
+        <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+        <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
+        <MenuItem value="hierarchicalRepulsion">
+          Hierarchical Repulsion
+        </MenuItem>
+        <MenuItem value="repulsion">Repulsion</MenuItem>
+        <MenuItem value="hierarchical">Hierarchical</MenuItem>
+        <MenuItem value="grid">Grid</MenuItem>
+        <MenuItem value="random">Random</MenuItem>
+      </Select>
       <section className="graph_container">
         <div className="graph_info">
-          <h1>Graph Information</h1>
-          <p>
+          <Typography variant="h5" gutterBottom>
+            Graph Information
+          </Typography>
+          <Typography variant="body1">
             Document Name: <br /> {graphData.document_name}
             <br /> <br />
             Created at: <br /> {formattedDate} {formattedTime}
-          <br /> <br />
-          Graph keywords: <br />          
-          <Box sx={{ marginBottom: 1 }}>
-            {keywords.map((keyword) => (
-              <Chip
-                key={keyword}
-                label={keyword}
-                onClick={() => setSearchQuery(keyword)}
-                sx={{ marginRight: 1, marginBottom: 1 }}
-                clickable
-              />
-            ))}
-          </Box>
-          </p>
+            <br /> <br />
+            Graph keywords: <br />
+            <Box sx={{ marginBottom: 1 }}>
+              {keywords.map((keyword) => (
+                <Chip
+                  key={keyword}
+                  label={keyword}
+                  onClick={() => setSearchQuery(keyword)}
+                  sx={{ marginRight: 1, marginBottom: 1 }}
+                  clickable
+                />
+              ))}
+            </Box>
+          </Typography>
           <TextField
             className="search_text_field"
             placeholder="Search for keywords"
@@ -328,4 +365,3 @@ const GraphVisualization = () => {
 };
 
 export default GraphVisualization;
-
