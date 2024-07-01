@@ -86,3 +86,4 @@ google-generativeai==0.5.4
 groq==0.8.0
 spacy
 langchain-groq
+bertopic

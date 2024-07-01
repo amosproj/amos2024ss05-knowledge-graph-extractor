@@ -1,8 +1,11 @@
 import os
 import uuid
+
 import networkx as nx
 import numpy as np
 import pandas as pd
+
+from graph_creator.models.graph_job import GraphJob
 from graph_creator.schemas.graph_vis import GraphVisData, GraphNode, GraphEdge
 
 # Scale range for min-max scaling the node sizes
@@ -36,9 +39,9 @@ class NetXGraphDB:
 
             # Add nodes with page attribute
             if edge["node_1"] not in graph:
-                graph.add_node(edge["node_1"], pages=set([]))
+                graph.add_node(edge["node_1"], pages=set([]), topic=edge["topic_node_1"])
             if edge["node_2"] not in graph:
-                graph.add_node(edge["node_2"], pages=set([]))
+                graph.add_node(edge["node_2"], pages=set([]), topic=edge["topic_node_2"])
 
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
@@ -94,19 +97,20 @@ class NetXGraphDB:
         if os.path.exists(file_location):
             os.remove(file_location)
 
-    def graph_data_for_visualization(
-        self, graph_job_id: uuid.UUID, node: str | None, adj_depth: int
+    async def graph_data_for_visualization(
+        self, graph_job: GraphJob, node: str = None, adj_depth: int = 1
     ) -> GraphVisData:
         """
         Given a graph travers it and return a json format of all the nodes and edges they have
         ready for visualization to FE
         """
-        graph = self.load_graph(graph_job_id)
+
+        graph = self.load_graph(graph_job.id)
 
         if node:
-            return self._graph_bfs_edges(graph, node, adj_depth)
+            return self._graph_bfs_edges(graph, graph_job, node, adj_depth)
 
-        return self._all_graph_data_for_visualization(graph)
+        return self._all_graph_data_for_visualization(graph, graph_job)
 
     @staticmethod
     def _get_graph_file_path_local_storage(graph_job_id: uuid.UUID) -> str:
@@ -123,7 +127,9 @@ class NetXGraphDB:
         return os.path.join(graphs_directory, f"{graph_job_id}.gml")
 
     @staticmethod
-    def _graph_bfs_edges(graph: nx.Graph, node: str, adj_depth: int) -> GraphVisData:
+    def _graph_bfs_edges(
+            graph: nx.Graph, graph_job: GraphJob, node: str, adj_depth: int
+    ) -> GraphVisData:
         nodes_data = []
         edges_data = []
         visited = set()
@@ -138,6 +144,7 @@ class NetXGraphDB:
                         size=graph.nodes[source].get("size", 1),
                         degree=graph.nodes[source].get("degree", 0),
                         pages=graph.nodes[source].get("pages", "pages not found"),
+                        topic=graph.nodes[source].get("topic", "topic not found"),
                     )
                 )
 
@@ -150,6 +157,7 @@ class NetXGraphDB:
                         size=graph.nodes[target].get("size", 1),
                         degree=graph.nodes[target].get("degree", 0),
                         pages=graph.nodes[source].get("pages", "pages not found"),
+                        topic=graph.nodes[source].get("topic", "topic not found"),
                     )
                 )
             edge_properties = graph[source][target]
@@ -162,10 +170,15 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(nodes=nodes_data, edges=edges_data)
+        return GraphVisData(document_name=graph_job.name,
+                            graph_created_at=graph_job.updated_at,
+                            nodes=nodes_data,
+                            edges=edges_data)
 
     @staticmethod
-    def _all_graph_data_for_visualization(graph: nx.Graph) -> GraphVisData:
+    def _all_graph_data_for_visualization(
+            graph: nx.Graph, graph_job: GraphJob
+    ) -> GraphVisData:
         nodes_data = []
         edges_data = []
 
@@ -179,6 +192,7 @@ class NetXGraphDB:
                     size=node_attrs.get("size", 1),
                     degree=node_attrs.get("degree", 0),
                     pages=node_attrs.get("pages", "pages not found"),
+                    topic=node_attrs.get("topic", "topic not found"),
                 )
             )
 
@@ -194,4 +208,7 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(nodes=nodes_data, edges=edges_data)
+        return GraphVisData(document_name=graph_job.name,
+                            graph_created_at=graph_job.updated_at,
+                            nodes=nodes_data,
+                            edges=edges_data)
