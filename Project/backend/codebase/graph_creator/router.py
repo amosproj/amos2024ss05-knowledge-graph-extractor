@@ -1,8 +1,5 @@
 import logging
-import mimetypes
 import os
-import shutil
-import tempfile
 import uuid
 from typing import Optional
 
@@ -12,8 +9,6 @@ from starlette.responses import JSONResponse
 
 import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
-from graph_creator.gemini import process_chunks
-from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.schemas.graph_job import GraphJobCreate
 from graph_creator.schemas.graph_vis import (
     GraphVisData,
@@ -22,7 +17,7 @@ from graph_creator.schemas.graph_vis import (
 )
 from graph_creator.services.netx_graphdb import NetXGraphDB
 from graph_creator.services.query_graph import GraphQuery
-from graph_creator.utils.const import GraphStatus
+from graph_creator.utils.const import GraphStatus, AllowedUploadFileFormat
 
 router = APIRouter()
 
@@ -54,7 +49,7 @@ async def upload_pdf(
     """
 
     # Check if the uploaded file type is correct
-    if file.content_type != "application/pdf":
+    if file.content_type not in AllowedUploadFileFormat.get_list_of_formats():
         raise HTTPException(status_code=400, detail="Uploaded file is not a PDF.")
 
     # Define the directory for saving files

@@ -86,3 +86,8 @@ google-generativeai==0.5.4
 groq==0.8.0
 langchain-groq
 bertopic
+docx2txt
+unstructured
+python-magic
+python-pptx
+psutil
