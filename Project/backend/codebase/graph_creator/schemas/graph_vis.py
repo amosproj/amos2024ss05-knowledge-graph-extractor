@@ -35,5 +35,4 @@ class QueryInputData(BaseModel):
 
 class GraphQueryOutput(BaseModel):
     llm_nodes: list[str]
-    spacy_nodes: list[str]
     retrieved_info: dict[str, list[tuple[str, str]]]
