@@ -5,7 +5,6 @@ import time
 
 import pandas as pd
 
-from graph_creator import llama3
 from bertopic import BERTopic
 
 logging.basicConfig(level=logging.INFO)

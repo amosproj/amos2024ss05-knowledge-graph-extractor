@@ -12,7 +12,6 @@ from starlette.responses import JSONResponse
 
 import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
-from graph_creator.gemini import process_chunks
 from graph_creator.pdf_handler import process_pdf_into_chunks
 from graph_creator.schemas.graph_job import GraphJobCreate
 from graph_creator.schemas.graph_vis import (
