@@ -13,11 +13,12 @@ import { VISUALIZE_API_PATH } from '../../constant';
 import { CircularProgress, Typography } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
 
-interface Node {
+export interface Node {
   id: string;
   label: string;
   size: number;
   color: string;
+  topic: string;
 }
 
 interface Edge {

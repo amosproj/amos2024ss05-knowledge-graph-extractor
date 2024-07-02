@@ -15,6 +15,8 @@ import {
   Typography,
   Stack,
 } from '@mui/material';
+import { Node } from './';
+type ITopicColourMap = Record<string, string>;
 
 interface GraphData {
   nodes: Array<{ id: string; label?: string; [key: string]: any }>;
@@ -43,22 +45,30 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
   useEffect(() => {
     if (!isLoaded || !containerRef.current || !graphData) return;
 
+
+    const topicColorMap = graphData.nodes.reduce((acc: ITopicColourMap, curr: Node) => {
+      if (!acc[curr.topic]) {
+        acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+      } return acc;
+    }, {});
+
+
     const data = {
       nodes: graphData.nodes.map((node) => ({
         id: node.id,
         label: node.label || node.id,
         shape: 'dot',
         size: 25,
+        ...node,
         title: `Found in pages: ${node.pages}`,
         color: {
-          background: '#69b3a2',
-          border: '#508e7f',
+          background: topicColorMap[node.topic],
+          border: 'white',
           highlight: {
             background: '#69b3a2',
             border: '#508e7f',
           },
         },
-        ...node,
       })),
       edges: graphData.edges.map((edge) => ({
         from: edge.source,
