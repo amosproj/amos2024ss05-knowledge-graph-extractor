@@ -8,7 +8,18 @@ from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import pdist, cosine
 import numpy as np
 
-def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.2):
+def save_data(graph_dir, graph_id, vector_store, embedding_dict, merged_nodes, node_to_merged):
+    for name, data in zip(['faiss_index', 'embedding_dict', 'merged_nodes', 'node_to_merged'],
+                          [vector_store, embedding_dict, merged_nodes, node_to_merged]):
+        with open(os.path.join(graph_dir, f'{graph_id}_{name}.pkl'), 'wb') as f:
+            pickle.dump(data, f)
+
+def load_data(graph_dir, graph_id):
+    return [pickle.load(open(os.path.join(graph_dir, f'{graph_id}_{name}.pkl'), 'rb'))
+            for name in ['faiss_index', 'embedding_dict', 'merged_nodes', 'node_to_merged']]
+    
+
+def generate_embeddings_and_merge_duplicates(data, graph_id, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.2):
     """
     Generates embeddings for nodes in the given data and merges duplicate nodes based on a threshold.
 
@@ -28,7 +39,9 @@ def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-n
             - node_to_merged (dict): A dictionary mapping original nodes to their corresponding merged node names.
     """
 
-    os.makedirs(save_dir, exist_ok=True)
+    # Create a directory for the graph if it doesn't exist
+    graph_dir = os.path.join(save_dir, graph_id)
+    os.makedirs(graph_dir, exist_ok=True)
 
     all_nodes = pd.concat([data['node_1'], data['node_2']]).unique()
     model = SentenceTransformer(model_name)
@@ -86,19 +99,16 @@ def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-n
         embedding=model.encode
     )
 
-    # Save FAISS index
-    faiss_path = os.path.join(save_dir, 'faiss_index.pkl')
-    with open(faiss_path, 'wb') as f:
-        pickle.dump(vector_store, f)
-
-    # Save embedding dictionary
-    embedding_dict_path = os.path.join(save_dir, 'embedding_dict.pkl')
-    with open(embedding_dict_path, 'wb') as f:
-        pickle.dump(embedding_dict, f)
+    save_data(graph_dir, graph_id, vector_store, embedding_dict, merged_nodes, node_to_merged)
 
     return embedding_dict, merged_nodes, merged_df, vector_store, model, node_to_merged
 
-def search_graph(query, vector_store, merged_nodes, model, node_to_merged, embedding_dict, k=20):
+def search_graph(query, graph_id, save_dir='embeddings', k=20):
+    # Load the model
+    model_name = 'xlm-r-bert-base-nli-stsb-mean-tokens'
+    model = SentenceTransformer(model_name)
+    vector_store, embedding_dict, merged_nodes, node_to_merged = load_data(os.path.join(save_dir, graph_id), graph_id)
+    
     query_embedding = model.encode([query])[0]
     results = vector_store.similarity_search_with_score(query, k=k)
     similar_nodes = []
@@ -149,21 +159,26 @@ def main():
     # Process the data
     model_name = 'xlm-r-bert-base-nli-stsb-mean-tokens'
     threshold = 0.2
-    embedding_dict, merged_nodes, updated_data, vector_store, model, node_to_merged = generate_embeddings_and_merge_duplicates(data, model_name=model_name, threshold=threshold)
+    graph_id = 'example_graph'
+    embedding_dict, merged_nodes, updated_data, vector_store, model, node_to_merged = generate_embeddings_and_merge_duplicates(data, graph_id, model_name=model_name, threshold=threshold)
 
 # Output results
     print("Process completed.")
     print(f"Number of merged nodes: {len(merged_nodes)}")
     print(f"Number of embeddings: {len(embedding_dict)}")
     print("Merged Nodes:")
+    
     for merged, original in merged_nodes.items():
         print(f"  {merged}: {original}")
+        
     print("\nUpdated DataFrame:")
     print(updated_data)
     print("\n")
     # Example of a future search
     query = "What is the name at birth?"
-    results = search_graph(query, vector_store, merged_nodes, model, node_to_merged, embedding_dict, k=20)
+    
+    results = search_graph(query, graph_id, k=20)
+    
     print(f"Similar nodes to '{query}':")
     for result in results:
         print(f"  Merged Node: {result['merged_node']}")
