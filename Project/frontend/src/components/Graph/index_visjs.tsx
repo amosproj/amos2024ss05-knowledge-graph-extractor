@@ -317,9 +317,7 @@ const GraphVisualization: React.FC = () => {
         </Typography>
         <Typography>
           Document Name:
-          <Typography>
-            {graphData.document_name}
-          </Typography>
+          <Typography>{graphData.document_name}</Typography>
           Created at:
           <Typography>
             {formattedDate} {formattedTime}
