@@ -363,6 +363,7 @@ const GraphVisualization: React.FC = () => {
             Graph Visualization
           </Typography>
           <Select
+            size='small'
             value={layout}
             onChange={(e) => setLayout(e.target.value as string)}
             style={{ marginBottom: '20px' }}
