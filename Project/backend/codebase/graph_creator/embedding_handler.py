@@ -1,4 +1,3 @@
-# Datei: embedding_handler.py
 import pandas as pd
 import os
 from tqdm import tqdm
@@ -7,6 +6,7 @@ from langchain_community.vectorstores import FAISS
 import pickle
 from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import pdist
+import numpy as np
 
 def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.4):
     os.makedirs(save_dir, exist_ok=True)
@@ -15,19 +15,7 @@ def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-n
     model = SentenceTransformer(model_name)
 
     embeddings = model.encode(all_nodes)
-    embedding_dict = {node: emb for node, emb in zip(all_nodes, embeddings)}  # Definition von embedding_dict
-    vector_store = FAISS.from_embeddings(
-        [(node, emb) for node, emb in zip(all_nodes, embeddings)],
-        embedding=model.encode
-    )
-
-    faiss_path = os.path.join(save_dir, 'faiss_index.pkl')
-    with open(faiss_path, 'wb') as f:
-        pickle.dump(vector_store, f)
-
-    embedding_dict_path = os.path.join(save_dir, 'embedding_dict.pkl')
-    with open(embedding_dict_path, 'wb') as f:
-        pickle.dump(embedding_dict, f)
+    embedding_dict = {node: emb for node, emb in zip(all_nodes, embeddings)}
 
     # Hierarchical Clustering
     distance_matrix = pdist(embeddings, 'cosine')
@@ -37,24 +25,66 @@ def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-n
     merged_nodes = {}
     for label in set(labels):
         cluster = [all_nodes[i] for i in range(len(all_nodes)) if labels[i] == label]
-        merged_name = min(cluster, key=len)
+        # Choose the most representative (abstract) name
+        merged_name = max(cluster, key=lambda x: sum(1 for c in x if c.isupper()) / len(x))
         merged_nodes[merged_name] = cluster
 
     node_mapping = {old: new for new, cluster in merged_nodes.items() for old in cluster}
     
+    # Update embeddings for merged nodes
+    updated_embedding_dict = {}
+    for merged_name, cluster in merged_nodes.items():
+        cluster_embeddings = [embedding_dict[node] for node in cluster]
+        updated_embedding_dict[merged_name] = np.mean(cluster_embeddings, axis=0)
+
+    # Create FAISS index with updated embeddings
+    vector_store = FAISS.from_embeddings(
+        [(node, emb) for node, emb in updated_embedding_dict.items()],
+        embedding=model.encode
+    )
+
+    # Save updated FAISS index
+    faiss_path = os.path.join(save_dir, 'faiss_index.pkl')
+    with open(faiss_path, 'wb') as f:
+        pickle.dump(vector_store, f)
+
+    # Save updated embedding dictionary
+    embedding_dict_path = os.path.join(save_dir, 'embedding_dict.pkl')
+    with open(embedding_dict_path, 'wb') as f:
+        pickle.dump(updated_embedding_dict, f)
+
+    # Update edges in the graph
     merged_data = []
     for _, row in data.iterrows():
         node_1 = node_mapping.get(row['node_1'], row['node_1'])
         node_2 = node_mapping.get(row['node_2'], row['node_2'])
         edge = row['edge']
         if node_1 != node_2:
-            merged_data.append({'node_1': node_1, 'node_2': node_2, 'edge': edge})
+            merged_data.append({
+                'node_1': node_1, 
+                'node_2': node_2, 
+                'edge': edge,
+                'original_node_1': row['node_1'],
+                'original_node_2': row['node_2']
+            })
 
     merged_df = pd.DataFrame(merged_data).drop_duplicates()
-    updated_embedding_dict = {new: embedding_dict[new] for new in merged_nodes.keys()}
 
     return updated_embedding_dict, merged_nodes, merged_df, vector_store
 
+def search_graph(query, vector_store, merged_nodes, k=5):
+    results = vector_store.similarity_search(query, k=k)
+    similar_nodes = []
+    for doc in results:
+        node = doc.page_content
+        similar_nodes.append({
+            'merged_node': node,
+            'original_nodes': merged_nodes.get(node, [node]),
+            'similarity': doc.metadata['score'] if 'score' in doc.metadata else None
+        })
+    return similar_nodes
+
+# Example usage
 data = pd.DataFrame({
     'node_1': ['Name', 'Straße', 'Wohnort', 'Geburtsname', 'Geburtsort', 'Adresse', 'Geburtsdatum', 
                'Name', 'Strasse', 'wohnort', 'GeburtsName', 'geburtsort', 'Anschrift', 'GeburtsDaten', 
@@ -84,9 +114,12 @@ for merged, original in merged_nodes.items():
 print("\nAktualisiertes DataFrame:")
 print(updated_data)
 
-print("\n Suche:")
+print("\nBeispiel für eine spätere Suche:")
 query = "Adresse"
-results = vector_store.similarity_search(query, k=5)
+results = search_graph(query, vector_store, merged_nodes, k=5)
 print(f"Ähnliche Knoten zu '{query}':")
-for doc in results:
-    print(f"  {doc.page_content}")
+for result in results:
+    print(f"  Merged Node: {result['merged_node']}")
+    print(f"  Original Nodes: {result['original_nodes']}")
+    print(f"  Similarity: {result['similarity']}")
+    print()
