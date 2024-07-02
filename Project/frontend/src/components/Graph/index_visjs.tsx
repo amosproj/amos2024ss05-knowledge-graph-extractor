@@ -315,23 +315,13 @@ const GraphVisualization: React.FC = () => {
         <Typography variant="h5" gutterBottom>
           Graph Information
         </Typography>
-        <Typography variant="body1">
+        <Typography>
           Document Name:
-          <Typography
-            component="span"
-            variant="body1"
-            display="block"
-            gutterBottom
-          >
+          <Typography>
             {graphData.document_name}
           </Typography>
           Created at:
-          <Typography
-            component="span"
-            variant="body1"
-            display="block"
-            gutterBottom
-          >
+          <Typography>
             {formattedDate} {formattedTime}
           </Typography>
           Graph keywords:
