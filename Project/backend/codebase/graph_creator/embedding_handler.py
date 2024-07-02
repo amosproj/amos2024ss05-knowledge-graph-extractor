@@ -8,7 +8,7 @@ from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import pdist, cosine
 import numpy as np
 
-def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.4):
+def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.2):
     os.makedirs(save_dir, exist_ok=True)
 
     all_nodes = pd.concat([data['node_1'], data['node_2']]).unique()
@@ -26,7 +26,8 @@ def generate_embeddings_and_merge_duplicates(data, model_name='xlm-r-bert-base-n
     node_to_merged = {}
     for label in set(labels):
         cluster = [all_nodes[i] for i in range(len(all_nodes)) if labels[i] == label]
-        merged_name = max(cluster, key=lambda x: sum(1 for c in x if c.isupper()) / len(x))
+        merged_name = "_".join(cluster)
+        # merged_name = max(cluster, key=lambda x: sum(1 for c in x if c.isupper()) / len(x)) # Choose the longest node with the most uppercase characters
         merged_nodes[merged_name] = cluster
         for node in cluster:
             node_to_merged[node] = merged_name
