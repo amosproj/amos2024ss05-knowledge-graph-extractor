@@ -6,7 +6,9 @@ html {
 *,
 *:before,
 *:after {
-  box-sizing: inherit;
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 body,
@@ -35,10 +37,14 @@ img {
 }
 
 #root {
-  margin: 0 auto;
-  text-align: center;
-  min-width: 100vw;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  max-width: 100vw;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: row;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .logo {
@@ -53,9 +59,7 @@ img {
   gap: 10px;
 }
 
-.title {
-  flex-grow: 1;
-}
+
 
 .main_wrapper {
   display: flex;
@@ -67,18 +71,13 @@ img {
   min-height: 100%;
 }
 
-.nav_link_item {
-  text-decoration: none;
-  color: inherit;
-  margin-right: 20px;
-}
+
 
 .Appcontainer {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  margin: 20px;
   min-width: 100%;
   min-height: 100%;
 }
