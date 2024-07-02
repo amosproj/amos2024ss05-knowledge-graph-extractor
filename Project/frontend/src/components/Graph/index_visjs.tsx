@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   Typography,
+  Stack,
 } from '@mui/material';
 
 interface GraphData {
@@ -27,9 +28,20 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
   options,
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [height, setHeight] = useState(0);
+  const [width, setWidth] = useState(0);
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  useLayoutEffect(() => {
+    const react = containerRef.current?.getBoundingClientRect();
+    console.log(react);
+    setHeight(react?.height || 0);
+    setWidth(react?.width || 0);
+    setIsLoaded(true);
+  }, []);
 
   useEffect(() => {
-    if (!graphData) return;
+    if (!isLoaded || !containerRef.current || !graphData) return;
 
     const data = {
       nodes: graphData.nodes.map((node) => ({
@@ -64,26 +76,25 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
       data,
       options,
     );
-
     network.on('selectNode', function (params) {
       network.setSelection({
         nodes: params.nodes,
         edges: network.getConnectedEdges(params.nodes[0]),
       });
     });
-
     return () => network.destroy();
-  }, [graphData, options]);
+  }, [isLoaded, containerRef.current, graphData]);
 
   return (
     <div
       ref={containerRef}
       style={{
-        width: '100vw',
-        height: 'calc(100vh - 50px)',
-        background: '#1A2130',
+        flex: 1,
+        ...(isLoaded ? { height, width, flex: '' } : {}),
       }}
-    />
+    >
+      Graph
+    </div>
   );
 };
 
@@ -290,77 +301,88 @@ const GraphVisualization: React.FC = () => {
   ).toLocaleTimeString();
 
   return (
-    <section className="main_graph_container">
-      <Typography variant="h4" gutterBottom>
-        Graph Visualization
-      </Typography>
-      <Select
-        value={layout}
-        onChange={(e) => setLayout(e.target.value as string)}
-        style={{ marginBottom: '20px' }}
+    <Stack flex={1} direction={'row'} alignItems={'stretch'} paddingTop={2}>
+      <Stack
+        direction={'column'}
+        alignItems={'center'}
+        textAlign={'center'}
+        padding={5}
+        maxWidth={450}
+        minWidth={450}
       >
-        <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-        <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-        <MenuItem value="hierarchicalRepulsion">
-          Hierarchical Repulsion
-        </MenuItem>
-        <MenuItem value="repulsion">Repulsion</MenuItem>
-        <MenuItem value="hierarchical">Hierarchical</MenuItem>
-        <MenuItem value="grid">Grid</MenuItem>
-        <MenuItem value="random">Random</MenuItem>
-      </Select>
-      <section className="graph_container">
-        <div className="graph_info">
-          <Typography variant="h5" gutterBottom>
-            Graph Information
+        <Typography variant="h5" gutterBottom>
+          Graph Information
+        </Typography>
+        <Typography variant="body1">
+          Document Name: <br /> {graphData.document_name}
+          <br /> <br />
+          Created at: <br /> {formattedDate} {formattedTime}
+          <br /> <br />
+          Graph keywords: <br />
+          <Box sx={{ marginBottom: 1 }}>
+            {keywords.map((keyword) => (
+              <Chip
+                key={keyword}
+                label={keyword}
+                onClick={() => setSearchQuery(keyword)}
+                sx={{ marginRight: 1, marginBottom: 1 }}
+                clickable
+              />
+            ))}
+          </Box>
+        </Typography>
+        <TextField
+          className="search_text_field"
+          placeholder="Search for keywords"
+          style={searchBarStyle}
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          onKeyDown={searchGraph}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <SearchIcon />
+              </InputAdornment>
+            ),
+          }}
+        />
+        <TextField
+          className="answer_text_field"
+          placeholder="Answer to your search will be displayed here!"
+          style={answerAreaStyle}
+          multiline
+          rows={8}
+          InputProps={{
+            readOnly: true,
+          }}
+        />
+      </Stack>
+      <Stack flex={1} direction={'column'} alignItems={'stretch'}>
+        <Stack justifyContent={'center'} alignItems={'center'} spacing={2}>
+          <Typography variant="h4" gutterBottom>
+            Graph Visualization
           </Typography>
-          <Typography variant="body1">
-            Document Name: <br /> {graphData.document_name}
-            <br /> <br />
-            Created at: <br /> {formattedDate} {formattedTime}
-            <br /> <br />
-            Graph keywords: <br />
-            <Box sx={{ marginBottom: 1 }}>
-              {keywords.map((keyword) => (
-                <Chip
-                  key={keyword}
-                  label={keyword}
-                  onClick={() => setSearchQuery(keyword)}
-                  sx={{ marginRight: 1, marginBottom: 1 }}
-                  clickable
-                />
-              ))}
-            </Box>
-          </Typography>
-          <TextField
-            className="search_text_field"
-            placeholder="Search for keywords"
-            style={searchBarStyle}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={searchGraph}
-            InputProps={{
-              endAdornment: (
-                <InputAdornment position="end">
-                  <SearchIcon />
-                </InputAdornment>
-              ),
-            }}
-          />
-          <TextField
-            className="answer_text_field"
-            placeholder="Answer to your search will be displayed here!"
-            style={answerAreaStyle}
-            multiline
-            rows={8}
-            InputProps={{
-              readOnly: true,
-            }}
-          />
-        </div>
-        <VisGraph graphData={graphData} options={options} />
-      </section>
-    </section>
+          <Select
+            value={layout}
+            onChange={(e) => setLayout(e.target.value as string)}
+            style={{ marginBottom: '20px' }}
+          >
+            <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+            <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
+            <MenuItem value="hierarchicalRepulsion">
+              Hierarchical Repulsion
+            </MenuItem>
+            <MenuItem value="repulsion">Repulsion</MenuItem>
+            <MenuItem value="hierarchical">Hierarchical</MenuItem>
+            <MenuItem value="grid">Grid</MenuItem>
+            <MenuItem value="random">Random</MenuItem>
+          </Select>
+        </Stack>
+        <Stack flex={1} margin={2} borderRadius={2} bgcolor={'#333'}>
+          <VisGraph graphData={graphData} options={options} />
+        </Stack>
+      </Stack>
+    </Stack>
   );
 };
 
