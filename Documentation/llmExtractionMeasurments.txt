@@ -1,0 +1,41 @@
+# Measurments of running Graph creator
+# india health article
+
+llama3, chunk_size=1500, chunk_overlap=150, 30 calls/min, 60 sec wait
+
+gemini-pro, chunk_size=1500, chunk_overlap=150, - calls/min, - sec wait
+
+gemini-flash, chunk_size=1500, chunk_overlap=150, - calls/min, - sec wait
+
+# Measurments as averages over all llm calls
+# two kinds of promts used: extract_entities_and_relations and check_for_connecting_relation
+
+
+# Execution speed of prompts by llm model
+
+gemini-flash: 12,75s (10 extraction requests) per request extracting, 1.57s connecting 
+
+gemini: 23,54s (10 extraction requests) per request extracting, 2,37s connecting
+
+groq+llama3: 0.72s (10 extraction requests) per request extracting, 0,48s connecting
+
+---------------------------------------
+
+# Statistics on the number of extracted entities by llm model
+
+llama: 3078 tokens / 1770 words -> 177 / 180 entities (34 / 47 connecting requests)
+
+gemini: 3078 tokens / 1770 words -> 303 / 316 entities (35 connecting requests)
+
+gemini-flash: 3078 tokens / 1770 words -> 309 / 369 entities (28 connecting requests)
+
+
+-----------------------------------------
+
+# Duration of knowledge graph extraction by llm model
+
+gemini-flash: 127,5s for entity extraction and 105s for connecting
+
+gemini: 212s for entity extraction and 189s for connecting
+
+groq+llama3: 7,9s for entity extraction and 136s for connecting

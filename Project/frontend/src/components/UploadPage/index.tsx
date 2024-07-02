@@ -6,6 +6,7 @@ import {
   Button,
   CircularProgress,
   Tooltip,
+  Stack,
   Typography,
 } from '@mui/material';
 import InfoIcon from '@mui/icons-material/Info'; // Import InfoIcon for hint button
@@ -85,7 +86,7 @@ function UploadPage() {
   `;
 
   return (
-    <main className="main_wrapper_upload">
+    <Stack flex={1} justifyContent={'center'} alignItems={'center'} spacing={2}>
       <Typography
         variant="h6"
         className="title"
@@ -102,29 +103,28 @@ function UploadPage() {
         handleRemoveFile={handleRemoveFile}
         handleDeleteFile={handleDeleteGraph}
       />
-      <div className="buttons_container">
-        <Button
-          variant="outlined"
-          color="success"
-          disabled={!fileId || isGenerating}
-          onClick={handleGenerateGraph}
-        >
-          {isGenerating ? (
-            <>
-              <CircularProgress size={15} />
-              <Box sx={{ ml: 2 }}>Generating...</Box>
-            </>
-          ) : (
-            'Generate Graph'
-          )}
-        </Button>
-      </div>
+      <Button
+        variant="outlined"
+        color="success"
+        disabled={!fileId || isGenerating}
+        onClick={handleGenerateGraph}
+      >
+        {isGenerating ? (
+          <>
+            <CircularProgress size={15} />
+            <Box sx={{ ml: 2 }}>Generating...</Box>
+          </>
+        ) : (
+          'Generate Graph'
+        )}
+      </Button>
+
       <CustomizedSnackbars
         open={showSnackbar}
         handleClick={handleClick}
         handleClose={handleClose}
       />
-    </main>
+    </Stack>
   );
 }
 
