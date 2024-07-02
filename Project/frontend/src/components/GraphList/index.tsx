@@ -17,7 +17,6 @@ import {
   GRAPH_DELETE_API_PATH,
   GRAPH_LIST_API_PATH,
   GraphStatus,
-  // VISUALIZE_API_PATH,
   GENERATE_API_PATH,
   messageSeverity,
 } from '../../constant';
@@ -54,8 +53,8 @@ const getDate = (isoDate: string) => {
 
 const GraphList = () => {
   const [list, setList] = React.useState<IGraphList[]>([]);
-  const [offset] = React.useState<number>(0);
-  const [limit] = React.useState<number>(100);
+  const [offset, setOffset] = React.useState<number>(0);
+  const [limit, setLimit] = React.useState<number>(1000);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);
@@ -69,7 +68,6 @@ const GraphList = () => {
     fetchItems(offset, limit);
   }, [offset, limit]);
 
-  // fetches the list of graphs from the backend via an api call
   const fetchItems = async (offset: number, limit: number) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
 
@@ -79,7 +77,7 @@ const GraphList = () => {
     fetch(API)
       .then((res) => {
         if (!res.ok) {
-          throw new Error('Problem occured while loading the knowledge graph');
+          throw new Error('Problem occurred while loading the knowledge graph');
         }
         return res.json();
       })
@@ -101,7 +99,6 @@ const GraphList = () => {
     });
   };
 
-  //close notification
   const handleClose = (
     event?: React.SyntheticEvent | Event,
     reason?: string,
@@ -116,12 +113,10 @@ const GraphList = () => {
     });
   };
 
-  //update notification variable to prompt notification
   const notify = (n: notification) => {
     setNotification(n);
   };
 
-  // makes call to delete api endpoint with graph_job_id and after that reloads the graph list
   const handleDelete = async (id: string) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_DELETE_API_PATH.replace(':fileId', id)}`;
     try {
@@ -131,14 +126,12 @@ const GraphList = () => {
           'Content-type': 'application/json; charset=UTF-8',
         },
       });
-      // Reload the list after deletion
       fetchItems(offset, limit);
     } catch (error) {
       console.error('Error deleting item:', error);
     }
   };
 
-  // makes call to generate endpoint with graph_job_id, notifies user about result and reloads graph list
   const handleGenerate = async (id: string) => {
     setGenerating(id);
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GENERATE_API_PATH.replace(':fileId', id)}`;
@@ -170,89 +163,112 @@ const GraphList = () => {
 
   const navigate = useNavigate();
 
+  const handleChangePage = (event: unknown, newPage: number) => {
+    setOffset(newPage * limit);
+  };
+
+  const handleChangeRowsPerPage = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    setLimit(+event.target.value);
+    setOffset(0);
+  };
+
   return (
     <main>
-      <TableContainer component={Paper}>
-        {loading && (
-          <Box className="loading_graph_list">
-            <CircularProgress />
-            <p>Existing knowledge graphs list is loading...</p>
-          </Box>
-        )}
-        {error && (
-          <Alert severity="error" className="error_graph_list">
-            {error}
-          </Alert>
-        )}
-        {!loading && !error && (
-          <Table sx={{ minWidth: 650 }} aria-label="simple table">
-            <TableHead>
-              <TableRow>
-                <TableCell>Name</TableCell>
-                <TableCell>Created at</TableCell>
-                <TableCell>Status</TableCell>
-                <TableCell>Actions</TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {list.map((row) => (
-                <TableRow
-                  key={row.id}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
+      <Paper sx={{ width: '100%', overflow: 'hidden' }}>
+        <TableContainer
+          component={Paper}
+          sx={{ border: '1px solid #ccc', borderRadius: '4px', maxHeight: 440 }}
+        >
+          {loading && (
+            <Box className="loading_graph_list">
+              <CircularProgress />
+              <p>Existing knowledge graphs list is loading...</p>
+            </Box>
+          )}
+          {error && (
+            <Alert severity="error" className="error_graph_list">
+              {error}
+            </Alert>
+          )}
+          {!loading && !error && (
+            <Table
+              stickyHeader
+              sx={{ minWidth: 650 }}
+              aria-label="sticky table"
+            >
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ borderBottom: '1px solid #ccc' }}>
+                    Name
                   </TableCell>
-                  <TableCell>{getDate(row.created_at)}</TableCell>
-                  <TableCell>{getStatus(row.status)}</TableCell>
-                  <TableCell>
-                    <Stack direction="row" spacing={2}>
-                      {row.status === GraphStatus.GRAPH_READY ? (
-                        <Button
-                          color="primary"
-                          variant="contained"
-                          size="small"
-                          className="main_action_button"
-                          onClick={() => navigate(`/graph/${row.id}`)}
-                          disabled={row.status !== GraphStatus.GRAPH_READY}
-                        >
-                          View
-                        </Button>
-                      ) : (
-                        <Button
-                          color="success"
-                          variant="contained"
-                          size="small"
-                          className="main_action_button"
-                          disabled={generating !== null}
-                          onClick={() => handleGenerate(row.id)}
-                        >
-                          {generating === row.id ? (
-                            <>
-                              <CircularProgress size={15} />
-                              <Box sx={{ ml: 2 }}>Working...</Box>
-                            </>
-                          ) : (
-                            'Generate Graph'
-                          )}
-                        </Button>
-                      )}
-                      <Button
-                        color="error"
-                        variant="contained"
-                        size="small"
-                        onClick={() => handleDelete(row.id)}
-                      >
-                        Delete
-                      </Button>
-                    </Stack>
+                  <TableCell sx={{ borderBottom: '1px solid #ccc' }}>
+                    Created at
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: '1px solid #ccc' }}>
+                    Status
+                  </TableCell>
+                  <TableCell sx={{ borderBottom: '1px solid #ccc' }}>
+                    Actions
                   </TableCell>
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        )}
-      </TableContainer>
+              </TableHead>
+              <TableBody>
+                {list.map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>{row.name}</TableCell>
+                    <TableCell>{getDate(row.created_at)}</TableCell>
+                    <TableCell>{getStatus(row.status)}</TableCell>
+                    <TableCell>
+                      <Stack direction="row" spacing={2}>
+                        {row.status === GraphStatus.GRAPH_READY ? (
+                          <Button
+                            color="primary"
+                            variant="contained"
+                            size="small"
+                            className="main_action_button"
+                            onClick={() => navigate(`/graph/${row.id}`)}
+                            disabled={row.status !== GraphStatus.GRAPH_READY}
+                          >
+                            View
+                          </Button>
+                        ) : (
+                          <Button
+                            color="success"
+                            variant="contained"
+                            size="small"
+                            className="main_action_button"
+                            disabled={generating !== null}
+                            onClick={() => handleGenerate(row.id)}
+                          >
+                            {generating === row.id ? (
+                              <>
+                                <CircularProgress size={15} />
+                                <Box sx={{ ml: 2 }}>Working...</Box>
+                              </>
+                            ) : (
+                              'Generate Graph'
+                            )}
+                          </Button>
+                        )}
+                        <Button
+                          color="error"
+                          variant="contained"
+                          size="small"
+                          onClick={() => handleDelete(row.id)}
+                        >
+                          Delete
+                        </Button>
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          )}
+        </TableContainer>
+      </Paper>
       <CustomizedSnackbars
         open={notification.show}
         handleClick={handleClick}
