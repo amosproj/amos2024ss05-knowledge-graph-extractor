@@ -12,8 +12,10 @@ def get_top_n_central_nodes(centrality_dict, n):
     Returns:
         Sorted list of top N nodes with their centrality values.
     """
+    # sorted_nodes = sorted(centrality_dict.items(), key=lambda item: item[1], reverse=True)
+    # return sorted_nodes[:n]
     sorted_nodes = sorted(centrality_dict.items(), key=lambda item: item[1], reverse=True)
-    return sorted_nodes[:n]
+    return [node for node, _ in sorted_nodes[:n]]
 
 def analyze_graph_structure(G):
     """Analyzes the structure of a knowledge graph and provides hopefully useful information.
@@ -29,6 +31,10 @@ def analyze_graph_structure(G):
     # Basic Graph Statistics
     num_nodes = G.number_of_nodes()  # Total number of nodes
     num_edges = G.number_of_edges()  # Total number of edges
+
+# Degree Distribution
+    degree_distribution = dict(G.degree())
+    # Degree distribution can indicate the presence of hubs or important nodes
 
     if num_nodes == 0 or num_edges == 0:
         raise ValueError("The graph is empty or not properly constructed.")
@@ -48,7 +54,7 @@ def analyze_graph_structure(G):
 
     # Betweenness Centrality: Measures node's control over information flow
     betweenness_centrality = nx.betweenness_centrality(G)
-    """ 
+    """
     - Betweenness Centrality: Measures node's control over information flow
     - Nodes with high betweenness centrality are important in the network
     
@@ -86,36 +92,31 @@ def analyze_graph_structure(G):
 
     """
 
-    graph_info = {
-        "num_nodes": num_nodes,
-        "num_edges": num_edges,
-        "top_degree_centrality": get_top_n_central_nodes(degree_centrality, top_n),
-        "top_betweenness_centrality": get_top_n_central_nodes(betweenness_centrality, top_n),
-        "top_eigenvector_centrality": get_top_n_central_nodes(eigenvector_centrality, top_n)
-    }
+    #  - Closeness Centrality: Measures average length of the shortest path from a node to all other nodes
+    closeness_centrality = nx.closeness_centrality(G)
 
-    return graph_info
-
-def print_graph_info(graph_info):
-    """Prints the graph information in a formatted and readable way.
-
-    Args:
-        graph_info: A dictionary containing information about the graph's structure.
     """
+    - Closeness Centrality: Measures average length of the shortest path from a node to all other nodes
+    - Nodes with high closeness centrality are important in the network
 
-    print(json.dumps(graph_info, indent=4))
+    Examples: 4 nodes are connected
+    0
+ / | \
+2--1--3
 
+    - Here, node 0, 1 (1.0) has the highest closeness centrality because it is connected to all other nodes (node 2, 3 = 0.75)
+    - Closeness Centrality show the average distance of a node to all other nodes in the network
+    """
+    n = 20  # Number of top nodes to return
+    # Calculate centrality measures
+    degree_centrality = get_top_n_central_nodes(nx.degree_centrality(G), n)
+    betweenness_centrality = get_top_n_central_nodes(nx.betweenness_centrality(G), n)
+    eigenvector_centrality = get_top_n_central_nodes(nx.eigenvector_centrality(G), n)
+    closeness_centrality = get_top_n_central_nodes(nx.closeness_centrality(G), n)
 
-graph_directory = os.fsencode("../.media/graphs/")
+    # Find intersection of top nodes from all measures (set intersection)
+    all_centrality_nodes = set(degree_centrality) & set(betweenness_centrality) & set(eigenvector_centrality) & set(closeness_centrality)
 
+    top_nodes = list(all_centrality_nodes)[:6]
 
-top_n = int(input("Enter the number of top nodes to display: "))
-
-with os.scandir("./Project/backend/codebase/.media/graphs/") as it:
-    for entry in it:
-        if entry.name.endswith("c.gml") and entry.is_file():
-            print("-----------------------")
-            print(f"Filename: {entry.name}")
-            graph = nx.read_gml(entry.path)
-            graph_info = analyze_graph_structure(graph)
-            print_graph_info(graph_info)
+    return top_nodes

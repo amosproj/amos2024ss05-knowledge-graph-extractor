@@ -5,7 +5,6 @@ import time
 
 import pandas as pd
 
-from graph_creator import llama3
 from bertopic import BERTopic
 
 logging.basicConfig(level=logging.INFO)
@@ -123,6 +122,10 @@ def index_entity_relation_table(entity_and_relation_df, entities):
         A List containing all relations as tuples of entity indexes
     """
     entities_dict = {}
+    # make sure all entities are strings
+    entities = [
+        entity if isinstance(entity, str) else str(entity) for entity in entities
+    ]
     # for reproducible results
     entities = sorted(entities)
     for i in range(len(entities)):
@@ -354,7 +357,7 @@ def add_topic(data: pd.DataFrame) -> pd.DataFrame:
     return data
 
 
-def connect_with_llm(data, text_chunks, rate_limit):
+def connect_with_llm(data, text_chunks, llm_handler, restrict_attempts=-1):
     """
     Connect the pieces of the knowlege graph by extracting new relations between disjoint
     graph pieces from the text chunks using the llm
@@ -365,9 +368,6 @@ def connect_with_llm(data, text_chunks, rate_limit):
         Table of nodes and relations between the nodes
     text_chunks : list
         A list of dictionaries containing the text chunks
-    rate_limit : int
-        The maximum number of requests that can be made to the LLM within a specified
-        timeframe.
 
     Returns
     -------
@@ -390,14 +390,12 @@ def connect_with_llm(data, text_chunks, rate_limit):
     components.sort(reverse=True, key=len)
     reverse_entities_dict = {v: k for k, v in entities_dict.items()}
 
-    # wait 60s so that available requests are refreshed
-    time.sleep(60)
-
     # try connecting small components to the biggest component
     connections = 0
     llm_calls = 0
     connecting_relations = []
-    for i in range(1, len(components)):
+    connect_components = len(components) if restrict_attempts < 0 else restrict_attempts
+    for i in range(1, connect_components):
         main_component = components[0]
         current_component = components[i]
 
@@ -420,11 +418,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
             # make call to llm with chunk and the entities of both components from that chunk
             text_chunk = text_chunks[int(key_shared_chunk)]
 
-            # only make calls to the llm if request rate allows for it
-            if llm_calls > 0 and llm_calls % rate_limit == 0:
-                time.sleep(60)
-
-            connecting_relation = llama3.check_for_connecting_relation_(
+            connecting_relation = llm_handler.check_for_connecting_relation(
                 text_chunk["page_content"], main_chunk_entities, current_chunk_entities
             )
             llm_calls += 1
