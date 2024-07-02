@@ -312,18 +312,24 @@ const GraphVisualization: React.FC = () => {
         maxWidth={450}
         minWidth={450}
       >
-        <Typography variant="h5" gutterBottom>
+        <Stack sx={{ fontSize: '25px', margin: '15px' }}>
           Graph Information
-        </Typography>
-        <Typography>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
           Document Name:
-          <Typography>{graphData.document_name}</Typography>
+          <Typography sx={{ marginTop: '2px' }}>
+            {graphData.document_name}
+          </Typography>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
           Created at:
-          <Typography>
+          <Typography sx={{ marginTop: '2px' }}>
             {formattedDate} {formattedTime}
           </Typography>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
           Graph keywords:
-          <Box sx={{ marginBottom: 1 }}>
+          <Box sx={{ marginTop: '4px' }}>
             {keywords.map((keyword) => (
               <Chip
                 key={keyword}
@@ -334,7 +340,7 @@ const GraphVisualization: React.FC = () => {
               />
             ))}
           </Box>
-        </Typography>
+        </Stack>
         <TextField
           className="search_text_field"
           placeholder="Search for keywords"
