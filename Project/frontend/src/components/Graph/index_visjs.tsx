@@ -315,12 +315,26 @@ const GraphVisualization: React.FC = () => {
         <Typography variant="h5" gutterBottom>
           Graph Information
         </Typography>
-         <Typography variant="body1">
-          Document Name: <br /> {graphData.document_name}
-          <br /> <br />
-          Created at: <br /> {formattedDate} {formattedTime}
-          <br /> <br />
-          Graph keywords: <br />
+        <Typography variant="body1">
+          Document Name:
+          <Typography
+            component="span"
+            variant="body1"
+            display="block"
+            gutterBottom
+          >
+            {graphData.document_name}
+          </Typography>
+          Created at:
+          <Typography
+            component="span"
+            variant="body1"
+            display="block"
+            gutterBottom
+          >
+            {formattedDate} {formattedTime}
+          </Typography>
+          Graph keywords:
           <Box sx={{ marginBottom: 1 }}>
             {keywords.map((keyword) => (
               <Chip
