@@ -8,6 +8,9 @@ import {
   AppBar,
   createTheme,
   CssBaseline,
+  Divider,
+  Paper,
+  Stack,
   ThemeProvider,
   Toolbar,
   Typography,
@@ -31,34 +34,36 @@ function App() {
     <Router>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <div className='Appcontainer'>
-          <AppBar position="sticky" className="appBar">
-            <Toolbar
-              className="toolbar"
-              sx={{ background: (theme) => theme.palette.background.default }}
-            >
-              <NavLink to="/">
+        <Stack direction="column" flex={1}>
+          <Paper
+            variant="elevation"
+            elevation={0.7}
+            component={Stack}
+            display={'flex'}
+            flexDirection={'row'}
+            alignItems={'center'}
+            justifyContent={'space-between'}
+            px={2}
+            py={1}
+          >
+            <NavLink to="/">
               <img src={logo} alt="Logo" className="logo" />
-              </NavLink>
-              <Typography variant="h6" className="title">
-                Graph Masters
+            </NavLink>
+            <Typography variant="h6">Graph Masters</Typography>
+            <NavLink to="/" style={{ textDecoration: 'none' }}>
+              <Typography variant="h6" sx={{ color: 'white' }}>
+                Home
               </Typography>
-              <NavLink to="/" className="nav_link_item">
-                <Typography variant="h6" className="title">
-                  Home
-                </Typography>
-              </NavLink>
-            </Toolbar>
-          </AppBar>
-        
-        <main className="main_wrapper">
-          <Routes>
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/upload" element={<UploadPage />} />
-            <Route path="/graph/:fileId" element={<Graph />} />
-          </Routes>
-        </main>
-        </div>
+            </NavLink>
+          </Paper>
+          <Stack direction="row" spacing={0} flex={1}>
+            <Routes>
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/upload" element={<UploadPage />} />
+              <Route path="/graph/:fileId" element={<Graph />} />
+            </Routes>
+          </Stack>
+        </Stack>
       </ThemeProvider>
     </Router>
   );
