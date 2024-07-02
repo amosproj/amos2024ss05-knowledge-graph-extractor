@@ -27,7 +27,7 @@ const VisGraph = ({ graphData, options, setStabilizationComplete }) => {
         size: 25,
         title: `Found in pages: ${node.pages}`,
         color: {
-          background: '#000000',
+          background: '#69b3a2',
           border: '#508e7f',
           highlight: {
             background: '#69b3a2',
