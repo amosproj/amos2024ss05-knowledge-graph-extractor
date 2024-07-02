@@ -49,6 +49,7 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
         label: node.label || node.id,
         shape: 'dot',
         size: 25,
+        title: `Found in pages: ${node.pages}`,
         color: {
           background: '#69b3a2',
           border: '#508e7f',
@@ -169,6 +170,7 @@ const GraphVisualization: React.FC = () => {
     },
     interaction: {
       hover: true,
+      tooltipDelay: 30,
       zoomView: true,
       dragView: true,
       selectConnectedEdges: false,
@@ -310,16 +312,24 @@ const GraphVisualization: React.FC = () => {
         maxWidth={450}
         minWidth={450}
       >
-        <Typography variant="h5" gutterBottom>
+        <Stack sx={{ fontSize: '25px', margin: '15px' }}>
           Graph Information
-        </Typography>
-        <Typography variant="body1">
-          Document Name: <br /> {graphData.document_name}
-          <br /> <br />
-          Created at: <br /> {formattedDate} {formattedTime}
-          <br /> <br />
-          Graph keywords: <br />
-          <Box sx={{ marginBottom: 1 }}>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+          Document Name:
+          <Typography sx={{ marginTop: '2px' }}>
+            {graphData.document_name}
+          </Typography>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+          Created at:
+          <Typography sx={{ marginTop: '2px' }}>
+            {formattedDate} {formattedTime}
+          </Typography>
+        </Stack>
+        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+          Graph keywords:
+          <Box sx={{ marginTop: '4px' }}>
             {keywords.map((keyword) => (
               <Chip
                 key={keyword}
@@ -330,7 +340,7 @@ const GraphVisualization: React.FC = () => {
               />
             ))}
           </Box>
-        </Typography>
+        </Stack>
         <TextField
           className="search_text_field"
           placeholder="Search for keywords"
@@ -363,7 +373,7 @@ const GraphVisualization: React.FC = () => {
             Graph Visualization
           </Typography>
           <Select
-            size='small'
+            size="small"
             value={layout}
             onChange={(e) => setLayout(e.target.value as string)}
             style={{ marginBottom: '20px' }}
