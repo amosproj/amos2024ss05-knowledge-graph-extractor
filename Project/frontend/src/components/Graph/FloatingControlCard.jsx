@@ -1,7 +1,23 @@
 import React from 'react';
-import { Card, CardContent, FormControl, InputLabel, Select, MenuItem, Slider, Typography, Box } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Slider,
+  Typography,
+  Box,
+} from '@mui/material';
 
-const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsChange, restartStabilization }) => {
+const FloatingControlCard = ({
+  layout,
+  setLayout,
+  physicsOptions,
+  handlePhysicsChange,
+  restartStabilization,
+}) => {
   const handleSliderChange = (name) => (event, value) => {
     handlePhysicsChange(name, value);
     restartStabilization();
@@ -139,7 +155,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
               min={0}
               max={1}
               step={1}
-              marks={[{ value: 0, label: 'Off' }, { value: 1, label: 'On' }]}
+              marks={[
+                { value: 0, label: 'Off' },
+                { value: 1, label: 'On' },
+              ]}
               valueLabelDisplay="auto"
               style={{ color: '#fff' }}
             />
@@ -150,7 +169,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
               min={0}
               max={1}
               step={1}
-              marks={[{ value: 0, label: 'Off' }, { value: 1, label: 'On' }]}
+              marks={[
+                { value: 0, label: 'Off' },
+                { value: 1, label: 'On' },
+              ]}
               valueLabelDisplay="auto"
               style={{ color: '#fff' }}
             />
@@ -161,7 +183,10 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
               min={0}
               max={1}
               step={1}
-              marks={[{ value: 0, label: 'Off' }, { value: 1, label: 'On' }]}
+              marks={[
+                { value: 0, label: 'Off' },
+                { value: 1, label: 'On' },
+              ]}
               valueLabelDisplay="auto"
               style={{ color: '#fff' }}
             />
@@ -257,59 +282,61 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
               step={0.01}
               valueLabelDisplay="auto"
               style={{ color: '#fff' }}
-              />
-              </Box>
-            );
-          default:
-            return null;
-        }
-      };
-    
-      return (
-        <Card
-          style={{
-            position: 'absolute',
-            bottom: '16px',
-            right: '16px',
-            width: '300px',
-            padding: '16px',
-            background: '#121826',
-            color: '#fff',
-            zIndex: 1000,
-          }}
-        >
-          <CardContent>
-            <FormControl fullWidth margin="normal">
-              <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
-              <Select
-                value={layout}
-                onChange={(e) => {
-                  setLayout(e.target.value);
-                  restartStabilization();
-                }}
-                style={{ color: '#fff' }}
-              >
-                <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-                <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-                <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
-                <MenuItem value="repulsion">Repulsion</MenuItem>
-                <MenuItem value="hierarchical">Hierarchical</MenuItem>
-              </Select>
-            </FormControl>
-            {renderSliders()}
-            <Typography gutterBottom>Stabilization Iterations</Typography>
-            <Slider
-              value={physicsOptions.iterations}
-              onChange={handleSliderChange('iterations')}
-              min={0}  // Minimum auf 0 gesetzt
-              max={5000}
-              step={100}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
             />
-          </CardContent>
-        </Card>
-      );
-    };
-    
-    export default FloatingControlCard;
+          </Box>
+        );
+      default:
+        return null;
+    }
+  };
+
+  return (
+    <Card
+      style={{
+        position: 'absolute',
+        bottom: '16px',
+        right: '16px',
+        width: '300px',
+        padding: '16px',
+        background: '#121826',
+        color: '#fff',
+        zIndex: 1000,
+      }}
+    >
+      <CardContent>
+        <FormControl fullWidth margin="normal">
+          <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
+          <Select
+            value={layout}
+            onChange={(e) => {
+              setLayout(e.target.value);
+              restartStabilization();
+            }}
+            style={{ color: '#fff' }}
+          >
+            <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+            <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
+            <MenuItem value="hierarchicalRepulsion">
+              Hierarchical Repulsion
+            </MenuItem>
+            <MenuItem value="repulsion">Repulsion</MenuItem>
+            <MenuItem value="hierarchical">Hierarchical</MenuItem>
+          </Select>
+        </FormControl>
+        {renderSliders()}
+        <Typography gutterBottom>Stabilization Iterations</Typography>
+        <Slider
+          value={physicsOptions.iterations}
+          onChange={handleSliderChange('iterations')}
+          min={0} // Minimum auf 0 gesetzt
+          max={5000}
+          step={100}
+          valueLabelDisplay="auto"
+          style={{ color: '#fff' }}
+        />
+      </CardContent>
+    </Card>
+  );
+};
+
+export default FloatingControlCard;

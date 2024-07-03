@@ -109,7 +109,7 @@ class gemini(LlmInterface):
             "   }, {...}\n"
             "]"
         )
-        
+
         USER_PROMPT = f"context: ```{chunk}``` \n\n output: "
 
         chat_session = self.genai_client.start_chat(history=[])

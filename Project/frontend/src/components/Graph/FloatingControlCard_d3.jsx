@@ -1,5 +1,13 @@
 import React from 'react';
-import { Card, CardContent, FormControl, InputLabel, Select, MenuItem, Box } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Box,
+} from '@mui/material';
 
 const FloatingControlCard = ({ layout, setLayout }) => {
   return (

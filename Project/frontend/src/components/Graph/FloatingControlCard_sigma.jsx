@@ -1,7 +1,22 @@
 import React from 'react';
-import { Card, CardContent, FormControl, InputLabel, Select, MenuItem, Slider, Typography, Box } from '@mui/material';
+import {
+  Card,
+  CardContent,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Slider,
+  Typography,
+  Box,
+} from '@mui/material';
 
-const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsChange }) => {
+const FloatingControlCard = ({
+  layout,
+  setLayout,
+  physicsOptions,
+  handlePhysicsChange,
+}) => {
   const handleSliderChange = (name) => (event, value) => {
     handlePhysicsChange(name, value);
   };
@@ -99,7 +114,9 @@ const FloatingControlCard = ({ layout, setLayout, physicsOptions, handlePhysicsC
           >
             <MenuItem value="barnesHut">Barnes Hut</MenuItem>
             <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-            <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
+            <MenuItem value="hierarchicalRepulsion">
+              Hierarchical Repulsion
+            </MenuItem>
             <MenuItem value="repulsion">Repulsion</MenuItem>
             <MenuItem value="hierarchical">Hierarchical</MenuItem>
           </Select>

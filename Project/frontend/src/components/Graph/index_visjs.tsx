@@ -45,13 +45,16 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
   useEffect(() => {
     if (!isLoaded || !containerRef.current || !graphData) return;
 
-
-    const topicColorMap = graphData.nodes.reduce((acc: ITopicColourMap, curr: Node) => {
-      if (!acc[curr.topic]) {
-        acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      } return acc;
-    }, {});
-
+    const topicColorMap = graphData.nodes.reduce(
+      (acc: ITopicColourMap, curr: Node) => {
+        if (!acc[curr.topic]) {
+          acc[curr.topic] =
+            '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+        return acc;
+      },
+      {},
+    );
 
     const data = {
       nodes: graphData.nodes.map((node) => ({
