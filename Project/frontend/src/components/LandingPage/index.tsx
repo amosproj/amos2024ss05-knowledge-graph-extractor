@@ -10,7 +10,12 @@ const LandingPage = () => {
   return (
     <Container maxWidth="lg">
       <Stack direction={'column'} spacing={1} sx={{ padding: 1 }}>
-        <Stack>
+        <Stack
+          direction={'column'}
+          alignItems={'center'}
+          alignSelf={'stretch'}
+          py={2}
+        >
           <Typography variant="h4" component="h4" gutterBottom>
             Welcome to Graph Masters
           </Typography>
