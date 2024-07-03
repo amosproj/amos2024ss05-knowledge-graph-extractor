@@ -19,7 +19,7 @@ def load_data(graph_dir, graph_id):
             for name in ['faiss_index', 'embedding_dict', 'merged_nodes', 'node_to_merged']]
     
 
-def generate_embeddings_and_merge_duplicates(data, graph_id, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='embeddings', threshold=0.2):
+def generate_embeddings_and_merge_duplicates(data, graph_id, model_name='xlm-r-bert-base-nli-stsb-mean-tokens', save_dir='Project/backend/codebase/embeddings', threshold=0.2):
     """
     Generates embeddings for nodes in the given data and merges duplicate nodes based on a threshold.
 
@@ -103,7 +103,7 @@ def generate_embeddings_and_merge_duplicates(data, graph_id, model_name='xlm-r-b
 
     return embedding_dict, merged_nodes, merged_df, vector_store, model, node_to_merged
 
-def search_graph(query, graph_id, save_dir='embeddings', k=20):
+def search_graph(query, graph_id, save_dir='Project/backend/codebase/embeddings', k=20):
     # Load the model
     model_name = 'xlm-r-bert-base-nli-stsb-mean-tokens'
     model = SentenceTransformer(model_name)

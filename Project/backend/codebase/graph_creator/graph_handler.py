@@ -428,25 +428,25 @@ def connect_with_llm(data, text_chunks, rate_limit):
 
     return data
 
-def create_and_store_graph(uuid, entities_and_relations, chunks): 
-    df_e_and_r = build_flattened_dataframe(entities_and_relations)
+# def create_and_store_graph(uuid, entities_and_relations, chunks): 
+#     df_e_and_r = build_flattened_dataframe(entities_and_relations)
 
-    # Generate node embeddings and consolidate duplicates
-    df_e_and_r, node_embeddings, nodes = process_and_merge_entities(df_e_and_r)
+#     # Generate node embeddings and consolidate duplicates
+#     df_e_and_r, node_embeddings, nodes = process_and_merge_entities(df_e_and_r)
 
-    # Add topic information
-    df_e_and_r = add_topic(df_e_and_r)
+#     # Add topic information
+#     df_e_and_r = add_topic(df_e_and_r)
 
-    # Combine knowledge graph pieces
-    combined = connect_with_llm(df_e_and_r, chunks, 30)
+#     # Combine knowledge graph pieces
+#     combined = connect_with_llm(df_e_and_r, chunks, 30)
 
-    # Create FAISS vector index and save embeddings
-    vector_store = create_faiss_index(node_embeddings)
-    save_faiss_index(vector_store, uuid)
+#     # Create FAISS vector index and save embeddings
+#     vector_store = create_faiss_index(node_embeddings)
+#     save_faiss_index(vector_store, uuid)
     
-    # Save the graph and embeddings in the graph database
-    graph_db_service = netx_graphdb.NetXGraphDB()
-    graph = graph_db_service.create_graph_from_df(combined, chunks)
-    graph_db_service.save_graph(uuid, graph)
+#     # Save the graph and embeddings in the graph database
+#     graph_db_service = netx_graphdb.NetXGraphDB()
+#     graph = graph_db_service.create_graph_from_df(combined, chunks)
+#     graph_db_service.save_graph(uuid, graph)
 
-    return vector_store
+#     return vector_store

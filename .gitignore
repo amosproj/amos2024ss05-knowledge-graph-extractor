@@ -35,4 +35,4 @@ bin/
 # MacOS
 .DS_Store
 # embeddings
-Project/backend/codebase/embeddings/
+Project/backend/codebase/embeddings/*
