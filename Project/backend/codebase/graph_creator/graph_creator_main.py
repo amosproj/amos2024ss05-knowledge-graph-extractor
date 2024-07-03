@@ -1,15 +1,12 @@
 import mimetypes
-import pandas as pd
+import pandas
 
 from graph_creator.llama3 import process_chunks as groq_process_chunks
 from graph_creator.models.graph_job import GraphJob
 from graph_creator import pdf_handler
 from graph_creator import graph_handler
 from graph_creator.services import netx_graphdb
-from graph_creator.embedding_handler import remove_duplicates_and_generate_embeddings
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 def process_file_to_graph(g_job: GraphJob):
     """
@@ -22,21 +19,17 @@ def process_file_to_graph(g_job: GraphJob):
         None
     """
     # extract entities and relations
-    entities_and_relations, chunks = process_file_to_entities_and_relations(g_job.location)
+    entities_and_relations, chunks = process_file_to_entities_and_relations(
+        g_job.location
+    )
 
     # check for error
     if entities_and_relations is None:
         return
 
-    # Remove duplicates and generate embeddings
-    df_e_and_r, node_embeddings, nodes = remove_duplicates_and_generate_embeddings(entities_and_relations)
-
     # connect graph pieces
     uuid = g_job.id
-    create_and_store_graph(uuid, df_e_and_r, chunks)
-
-    # Optionally, save embeddings and FAISS index
-    # (This part can be extended to save the embeddings in a database or index)
+    create_and_store_graph(uuid, entities_and_relations, chunks)
 
 
 def process_file_to_entities_and_relations(file: str):
@@ -55,12 +48,14 @@ def process_file_to_entities_and_relations(file: str):
     try:
         # Check if the file is a PDF by MIME type
         mime_type, _ = mimetypes.guess_type(filename)
-        if (mime_type != "application/pdf"):
+        if mime_type != "application/pdf":
             raise ValueError("Uploaded file is not a PDF based on MIME type.")
 
         # Process PDF into chunks
         chunks = pdf_handler.process_pdf_into_chunks(filename)
-        text_chunks = [{"text": chunk.page_content} for chunk in chunks]  # Assuming chunk has 'page_content' attribute
+        text_chunks = [
+            {"text": chunk.page_content} for chunk in chunks
+        ]  # Assuming chunk has 'page_content' attribute
 
         # Generate response using LLM
         # response_json = process_chunks(text_chunks, prompt_template)
@@ -73,23 +68,21 @@ def process_file_to_entities_and_relations(file: str):
     return response_json, chunks
 
 
-def create_and_store_graph(uuid, df_e_and_r, chunks):
+def create_and_store_graph(uuid, entities_and_relations, chunks):
     """
     Create and store a graph based on the given entities and relations.
 
     Parameters:
     - uuid (str): The unique identifier for the graph.
-    - df_e_and_r (pd.DataFrame): DataFrame containing entities and relations.
-    - chunks (list): List of chunks representing text data.
+    - entities_and_relations (list): A list of dictionaries representing the entities and relations.
 
     Returns:
     None
     """
-    # Ensure entities_and_relations is a DataFrame
-    if not isinstance(df_e_and_r, pd.DataFrame):
-        df_e_and_r = pd.DataFrame(df_e_and_r)
+    df_e_and_r = graph_handler.build_flattened_dataframe(entities_and_relations)
 
-    # Combine knowledge graph pieces
+    # combine knowledge graph pieces
+    # combined = graph_handler.connect_with_chunk_proximity(df_e_and_r)
     for i in range(len(chunks)):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, 30)
@@ -97,8 +90,8 @@ def create_and_store_graph(uuid, df_e_and_r, chunks):
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()
 
-    # Read entities and relations
-    graph = graph_db_service.create_graph_from_df(combined, chunks)
+    # read entities and relations
+    graph = graph_db_service.create_graph_from_df(combined)
 
-    # Save graph as file
+    # save graph as file
     graph_db_service.save_graph(uuid, graph)
