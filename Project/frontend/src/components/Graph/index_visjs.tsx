@@ -294,45 +294,14 @@ const GraphVisualization: React.FC = () => {
     },
     physics: {
       enabled: true,
-      barnesHut: layout === 'barnesHut' ? {
-        gravitationalConstant: physicsOptions.gravitationalConstant,
-        centralGravity: 0.3,
-        springLength: physicsOptions.springLength,
-        springConstant: physicsOptions.springConstant,
-        damping: physicsOptions.damping,
-        avoidOverlap: 0.5,
-      } : undefined,
-      forceAtlas2Based: layout === 'forceAtlas2Based' ? {
-        gravitationalConstant: physicsOptions.gravitationalConstant,
-        centralGravity: 0.01,
-        springConstant: physicsOptions.springConstant,
-        springLength: physicsOptions.springLength,
-        damping: physicsOptions.damping,
-      } : undefined,
-      repulsion: layout === 'repulsion' ? {
-        nodeDistance: physicsOptions.nodeSpacing,
-        centralGravity: physicsOptions.gravitationalConstant,
-        springLength: physicsOptions.springLength,
-        springConstant: physicsOptions.springConstant,
-        damping: physicsOptions.damping,
-      } : undefined,
-      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? {
-        nodeDistance: physicsOptions.nodeSpacing,
-        centralGravity: 0.0,
-        springLength: physicsOptions.springLength,
-        springConstant: physicsOptions.springConstant,
-        damping: physicsOptions.damping,
-      } : undefined,
-      solver: layout === 'hierarchical' ? 'hierarchicalRepulsion' : layout,
+      barnesHut: layout === 'barnesHut' ? physicsOptions : {},
+      forceAtlas2Based: layout === 'forceAtlas2Based' ? physicsOptions : {},
+      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? { nodeDistance: physicsOptions.springLength } : {},
+      repulsion: layout === 'repulsion' ? { nodeDistance: physicsOptions.springLength, centralGravity: physicsOptions.gravitationalConstant, springLength: physicsOptions.springLength, springConstant: physicsOptions.springConstant, damping: physicsOptions.damping } : {},
+      solver: layout,
       stabilization: {
-        enabled: true,
-        iterations: physicsOptions.iterations,
-        updateInterval: 50,
-        onlyDynamicEdges: false,
-        fit: true,
-        adaptiveTimestep: true,
+        iterations: physicsOptions.iterations,  // Live Anpassung der Stabilisierung
       },
-      timestep: 0.5,
     },
     layout: layout === 'hierarchical' ? {
       hierarchical: {
@@ -345,7 +314,7 @@ const GraphVisualization: React.FC = () => {
         edgeMinimization: physicsOptions.edgeMinimization,
         parentCentralization: physicsOptions.parentCentralization,
         shakeTowards: physicsOptions.shakeTowards,
-        improvedLayout: false,
+        improvedLayout: false  
       }
     } : {}
   };
@@ -477,18 +446,6 @@ const GraphVisualization: React.FC = () => {
           <Typography variant="h4" gutterBottom>
             Graph Visualization
           </Typography>
-          <Select
-            size="small"
-            value={layout}
-            onChange={(e) => setLayout(e.target.value as string)}
-            style={{ marginBottom: '20px' }}
-          >
-            <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-            <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-            <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
-            <MenuItem value="repulsion">Repulsion</MenuItem>
-            <MenuItem value="hierarchical">Hierarchical</MenuItem>
-          </Select>
         </Stack>
         <Stack 
           flex={1} 
