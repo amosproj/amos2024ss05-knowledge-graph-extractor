@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
@@ -15,8 +15,7 @@ import {
   Typography,
   Stack,
 } from '@mui/material';
-import { Node } from './';
-type ITopicColourMap = Record<string, string>;
+import FloatingControlCard from './FloatingControlCard';
 
 interface GraphData {
   nodes: Array<{ id: string; label?: string; [key: string]: any }>;
@@ -25,36 +24,19 @@ interface GraphData {
   graph_created_at: string;
 }
 
-const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
+const VisGraph: React.FC<{ graphData: GraphData; options: Options, setStabilizationComplete: React.Dispatch<React.SetStateAction<boolean>> }> = ({
   graphData,
   options,
+  setStabilizationComplete
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [height, setHeight] = useState(0);
-  const [width, setWidth] = useState(0);
-  const [isLoaded, setIsLoaded] = useState(false);
-
-  useLayoutEffect(() => {
-    const react = containerRef.current?.getBoundingClientRect();
-    console.log(react);
-    setHeight(react?.height || 0);
-    setWidth(react?.width || 0);
-    setIsLoaded(true);
-  }, []);
+  const networkRef = useRef<Network | null>(null);
+  const [stabilizationProgress, setStabilizationProgress] = useState(0);
+  const [isStabilizing, setIsStabilizing] = useState(false);
+  const isStabilizingRef = useRef(false);
 
   useEffect(() => {
-    if (!isLoaded || !containerRef.current || !graphData) return;
-
-    const topicColorMap = graphData.nodes.reduce(
-      (acc: ITopicColourMap, curr: Node) => {
-        if (!acc[curr.topic]) {
-          acc[curr.topic] =
-            '#' + Math.floor(Math.random() * 16777215).toString(16);
-        }
-        return acc;
-      },
-      {},
-    );
+    if (!containerRef.current || !graphData) return;
 
     const data = {
       nodes: graphData.nodes.map((node) => ({
@@ -62,16 +44,15 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
         label: node.label || node.id,
         shape: 'dot',
         size: 25,
-        ...node,
-        title: `Found in pages: ${node.pages}`,
         color: {
-          background: topicColorMap[node.topic],
-          border: 'white',
+          background: '#69b3a2',
+          border: '#508e7f',
           highlight: {
             background: '#69b3a2',
             border: '#508e7f',
           },
         },
+        ...node,
       })),
       edges: graphData.edges.map((edge) => ({
         from: edge.source,
@@ -85,29 +66,65 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options }> = ({
       })),
     };
 
-    const network = new Network(
-      containerRef.current as HTMLElement,
-      data,
-      options,
-    );
-    network.on('selectNode', function (params) {
-      network.setSelection({
-        nodes: params.nodes,
-        edges: network.getConnectedEdges(params.nodes[0]),
-      });
+    if (networkRef.current) {
+      networkRef.current.destroy();
+    }
+
+    const network = new Network(containerRef.current, data, options);
+    networkRef.current = network;
+
+    setIsStabilizing(true);
+    setStabilizationProgress(0);
+    isStabilizingRef.current = true;
+
+    network.on('stabilizationProgress', function (params) {
+      const progress = (params.iterations / params.total) * 100;
+      setStabilizationProgress(progress);
     });
-    return () => network.destroy();
-  }, [isLoaded, containerRef.current, graphData]);
+
+    network.on('stabilizationIterationsDone', function () {
+      setStabilizationProgress(100);
+      setIsStabilizing(false);
+      setStabilizationComplete(true);
+      isStabilizingRef.current = false;
+    });
+
+    network.on('stabilized', function () {
+      if (isStabilizingRef.current) {
+        setStabilizationProgress(100);
+        setIsStabilizing(false);
+        setStabilizationComplete(true);
+        isStabilizingRef.current = false;
+      }
+    });
+
+    return () => {
+      network.destroy();
+      networkRef.current = null;
+    };
+  }, [graphData, options]);
 
   return (
-    <div
-      ref={containerRef}
-      style={{
-        flex: 1,
-        ...(isLoaded ? { height, width, flex: '' } : {}),
-      }}
-    >
-      Graph
+    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#1A2130' }}>
+      {isStabilizing && (
+        <Box
+          style={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            color: '#fff',
+            textAlign: 'center',
+            zIndex: 1000,
+          }}
+        >
+          <CircularProgress color="inherit" />
+          <Typography variant="h6" style={{ marginTop: '8px' }}>
+            Stabilizing... {Math.round(stabilizationProgress)}%
+          </Typography>
+        </Box>
+      )}
+      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
     </div>
   );
 };
@@ -119,6 +136,23 @@ const GraphVisualization: React.FC = () => {
   const [layout, setLayout] = useState('barnesHut');
   const [searchQuery, setSearchQuery] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
+  const [stabilizationComplete, setStabilizationComplete] = useState(false);
+  const [physicsOptions, setPhysicsOptions] = useState({
+    gravitationalConstant: -20000,
+    springLength: 100,
+    springConstant: 0.1,
+    damping: 0.09,
+    levelSeparation: 150,
+    nodeSpacing: 100,
+    treeSpacing: 200,
+    blockShifting: true,
+    edgeMinimization: true,
+    parentCentralization: true,
+    direction: 'UD',
+    sortMethod: 'hubsize',
+    shakeTowards: 'leaves',
+    iterations: 1000,
+  });
 
   useEffect(() => {
     const fetchGraphData = async () => {
@@ -150,6 +184,77 @@ const GraphVisualization: React.FC = () => {
     fetchGraphData();
     fetchKeywords();
   }, [fileId]);
+
+  useEffect(() => {
+    switch (layout) {
+      case 'barnesHut':
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          gravitationalConstant: -20000,
+          springLength: 100,
+          springConstant: 0.1,
+          damping: 0.09,
+        }));
+        break;
+      case 'forceAtlas2Based':
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          gravitationalConstant: -50,
+          springLength: 100,
+          springConstant: 0.08,
+          damping: 0.4,
+        }));
+        break;
+      case 'hierarchicalRepulsion':
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          gravitationalConstant: 0,
+          springLength: 120,
+          springConstant: 0,
+          damping: 0,
+        }));
+        break;
+      case 'repulsion':
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          gravitationalConstant: 0.2,
+          springLength: 200,
+          springConstant: 0.05,
+          damping: 0.09,
+        }));
+        break;
+      case 'hierarchical':
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          levelSeparation: 150,
+          nodeSpacing: 100,
+          treeSpacing: 200,
+          blockShifting: true,
+          edgeMinimization: true,
+          parentCentralization: true,
+          direction: 'UD',
+          sortMethod: 'hubsize',
+          shakeTowards: 'leaves',
+        }));
+        break;
+      default:
+        setPhysicsOptions((prevOptions) => ({
+          ...prevOptions,
+          gravitationalConstant: -20000,
+          springLength: 100,
+          springConstant: 0.1,
+          damping: 0.09,
+        }));
+    }
+  }, [layout]);
+
+  const handlePhysicsChange = (name: string, value: any) => {
+    setPhysicsOptions((prevOptions) => ({
+      ...prevOptions,
+      [name]: value,
+    }));
+    setStabilizationComplete(false);
+  };
 
   const options: Options = {
     nodes: {
@@ -183,90 +288,66 @@ const GraphVisualization: React.FC = () => {
     },
     interaction: {
       hover: true,
-      tooltipDelay: 30,
-      zoomView: true,
+      zoomView:       true,
       dragView: true,
       selectConnectedEdges: false,
     },
-    physics:
-      layout === 'barnesHut'
-        ? {
-            enabled: true,
-            barnesHut: {
-              gravitationalConstant: -20000,
-              springLength: 100,
-              springConstant: 0.1,
-            },
-            stabilization: {
-              iterations: 2500,
-            },
-          }
-        : layout === 'forceAtlas2Based'
-          ? {
-              enabled: true,
-              forceAtlas2Based: {
-                gravitationalConstant: -50,
-                centralGravity: 0.01,
-                springConstant: 0.08,
-                springLength: 100,
-                damping: 0.4,
-              },
-              stabilization: {
-                iterations: 2500,
-              },
-              solver: 'forceAtlas2Based',
-            }
-          : layout === 'hierarchicalRepulsion'
-            ? {
-                enabled: true,
-                hierarchicalRepulsion: {
-                  nodeDistance: 120,
-                },
-                stabilization: {
-                  iterations: 2500,
-                },
-              }
-            : layout === 'repulsion'
-              ? {
-                  enabled: true,
-                  repulsion: {
-                    nodeDistance: 200,
-                    centralGravity: 0.2,
-                    springLength: 50,
-                    springConstant: 0.05,
-                    damping: 0.09,
-                  },
-                  stabilization: {
-                    iterations: 2500,
-                  },
-                }
-              : layout === 'hierarchical'
-                ? {
-                    enabled: true,
-                    hierarchical: {
-                      direction: 'UD', // UD, DU, LR, RL
-                      sortMethod: 'hubsize',
-                    },
-                    stabilization: {
-                      iterations: 2500,
-                    },
-                  }
-                : layout === 'grid'
-                  ? {
-                      enabled: false,
-                      layout: {
-                        hierarchical: false,
-                        randomSeed: undefined,
-                        improvedLayout: true,
-                      },
-                      physics: {
-                        enabled: false,
-                      },
-                    }
-                  : {
-                      enabled: true,
-                      randomSeed: 2,
-                    },
+    physics: {
+      enabled: true,
+      barnesHut: layout === 'barnesHut' ? {
+        gravitationalConstant: physicsOptions.gravitationalConstant,
+        centralGravity: 0.3,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+        avoidOverlap: 0.5,
+      } : undefined,
+      forceAtlas2Based: layout === 'forceAtlas2Based' ? {
+        gravitationalConstant: physicsOptions.gravitationalConstant,
+        centralGravity: 0.01,
+        springConstant: physicsOptions.springConstant,
+        springLength: physicsOptions.springLength,
+        damping: physicsOptions.damping,
+      } : undefined,
+      repulsion: layout === 'repulsion' ? {
+        nodeDistance: physicsOptions.nodeSpacing,
+        centralGravity: physicsOptions.gravitationalConstant,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+      } : undefined,
+      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? {
+        nodeDistance: physicsOptions.nodeSpacing,
+        centralGravity: 0.0,
+        springLength: physicsOptions.springLength,
+        springConstant: physicsOptions.springConstant,
+        damping: physicsOptions.damping,
+      } : undefined,
+      solver: layout === 'hierarchical' ? 'hierarchicalRepulsion' : layout,
+      stabilization: {
+        enabled: true,
+        iterations: physicsOptions.iterations,
+        updateInterval: 50,
+        onlyDynamicEdges: false,
+        fit: true,
+        adaptiveTimestep: true,
+      },
+      timestep: 0.5,
+    },
+    layout: layout === 'hierarchical' ? {
+      hierarchical: {
+        direction: physicsOptions.direction,
+        sortMethod: physicsOptions.sortMethod,
+        levelSeparation: physicsOptions.levelSeparation,
+        nodeSpacing: physicsOptions.nodeSpacing,
+        treeSpacing: physicsOptions.treeSpacing,
+        blockShifting: physicsOptions.blockShifting,
+        edgeMinimization: physicsOptions.edgeMinimization,
+        parentCentralization: physicsOptions.parentCentralization,
+        shakeTowards: physicsOptions.shakeTowards,
+        improvedLayout: false,
+      }
+    } : {}
   };
 
   const searchGraph = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -278,19 +359,6 @@ const GraphVisualization: React.FC = () => {
   const performSearch = () => {
     // Perform the search based on searchQuery
     console.log('Searching for:', searchQuery);
-  };
-
-  const searchBarStyle: React.CSSProperties = {
-    padding: '8px',
-    width: '100%',
-    marginBottom: '10px',
-    fontSize: '16px',
-  };
-
-  const answerAreaStyle: React.CSSProperties = {
-    padding: '8px',
-    width: '100%',
-    fontSize: '16px',
   };
 
   if (isLoading) {
@@ -308,15 +376,21 @@ const GraphVisualization: React.FC = () => {
     return <div className="error_container">Sorry, an error has occurred!</div>;
   }
 
-  const formattedDate = new Date(
-    graphData.graph_created_at,
-  ).toLocaleDateString();
-  const formattedTime = new Date(
-    graphData.graph_created_at,
-  ).toLocaleTimeString();
+  const formattedDate = new Date(graphData.graph_created_at).toLocaleDateString();
+  const formattedTime = new Date(graphData.graph_created_at).toLocaleTimeString();
 
   return (
-    <Stack flex={1} direction={'row'} alignItems={'stretch'} paddingTop={2}>
+    <Stack 
+      sx={{ 
+        height: '100vh', 
+        overflow: 'hidden' 
+      }} 
+      flex={1} 
+      direction={'row'} 
+      alignItems={'stretch'} 
+      paddingTop={2}
+    >
+      {/* Seitenleiste */}
       <Stack
         direction={'column'}
         alignItems={'center'}
@@ -324,7 +398,9 @@ const GraphVisualization: React.FC = () => {
         padding={5}
         maxWidth={450}
         minWidth={450}
+        sx={{ overflowY: 'auto' }}
       >
+        {/* Inhalt der Seitenleiste */}
         <Stack sx={{ fontSize: '25px', margin: '15px' }}>
           Graph Information
         </Stack>
@@ -357,7 +433,12 @@ const GraphVisualization: React.FC = () => {
         <TextField
           className="search_text_field"
           placeholder="Search for keywords"
-          style={searchBarStyle}
+          style={{
+            padding: '8px',
+            width: '100%',
+            marginBottom: '10px',
+            fontSize: '16px',
+          }}
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={searchGraph}
@@ -372,7 +453,11 @@ const GraphVisualization: React.FC = () => {
         <TextField
           className="answer_text_field"
           placeholder="Answer to your search will be displayed here!"
-          style={answerAreaStyle}
+          style={{
+            padding: '8px',
+            width: '100%',
+            fontSize: '16px',
+          }}
           multiline
           rows={8}
           InputProps={{
@@ -380,7 +465,14 @@ const GraphVisualization: React.FC = () => {
           }}
         />
       </Stack>
-      <Stack flex={1} direction={'column'} alignItems={'stretch'}>
+
+      {/* Hauptbereich mit Graph */}
+      <Stack 
+        flex={1} 
+        direction={'column'} 
+        alignItems={'stretch'}
+        sx={{ height: '100%', overflow: 'hidden' }}
+      >
         <Stack justifyContent={'center'} alignItems={'center'} spacing={2}>
           <Typography variant="h4" gutterBottom>
             Graph Visualization
@@ -393,19 +485,29 @@ const GraphVisualization: React.FC = () => {
           >
             <MenuItem value="barnesHut">Barnes Hut</MenuItem>
             <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-            <MenuItem value="hierarchicalRepulsion">
-              Hierarchical Repulsion
-            </MenuItem>
+            <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
             <MenuItem value="repulsion">Repulsion</MenuItem>
             <MenuItem value="hierarchical">Hierarchical</MenuItem>
-            <MenuItem value="grid">Grid</MenuItem>
-            <MenuItem value="random">Random</MenuItem>
           </Select>
         </Stack>
-        <Stack flex={1} margin={2} borderRadius={2} bgcolor={'#333'}>
-          <VisGraph graphData={graphData} options={options} />
+        <Stack 
+          flex={1} 
+          margin={2} 
+          borderRadius={2} 
+          bgcolor={'#333'}
+          sx={{ position: 'relative', overflow: 'hidden' }}
+        >
+          <VisGraph graphData={graphData} options={options} setStabilizationComplete={setStabilizationComplete} />
         </Stack>
       </Stack>
+      <FloatingControlCard
+        layout={layout}
+        setLayout={setLayout}
+        physicsOptions={physicsOptions}
+        handlePhysicsChange={handlePhysicsChange}
+        restartStabilization={() => setStabilizationComplete(false)}
+        style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}
+      />
     </Stack>
   );
 };
