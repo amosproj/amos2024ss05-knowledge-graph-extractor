@@ -91,3 +91,8 @@ scipy==1.10.1
 bertopic==0.16.2
 faiss-cpu==1.7.3
 sentence-transformers==2.2.2
+docx2txt
+unstructured
+python-magic
+python-pptx
+psutil

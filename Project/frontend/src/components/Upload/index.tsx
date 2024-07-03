@@ -64,7 +64,13 @@ function Upload(props: UploadProps) {
         server={server}
         name="file"
         labelIdle='Drag & Drop your files or <span class="filepond--label-action">Browse</span>'
-        acceptedFileTypes={['application/pdf']}
+        acceptedFileTypes={[
+          'application/pdf',
+          'text/plain',
+          'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+          'application/json',
+        ]}
         credits={false}
         onprocessfile={handleFileProcess}
         onremovefile={props.handleRemoveFile}

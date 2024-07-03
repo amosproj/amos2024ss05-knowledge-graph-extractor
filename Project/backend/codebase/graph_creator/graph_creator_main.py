@@ -1,11 +1,10 @@
 import logging
-import mimetypes
 
 from graph_creator import graph_handler
-from graph_creator import pdf_handler
 from graph_creator.services.llm.llama_gemini_combination import llama_gemini_combination
 from graph_creator.models.graph_job import GraphJob
 from graph_creator.services import netx_graphdb
+from graph_creator.services.file_handler import FileHandler
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -48,17 +47,10 @@ def process_file_to_entities_and_relations(file: str, llm_handler):
     Returns:
         list: A list of dictionaries representing the extracted entities and relations.
     """
-    # Save uploaded PDF file temporarily
-    filename = file
 
     try:
-        # Check if the file is a PDF by MIME type
-        mime_type, _ = mimetypes.guess_type(filename)
-        if mime_type != "application/pdf":
-            raise ValueError("Uploaded file is not a PDF based on MIME type.")
-
-        # Process PDF into chunks
-        chunks = pdf_handler.process_pdf_into_chunks(filename)
+        file_handler = FileHandler(file)
+        chunks = file_handler.process_file_into_chunks()
         text_chunks = [
             {"text": chunk.page_content} for chunk in chunks
         ]  # Assuming chunk has 'page_content' attribute
@@ -68,7 +60,9 @@ def process_file_to_entities_and_relations(file: str, llm_handler):
         response_json = llm_handler.process_chunks(text_chunks)
         print(response_json)
     except Exception as e:
+        print("ERROR")
         logging.error(e)
+        print("------------------")
         response_json = None
 
     return response_json, chunks

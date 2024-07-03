@@ -27,7 +27,7 @@ class NetXGraphDB:
         chunk_to_page = {}
         for i, chunk in enumerate(chunks):
             chunk_id = i
-            page_number = chunk["metadata"]["page"]
+            page_number = chunk["metadata"].get("page", "No page in metadata")
             chunk_to_page[chunk_id] = page_number
 
         # Iterate over each row in the DataFrame
