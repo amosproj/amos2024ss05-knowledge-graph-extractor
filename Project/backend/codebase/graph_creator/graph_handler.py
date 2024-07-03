@@ -3,6 +3,9 @@ import logging
 import re
 import time
 
+from graph_creator import llama3
+from graph_creator import embedding_handler # To be integrated
+
 import pandas as pd
 
 from bertopic import BERTopic

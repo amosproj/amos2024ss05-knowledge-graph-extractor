@@ -7,6 +7,11 @@ WORKDIR /usr/src/app
 
 COPY codebase/requirements.txt .
 
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    gcc \
+    && rm -rf /var/lib/apt/lists/*
+
 RUN : \
     && apt-get update \
     && apt-get -y install gcc \
@@ -16,7 +21,3 @@ RUN : \
     && :
 
 COPY codebase/ ./
-
-
-
-
