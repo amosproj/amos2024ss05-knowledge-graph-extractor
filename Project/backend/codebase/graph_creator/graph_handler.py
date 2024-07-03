@@ -1,9 +1,17 @@
-import pandas as pd
-import re
 import json
+import logging
+import re
 import time
+
 from graph_creator import llama3
 from graph_creator import embedding_handler # To be integrated
+
+import pandas as pd
+
+from bertopic import BERTopic
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 
 def build_flattened_dataframe(entities_and_relations):
@@ -12,7 +20,7 @@ def build_flattened_dataframe(entities_and_relations):
 
     Parameters
     ----------
-    entity_and_relations :  list
+    entities_and_relations :  list
         List of Lists of dictionaries
 
     Returns
@@ -48,7 +56,7 @@ def connect_with_chunk_proximity(entity_and_relation_df):
     pandas.dataframe
         A table with given relations and chunk proximity relations between the nodes
     """
-    # seperate all nodes by chunk_id
+    # separate all nodes by chunk_id
     df_by_chunk_id = pd.melt(
         entity_and_relation_df,
         id_vars=["chunk_id"],
@@ -117,7 +125,11 @@ def index_entity_relation_table(entity_and_relation_df, entities):
         A List containing all relations as tuples of entity indexes
     """
     entities_dict = {}
-    # for reproducable results
+    # make sure all entities are strings
+    entities = [
+        entity if isinstance(entity, str) else str(entity) for entity in entities
+    ]
+    # for reproducible results
     entities = sorted(entities)
     for i in range(len(entities)):
         entities_dict[entities[i]] = i
@@ -179,7 +191,7 @@ def extract_components(relations_list):
         elif inserte["at"] >= 0:
             components[inserte["at"]].append(inserte["new_node"])
 
-    # remove empty componente
+    # remove empty components
     components.pop(len(components) - 1)
 
     return components
@@ -243,7 +255,6 @@ def get_shared_chunks_by_component(component1, component2, entity_chunks_list):
         chunk_entities = set(entity_chunks_list[keys[i]])
         intersection_c1 = chunk_entities.intersection(entities_component_1)
         intersection_c2 = chunk_entities.intersection(entities_component_2)
-        # print(f"{intersection_size_c1}, {intersection_size_c2}")
         if len(intersection_c1) > 0 and len(intersection_c2) > 0:
             shared_chunks.append(keys[i])
             intersections[keys[i]] = {"c1": intersection_c1, "c2": intersection_c2}
@@ -334,7 +345,22 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
     return entity_and_relation_df
 
 
-def connect_with_llm(data, text_chunks, rate_limit):
+def add_topic(data: pd.DataFrame) -> pd.DataFrame:
+    documents = list(set(data['node_1']).union(set(data['node_2'])))
+
+    topic_model = BERTopic()
+    topics, probabilities = topic_model.fit_transform(documents)
+    topic_name_info = {row['Topic']: row['Name'] for _, row in topic_model.get_topic_info().iterrows()}
+    doc_topic_map = {doc: topic for doc, topic in zip(documents, topics)}
+    doc_topic_strings_map = {doc: topic_name_info.get(topic, "no_topic") for doc, topic in doc_topic_map.items()}
+
+    # Add new columns to the DataFrame and populate them
+    data['topic_node_1'] = [doc_topic_strings_map[node] for i, node in data['node_1'].items()]
+    data['topic_node_2'] = [doc_topic_strings_map[node] for i, node in data['node_2'].items()]
+    return data
+
+
+def connect_with_llm(data, text_chunks, llm_handler, restrict_attempts=-1):
     """
     Connect the pieces of the knowlege graph by extracting new relations between disjoint
     graph pieces from the text chunks using the llm
@@ -357,7 +383,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
     components = extract_components(relations_list)
     number_components = len(components)
 
-    print("Before connecting {} components".format(number_components))
+    logger.info(f"Before connecting {number_components} components")
 
     # get chunk information about contained entities
     entity_chunks_list = get_entities_by_chunk(data, entities_dict)
@@ -367,14 +393,12 @@ def connect_with_llm(data, text_chunks, rate_limit):
     components.sort(reverse=True, key=len)
     reverse_entities_dict = {v: k for k, v in entities_dict.items()}
 
-    # wait 60s so that available requests are refreshed
-    time.sleep(60)
-
     # try connecting small components to the biggest component
     connections = 0
     llm_calls = 0
     connecting_relations = []
-    for i in range(1, len(components)):
+    connect_components = len(components) if restrict_attempts < 0 else restrict_attempts
+    for i in range(1, connect_components):
         main_component = components[0]
         current_component = components[i]
 
@@ -397,11 +421,7 @@ def connect_with_llm(data, text_chunks, rate_limit):
             # make call to llm with chunk and the entities of both components from that chunk
             text_chunk = text_chunks[int(key_shared_chunk)]
 
-            # only make calls to the llm if request rate allows for it
-            if llm_calls > 0 and llm_calls % rate_limit == 0:
-                time.sleep(60)
-
-            connecting_relation = llama3.check_for_connecting_relation_(
+            connecting_relation = llm_handler.check_for_connecting_relation(
                 text_chunk["page_content"], main_chunk_entities, current_chunk_entities
             )
             llm_calls += 1
@@ -409,19 +429,19 @@ def connect_with_llm(data, text_chunks, rate_limit):
             relation = extract_relation_from_llm_output(
                 connecting_relation, main_chunk_entities, current_chunk_entities
             )
+
             # if relation is extracted than a valid relation containing only existing entities can be added
-            # print(relation)
             if relation is not None:
                 relation["chunk_id"] = key_shared_chunk
                 connecting_relations.append(relation)
                 connections += 1
                 break
 
-    print(
-        "Made {} new connections and thereby reduced the graph to {} components".format(
-            connections, number_components - connections
-        )
+    logger.info(
+        f"Made {connections} new connections and thereby reduced the graph "
+        f"to {number_components - connections} components "
     )
     data = add_relations_to_data(data, connecting_relations)
+    data = add_topic(data)
 
     return data
