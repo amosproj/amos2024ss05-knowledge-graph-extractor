@@ -24,11 +24,11 @@ interface GraphData {
   graph_created_at: string;
 }
 
-const VisGraph: React.FC<{ graphData: GraphData; options: Options, setStabilizationComplete: React.Dispatch<React.SetStateAction<boolean>> }> = ({
-  graphData,
-  options,
-  setStabilizationComplete
-}) => {
+const VisGraph: React.FC<{
+  graphData: GraphData;
+  options: Options;
+  setStabilizationComplete: React.Dispatch<React.SetStateAction<boolean>>;
+}> = ({ graphData, options, setStabilizationComplete }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
   const [stabilizationProgress, setStabilizationProgress] = useState(0);
@@ -38,11 +38,16 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options, setStabilizat
   useEffect(() => {
     if (!containerRef.current || !graphData) return;
 
-    const topicColorMap = graphData.nodes.reduce((acc: ITopicColourMap, curr: Node) => {
-      if (!acc[curr.topic]) {
-        acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-      } return acc;
-    }, {});
+    const topicColorMap = graphData.nodes.reduce(
+      (acc: ITopicColourMap, curr: Node) => {
+        if (!acc[curr.topic]) {
+          acc[curr.topic] =
+            '#' + Math.floor(Math.random() * 16777215).toString(16);
+        }
+        return acc;
+      },
+      {},
+    );
 
     const data = {
       nodes: graphData.nodes.map((node) => ({
@@ -51,6 +56,7 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options, setStabilizat
         shape: 'dot',
         size: 25,
         ...node,
+        title: `Found in pages: ${node.pages}`,
         color: {
           background: topicColorMap[node.topic],
           border: 'white',
@@ -112,7 +118,14 @@ const VisGraph: React.FC<{ graphData: GraphData; options: Options, setStabilizat
   }, [graphData, options]);
 
   return (
-    <div style={{ position: 'relative', width: '100%', height: '100%', background: '#1A2130' }}>
+    <div
+      style={{
+        position: 'relative',
+        width: '100%',
+        height: '100%',
+        background: '#1A2130',
+      }}
+    >
       {isStabilizing && (
         <Box
           style={{
@@ -295,7 +308,8 @@ const GraphVisualization: React.FC = () => {
     },
     interaction: {
       hover: true,
-      zoomView:       true,
+      tooltipDelay: 30,
+      zoomView: true,
       dragView: true,
       selectConnectedEdges: false,
     },
@@ -303,27 +317,42 @@ const GraphVisualization: React.FC = () => {
       enabled: true,
       barnesHut: layout === 'barnesHut' ? physicsOptions : {},
       forceAtlas2Based: layout === 'forceAtlas2Based' ? physicsOptions : {},
-      hierarchicalRepulsion: layout === 'hierarchicalRepulsion' ? { nodeDistance: physicsOptions.springLength } : {},
-      repulsion: layout === 'repulsion' ? { nodeDistance: physicsOptions.springLength, centralGravity: physicsOptions.gravitationalConstant, springLength: physicsOptions.springLength, springConstant: physicsOptions.springConstant, damping: physicsOptions.damping } : {},
+      hierarchicalRepulsion:
+        layout === 'hierarchicalRepulsion'
+          ? { nodeDistance: physicsOptions.springLength }
+          : {},
+      repulsion:
+        layout === 'repulsion'
+          ? {
+              nodeDistance: physicsOptions.springLength,
+              centralGravity: physicsOptions.gravitationalConstant,
+              springLength: physicsOptions.springLength,
+              springConstant: physicsOptions.springConstant,
+              damping: physicsOptions.damping,
+            }
+          : {},
       solver: layout,
       stabilization: {
-        iterations: physicsOptions.iterations,  // Live Anpassung der Stabilisierung
+        iterations: physicsOptions.iterations, // Live Anpassung der Stabilisierung
       },
     },
-    layout: layout === 'hierarchical' ? {
-      hierarchical: {
-        direction: physicsOptions.direction,
-        sortMethod: physicsOptions.sortMethod,
-        levelSeparation: physicsOptions.levelSeparation,
-        nodeSpacing: physicsOptions.nodeSpacing,
-        treeSpacing: physicsOptions.treeSpacing,
-        blockShifting: physicsOptions.blockShifting,
-        edgeMinimization: physicsOptions.edgeMinimization,
-        parentCentralization: physicsOptions.parentCentralization,
-        shakeTowards: physicsOptions.shakeTowards,
-        improvedLayout: false  
-      }
-    } : {}
+    layout:
+      layout === 'hierarchical'
+        ? {
+            hierarchical: {
+              direction: physicsOptions.direction,
+              sortMethod: physicsOptions.sortMethod,
+              levelSeparation: physicsOptions.levelSeparation,
+              nodeSpacing: physicsOptions.nodeSpacing,
+              treeSpacing: physicsOptions.treeSpacing,
+              blockShifting: physicsOptions.blockShifting,
+              edgeMinimization: physicsOptions.edgeMinimization,
+              parentCentralization: physicsOptions.parentCentralization,
+              shakeTowards: physicsOptions.shakeTowards,
+              improvedLayout: false,
+            },
+          }
+        : {},
   };
 
   const searchGraph = (event: React.KeyboardEvent<HTMLDivElement>) => {
@@ -352,18 +381,22 @@ const GraphVisualization: React.FC = () => {
     return <div className="error_container">Sorry, an error has occurred!</div>;
   }
 
-  const formattedDate = new Date(graphData.graph_created_at).toLocaleDateString();
-  const formattedTime = new Date(graphData.graph_created_at).toLocaleTimeString();
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
 
   return (
-    <Stack 
-      sx={{ 
-        height: '100vh', 
-        overflow: 'hidden' 
-      }} 
-      flex={1} 
-      direction={'row'} 
-      alignItems={'stretch'} 
+    <Stack
+      sx={{
+        height: '100vh',
+        overflow: 'hidden',
+      }}
+      flex={1}
+      direction={'row'}
+      alignItems={'stretch'}
       paddingTop={2}
     >
       {/* Seitenleiste */}
@@ -443,9 +476,9 @@ const GraphVisualization: React.FC = () => {
       </Stack>
 
       {/* Hauptbereich mit Graph */}
-      <Stack 
-        flex={1} 
-        direction={'column'} 
+      <Stack
+        flex={1}
+        direction={'column'}
         alignItems={'stretch'}
         sx={{ height: '100%', overflow: 'hidden' }}
       >
@@ -454,14 +487,18 @@ const GraphVisualization: React.FC = () => {
             Graph Visualization
           </Typography>
         </Stack>
-        <Stack 
-          flex={1} 
-          margin={2} 
-          borderRadius={2} 
+        <Stack
+          flex={1}
+          margin={2}
+          borderRadius={2}
           bgcolor={'#333'}
           sx={{ position: 'relative', overflow: 'hidden' }}
         >
-          <VisGraph graphData={graphData} options={options} setStabilizationComplete={setStabilizationComplete} />
+          <VisGraph
+            graphData={graphData}
+            options={options}
+            setStabilizationComplete={setStabilizationComplete}
+          />
         </Stack>
       </Stack>
       <FloatingControlCard
@@ -470,7 +507,12 @@ const GraphVisualization: React.FC = () => {
         physicsOptions={physicsOptions}
         handlePhysicsChange={handlePhysicsChange}
         restartStabilization={() => setStabilizationComplete(false)}
-        style={{ position: 'absolute', top: '10px', right: '10px', zIndex: 1000 }}
+        style={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+        }}
       />
     </Stack>
   );
