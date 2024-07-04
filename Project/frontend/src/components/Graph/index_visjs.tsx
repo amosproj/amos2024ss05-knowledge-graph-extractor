@@ -4,31 +4,36 @@ import { useParams } from 'react-router-dom';
 import './index.css';
 import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
-import TextField from '@mui/material/TextField';
 import {
+  TextField,
   InputAdornment,
   Chip,
   Box,
   CircularProgress,
-  MenuItem,
-  Select,
   Typography,
   Stack,
+  useTheme,
+  useMediaQuery,
 } from '@mui/material';
 import FloatingControlCard from './FloatingControlCard';
 
 interface GraphData {
-  nodes: Array<{ id: string; label?: string; [key: string]: any }>;
+  nodes: Array<{ id: string; label?: string; topic: string; pages: string; [key: string]: any }>;
   edges: Array<{ source: string; target: string; [key: string]: any }>;
   document_name: string;
   graph_created_at: string;
+}
+
+interface ITopicColourMap {
+  [key: string]: string;
 }
 
 const VisGraph: React.FC<{
   graphData: GraphData;
   options: Options;
   setStabilizationComplete: React.Dispatch<React.SetStateAction<boolean>>;
-}> = ({ graphData, options, setStabilizationComplete }) => {
+  topicColorMap: ITopicColourMap;
+}> = ({ graphData, options, setStabilizationComplete, topicColorMap }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const networkRef = useRef<Network | null>(null);
   const [stabilizationProgress, setStabilizationProgress] = useState(0);
@@ -37,17 +42,6 @@ const VisGraph: React.FC<{
 
   useEffect(() => {
     if (!containerRef.current || !graphData) return;
-
-    const topicColorMap = graphData.nodes.reduce(
-      (acc: ITopicColourMap, curr: Node) => {
-        if (!acc[curr.topic]) {
-          acc[curr.topic] =
-            '#' + Math.floor(Math.random() * 16777215).toString(16);
-        }
-        return acc;
-      },
-      {},
-    );
 
     const data = {
       nodes: graphData.nodes.map((node) => ({
@@ -65,7 +59,6 @@ const VisGraph: React.FC<{
             border: '#508e7f',
           },
         },
-        // ...node,
       })),
       edges: graphData.edges.map((edge) => ({
         from: edge.source,
@@ -115,11 +108,11 @@ const VisGraph: React.FC<{
       network.destroy();
       networkRef.current = null;
     };
-  }, [graphData, options]);
+  }, [graphData, options, topicColorMap]);
 
   return (
-    <div
-      style={{
+    <Box
+      sx={{
         position: 'relative',
         width: '100%',
         height: '100%',
@@ -128,7 +121,7 @@ const VisGraph: React.FC<{
     >
       {isStabilizing && (
         <Box
-          style={{
+          sx={{
             position: 'absolute',
             top: '50%',
             left: '50%',
@@ -139,13 +132,13 @@ const VisGraph: React.FC<{
           }}
         >
           <CircularProgress color="inherit" />
-          <Typography variant="h6" style={{ marginTop: '8px' }}>
+          <Typography variant="h6" sx={{ marginTop: '8px' }}>
             Stabilizing... {Math.round(stabilizationProgress)}%
           </Typography>
         </Box>
       )}
-      <div ref={containerRef} style={{ width: '100%', height: '100%' }} />
-    </div>
+      <Box ref={containerRef} sx={{ width: '100%', height: '100%' }} />
+    </Box>
   );
 };
 
@@ -157,6 +150,7 @@ const GraphVisualization: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
   const [stabilizationComplete, setStabilizationComplete] = useState(false);
+  const [topicColorMap, setTopicColorMap] = useState<ITopicColourMap>({});
   const [physicsOptions, setPhysicsOptions] = useState({
     gravitationalConstant: -20000,
     springLength: 100,
@@ -174,6 +168,9 @@ const GraphVisualization: React.FC = () => {
     iterations: 1000,
   });
 
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+
   useEffect(() => {
     const fetchGraphData = async () => {
       try {
@@ -182,6 +179,15 @@ const GraphVisualization: React.FC = () => {
         );
         const data = await response.json();
         setGraphData(data);
+
+        // Generate and set topic color map
+        const newTopicColorMap = data.nodes.reduce((acc: ITopicColourMap, curr: any) => {
+          if (!acc[curr.topic]) {
+            acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
+          }
+          return acc;
+        }, {});
+        setTopicColorMap(newTopicColorMap);
       } catch (error) {
         console.error('Error fetching graph data:', error);
       } finally {
@@ -280,14 +286,6 @@ const GraphVisualization: React.FC = () => {
     nodes: {
       shape: 'dot',
       size: 25,
-      color: {
-        background: '#69b3a2',
-        border: '#508e7f',
-        highlight: {
-          background: '#ffeb3b',
-          border: '#fbc02d',
-        },
-      },
       font: {
         size: 18,
         color: '#ffffff',
@@ -333,7 +331,7 @@ const GraphVisualization: React.FC = () => {
           : {},
       solver: layout,
       stabilization: {
-        iterations: physicsOptions.iterations, // Live Anpassung der Stabilisierung
+        iterations: physicsOptions.iterations,
       },
     },
     layout:
@@ -368,25 +366,39 @@ const GraphVisualization: React.FC = () => {
 
   if (isLoading) {
     return (
-      <div className="loading_spinner_graph">
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
         <CircularProgress />
-        <Typography variant="h6" style={{ marginLeft: '10px' }}>
+        <Typography variant="h6" sx={{ marginLeft: '10px' }}>
           Loading graph...
         </Typography>
-      </div>
+      </Box>
     );
   }
 
   if (!graphData) {
-    return <div className="error_container">Sorry, an error has occurred!</div>;
+    return (
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'center',
+          alignItems: 'center',
+          height: '100vh',
+        }}
+      >
+        <Typography variant="h6">Sorry, an error has occurred!</Typography>
+      </Box>
+    );
   }
 
-  const formattedDate = new Date(
-    graphData.graph_created_at,
-  ).toLocaleDateString();
-  const formattedTime = new Date(
-    graphData.graph_created_at,
-  ).toLocaleTimeString();
+  const formattedDate = new Date(graphData.graph_created_at).toLocaleDateString();
+  const formattedTime = new Date(graphData.graph_created_at).toLocaleTimeString();
 
   return (
     <Stack
@@ -394,38 +406,36 @@ const GraphVisualization: React.FC = () => {
         height: '100vh',
         overflow: 'hidden',
       }}
-      flex={1}
-      direction={'row'}
-      alignItems={'stretch'}
-      paddingTop={2}
+      direction={isMobile ? 'column' : 'row'}
+      alignItems="stretch"
     >
-      {/* Seitenleiste */}
       <Stack
-        direction={'column'}
-        alignItems={'center'}
-        textAlign={'center'}
-        padding={5}
-        maxWidth={450}
-        minWidth={450}
-        sx={{ overflowY: 'auto' }}
+        direction="column"
+        alignItems="center"
+        textAlign="center"
+        padding={2}
+        sx={{
+          width: isMobile ? '100%' : '300px',
+          overflowY: 'auto',
+          bgcolor: theme.palette.background.paper,
+        }}
       >
-        {/* Inhalt der Seitenleiste */}
-        <Stack sx={{ fontSize: '25px', margin: '15px' }}>
+        <Typography variant="h5" sx={{ margin: '15px' }}>
           Graph Information
-        </Stack>
-        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+        </Typography>
+        <Typography variant="subtitle1" sx={{ margin: '10px' }}>
           Document Name:
-          <Typography sx={{ marginTop: '2px' }}>
+          <Box component="span" sx={{ display: 'block', marginTop: '2px' }}>
             {graphData.document_name}
-          </Typography>
-        </Stack>
-        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+          </Box>
+        </Typography>
+        <Typography variant="subtitle1" sx={{ margin: '10px' }}>
           Created at:
-          <Typography sx={{ marginTop: '2px' }}>
+          <Box component="span" sx={{ display: 'block', marginTop: '2px' }}>
             {formattedDate} {formattedTime}
-          </Typography>
-        </Stack>
-        <Stack sx={{ fontSize: '16px', margin: '10px' }}>
+          </Box>
+        </Typography>
+        <Typography variant="subtitle1" sx={{ margin: '10px' }}>
           Graph keywords:
           <Box sx={{ marginTop: '4px' }}>
             {keywords.map((keyword) => (
@@ -433,21 +443,15 @@ const GraphVisualization: React.FC = () => {
                 key={keyword}
                 label={keyword}
                 onClick={() => setSearchQuery(keyword)}
-                sx={{ marginRight: 1, marginBottom: 1 }}
+                sx={{ margin: '2px' }}
                 clickable
               />
             ))}
           </Box>
-        </Stack>
+        </Typography>
         <TextField
-          className="search_text_field"
           placeholder="Search for keywords"
-          style={{
-            padding: '8px',
-            width: '100%',
-            marginBottom: '10px',
-            fontSize: '16px',
-          }}
+          fullWidth
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           onKeyDown={searchGraph}
@@ -458,48 +462,45 @@ const GraphVisualization: React.FC = () => {
               </InputAdornment>
             ),
           }}
+          sx={{ marginBottom: '10px' }}
         />
         <TextField
-          className="answer_text_field"
           placeholder="Answer to your search will be displayed here!"
-          style={{
-            padding: '8px',
-            width: '100%',
-            fontSize: '16px',
-          }}
+          fullWidth
           multiline
           rows={8}
           InputProps={{
             readOnly: true,
           }}
+          sx={{ marginBottom: '10px' }}
         />
       </Stack>
 
-      {/* Hauptbereich mit Graph */}
       <Stack
         flex={1}
-        direction={'column'}
-        alignItems={'stretch'}
+        direction="column"
+        alignItems="stretch"
         sx={{ height: '100%', overflow: 'hidden' }}
       >
-        <Stack justifyContent={'center'} alignItems={'center'} spacing={2}>
-          <Typography variant="h4" gutterBottom>
-            Graph Visualization
-          </Typography>
-        </Stack>
-        <Stack
+        <Typography variant="h4" align="center" gutterBottom>
+          Graph Visualization
+        </Typography>
+        <Box
           flex={1}
           margin={2}
           borderRadius={2}
-          bgcolor={'#333'}
+          bgcolor={theme.palette.background.default}
           sx={{ position: 'relative', overflow: 'hidden' }}
         >
-          <VisGraph
-            graphData={graphData}
-            options={options}
-            setStabilizationComplete={setStabilizationComplete}
-          />
-        </Stack>
+          {graphData && (
+            <VisGraph
+              graphData={graphData}
+              options={options}
+              setStabilizationComplete={setStabilizationComplete}
+              topicColorMap={topicColorMap}
+            />
+          )}
+        </Box>
       </Stack>
       <FloatingControlCard
         layout={layout}
@@ -507,7 +508,7 @@ const GraphVisualization: React.FC = () => {
         physicsOptions={physicsOptions}
         handlePhysicsChange={handlePhysicsChange}
         restartStabilization={() => setStabilizationComplete(false)}
-        style={{
+        sx={{
           position: 'absolute',
           top: '10px',
           right: '10px',
