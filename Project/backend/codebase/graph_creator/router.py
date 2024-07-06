@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
+from graph_creator.schemas.graph_query import QueryRequest
 import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
@@ -298,3 +299,46 @@ async def query_graph(
     graph = netx_services.load_graph(graph_job_id=graph_job_id)
     graph_keywords = analyze_graph_structure(graph)
     return graph_keywords
+
+
+@router.post("/graph_search/{graph_job_id}")
+async def query_graph(
+    graph_job_id: uuid.UUID,
+    request: QueryRequest,
+    graph_job_dao: GraphJobDAO = Depends(),
+):
+    """
+    Reads a graph job by id and tries to answer a query about the graph using embeddings
+
+    Args:
+        graph_job_id (uuid.UUID): ID of the graph job to be read.
+        request (QueryRequest): contains user query
+        graph_job_dao (GraphJobDAO): graph job database access object
+
+    Returns:
+        Answer to question from the user regarding the graph
+
+    Raises:
+        HTTPException: If there is no graph job with the given ID.
+    """
+
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != GraphStatus.GRAPH_READY:
+        raise HTTPException(
+            status_code=400,
+            detail="No graph created for this job!",
+        )
+    
+    user_query = request.query
+    #print(f"Received query: {user_query}")
+
+    #todo: implement search
+    answer = 'The answer from the llm for the given question'
+
+    return JSONResponse(
+        content={"answer": answer},
+        status_code=200,
+    )

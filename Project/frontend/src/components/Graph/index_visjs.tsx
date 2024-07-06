@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef, useLayoutEffect } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
-import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
+import { KEYWORDS_API_PATH, VISUALIZE_API_PATH, GRAPH_SEARCH_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import TextField from '@mui/material/TextField';
 import {
@@ -116,6 +116,8 @@ const GraphVisualization: React.FC = () => {
   const { fileId = '' } = useParams<{ fileId: string }>();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [answerText, setAnswerText] = useState("");
   const [layout, setLayout] = useState('barnesHut');
   const [searchQuery, setSearchQuery] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -275,9 +277,27 @@ const GraphVisualization: React.FC = () => {
     }
   };
 
-  const performSearch = () => {
+  const performSearch = async () => {
     // Perform the search based on searchQuery
-    console.log('Searching for:', searchQuery);
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_SEARCH_API_PATH.replace(':fileId', fileId)}`;
+
+    //setLoading(true);
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const result = await response.json();
+      setAnswerText(result.answer);
+      //setLoading(false);
+    } catch (error) {
+      console.error("Error fetching the search results:", error);
+      setAnswerText("An error occurred while fetching the search results.");
+      //setLoading(false);
+    }
   };
 
   const searchBarStyle: React.CSSProperties = {
@@ -378,6 +398,7 @@ const GraphVisualization: React.FC = () => {
           InputProps={{
             readOnly: true,
           }}
+          value={answerText}
         />
       </Stack>
       <Stack flex={1} direction={'column'} alignItems={'stretch'}>
