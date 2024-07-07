@@ -54,7 +54,6 @@ const getDate = (isoDate: string) => {
 const GraphList = () => {
   const [list, setList] = React.useState<IGraphList[]>([]);
   const [offset, setOffset] = React.useState<number>(0);
-  const [limit, setLimit] = React.useState<number>(1000);
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);
@@ -65,11 +64,11 @@ const GraphList = () => {
   });
 
   React.useEffect(() => {
-    fetchItems(offset, limit);
-  }, [offset, limit]);
+    fetchItems(offset);
+  }, [offset]);
 
-  const fetchItems = async (offset: number, limit: number) => {
-    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
+  const fetchItems = async (offset: number) => {
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}`;
 
     setLoading(true);
     setError(null);
@@ -126,7 +125,7 @@ const GraphList = () => {
           'Content-type': 'application/json; charset=UTF-8',
         },
       });
-      fetchItems(offset, limit);
+      fetchItems(offset);
     } catch (error) {
       console.error('Error deleting item:', error);
     }
@@ -143,7 +142,7 @@ const GraphList = () => {
         },
         body: JSON.stringify({ id }),
       });
-      fetchItems(offset, limit);
+      fetchItems(offset);
       notify({
         show: true,
         severity: messageSeverity.SUCCESS,
@@ -164,13 +163,12 @@ const GraphList = () => {
   const navigate = useNavigate();
 
   const handleChangePage = (event: unknown, newPage: number) => {
-    setOffset(newPage * limit);
+    setOffset(newPage);
   };
 
   const handleChangeRowsPerPage = (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    setLimit(+event.target.value);
     setOffset(0);
   };
 
