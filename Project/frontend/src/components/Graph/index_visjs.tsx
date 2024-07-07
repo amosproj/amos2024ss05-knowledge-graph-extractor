@@ -173,12 +173,18 @@ const GraphVisualization: React.FC = () => {
 
   useEffect(() => {
     const fetchGraphData = async () => {
+      if (sessionStorage.getItem(fileId)) {
+        setGraphData(JSON.parse(sessionStorage.getItem(fileId) as string));
+        setIsLoading(false);
+        return;
+      }
       try {
         const response = await fetch(
           `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
         );
         const data = await response.json();
         setGraphData(data);
+        sessionStorage.setItem(fileId, JSON.stringify(data));
 
         // Generate and set topic color map
         const newTopicColorMap = data.nodes.reduce((acc: ITopicColourMap, curr: any) => {
