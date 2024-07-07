@@ -14,7 +14,6 @@ import InfoIcon from '@mui/icons-material/Info'; // Import InfoIcon for hint but
 import { GENERATE_API_PATH, GraphStatus } from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
 import Upload from '../Upload';
-import './index.css';
 
 function UploadPage() {
   const [fileId, setFileId] = useState('');

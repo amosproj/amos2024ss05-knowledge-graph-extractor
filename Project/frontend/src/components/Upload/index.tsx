@@ -4,7 +4,6 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
 import { GRAPH_DELETE_API_PATH, UPLOAD_API_PATH } from '../../constant';
 
-import './index.css';
 
 registerPlugin(FilePondPluginFileValidateType);
 
