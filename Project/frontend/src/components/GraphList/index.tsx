@@ -65,13 +65,13 @@ const GraphList = () => {
   });
 
   React.useEffect(() => {
+    setLoading(true);
     fetchItems(offset, limit);
   }, [offset, limit]);
 
   const fetchItems = async (offset: number, limit: number) => {
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_LIST_API_PATH}?offset=${offset}&limit=${limit}`;
 
-    setLoading(true);
     setError(null);
 
     fetch(API)
@@ -127,8 +127,19 @@ const GraphList = () => {
         },
       });
       fetchItems(offset, limit);
+      notify({
+        show: true,
+        severity: messageSeverity.SUCCESS,
+        message: 'File deleted successfully!',
+      });
+
     } catch (error) {
       console.error('Error deleting item:', error);
+      notify({
+        show: true,
+        severity: messageSeverity.ERROR,
+        message: 'Error in deleting file!',
+      });
     }
   };
 
@@ -147,14 +158,14 @@ const GraphList = () => {
       notify({
         show: true,
         severity: messageSeverity.SUCCESS,
-        message: 'Success!',
+        message: 'Graph generated successfully!',
       });
     } catch (error) {
       console.error('Error generating graph:', error);
       notify({
         show: true,
         severity: messageSeverity.ERROR,
-        message: 'Error!',
+        message: 'Error in generating graph!',
       });
     } finally {
       setGenerating(null);
@@ -162,17 +173,6 @@ const GraphList = () => {
   };
 
   const navigate = useNavigate();
-
-  const handleChangePage = (event: unknown, newPage: number) => {
-    setOffset(newPage * limit);
-  };
-
-  const handleChangeRowsPerPage = (
-    event: React.ChangeEvent<HTMLInputElement>,
-  ) => {
-    setLimit(+event.target.value);
-    setOffset(0);
-  };
 
   return (
     <main>
@@ -215,7 +215,7 @@ const GraphList = () => {
                 </TableRow>
               </TableHead>
               <TableBody>
-                {list.map((row) => (
+                {list.length ? list.map((row) => (
                   <TableRow key={row.id}>
                     <TableCell>{row.name}</TableCell>
                     <TableCell>{getDate(row.created_at)}</TableCell>
@@ -263,7 +263,15 @@ const GraphList = () => {
                       </Stack>
                     </TableCell>
                   </TableRow>
-                ))}
+                )) :
+                  <TableRow>
+                    <TableCell colSpan={4} sx={{ textAlign: "center" }}>
+                      <Stack sx={{ width: '100%' }} spacing={2}>
+                        No files found. Please upload files by clicking on create graph.
+                      </Stack>
+                    </TableCell>
+                  </TableRow>
+                }
               </TableBody>
             </Table>
           )}
