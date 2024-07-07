@@ -281,7 +281,7 @@ const GraphVisualization: React.FC = () => {
     // Perform the search based on searchQuery
     const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_SEARCH_API_PATH.replace(':fileId', fileId)}`;
 
-    //setLoading(true);
+    setSearchIsLoading(true);
     try {
       const response = await fetch(API, {
         method: "POST",
@@ -292,11 +292,11 @@ const GraphVisualization: React.FC = () => {
       });
       const result = await response.json();
       setAnswerText(result.answer);
-      //setLoading(false);
+      setSearchIsLoading(false);
     } catch (error) {
       console.error("Error fetching the search results:", error);
       setAnswerText("An error occurred while fetching the search results.");
-      //setLoading(false);
+      setSearchIsLoading(false);
     }
   };
 
@@ -389,6 +389,10 @@ const GraphVisualization: React.FC = () => {
             ),
           }}
         />
+          {searchIsLoading ? <>
+            <CircularProgress size={15} />
+            <Box sx={{ ml: 2 }}>Searching...</Box>
+          </> : <></>}
         <TextField
           className="answer_text_field"
           placeholder="Answer to your search will be displayed here!"
@@ -398,7 +402,7 @@ const GraphVisualization: React.FC = () => {
           InputProps={{
             readOnly: true,
           }}
-          value={answerText}
+          value={searchIsLoading ? '' : answerText}
         />
       </Stack>
       <Stack flex={1} direction={'column'} alignItems={'stretch'}>
