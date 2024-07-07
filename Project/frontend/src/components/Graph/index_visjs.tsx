@@ -233,20 +233,36 @@ const GraphVisualization: React.FC = () => {
         const data = await response.json();
         setGraphData(data);
 
-        // Generate color scale
+        // Get the list of unique topics
         const uniqueTopics = Array.from(
           new Set(data.nodes.map((node) => node.topic)),
         );
 
-        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+        // Create color scheme for the topics
+        const colorSchemes = [
+          d3.schemeCategory10,
+          d3.schemePaired,
+          d3.schemeSet1,
+        ];
+        const uniqueColors = Array.from(new Set(colorSchemes.flat()));
+
+        const otherIndex = uniqueTopics.indexOf('other');
+        if (otherIndex !== -1) {
+          uniqueTopics.splice(otherIndex, 1);
+        }
 
         const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
           (acc: ITopicColourMap, topic, index) => {
-            acc[topic] = colorScale(index);
+            acc[topic] = uniqueColors[index % uniqueColors.length];
             return acc;
           },
           {},
         );
+
+        if (otherIndex !== -1) {
+          topicColorMap['other'] =
+            uniqueColors[uniqueTopics.length % uniqueColors.length];
+        }
 
         setTopicColorMap(topicColorMap);
       } catch (error) {
