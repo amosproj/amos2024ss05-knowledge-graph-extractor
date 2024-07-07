@@ -59,21 +59,4 @@ img {
   gap: 10px;
 }
 
-.main_wrapper {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  margin: 20px;
-  min-width: 100%;
-  min-height: 100%;
-}
 
-.Appcontainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 20px;
-  min-width: 100%;
-  min-height: 100%;
-}

@@ -56,13 +56,12 @@ function App() {
               </Typography>
             </NavLink>
           </Paper>
-          <Stack direction="row" spacing={0} flex={1}>
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/upload" element={<UploadPage />} />
-              <Route path="/graph/:fileId" element={<Graph />} />
-            </Routes>
-          </Stack>
+
+          <Routes>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/upload" element={<UploadPage />} />
+            <Route path="/graph/:fileId" element={<Graph />} />
+          </Routes>
         </Stack>
       </ThemeProvider>
     </Router>
