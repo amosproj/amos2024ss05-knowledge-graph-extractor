@@ -58,7 +58,7 @@ function Upload(props: UploadProps) {
     props.handleAddFile?.(error, file);
 
   return (
-    <section className="upload_wrapper">
+    <section style={{ width: '500px'}}>
       <FilePond
         allowMultiple={false}
         server={server}
