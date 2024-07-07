@@ -101,7 +101,8 @@ const VisGraph: React.FC<{
         shape: 'dot',
         size: 25,
         ...node,
-        title: `Found in pages: ${node.pages}`,
+        title: `Found in pages: ${node.pages}
+                Topic: ${node.topic.substring(node.topic.indexOf('_') + 1)}`,
         color: {
           background: topicColorMap[node.topic],
           border: 'white',
