@@ -16,6 +16,7 @@ import {
   useTheme,
 } from '@mui/material';
 import FloatingControlCard from './FloatingControlCard.jsx';
+import * as d3 from 'd3';
 
 type ITopicColourMap = Record<string, string>;
 
@@ -231,18 +232,22 @@ const GraphVisualization: React.FC = () => {
         const data = await response.json();
         setGraphData(data);
 
-        // Generate and set topic color map
-        const newTopicColorMap = data.nodes.reduce(
-          (acc: ITopicColourMap, curr: any) => {
-            if (!acc[curr.topic]) {
-              acc[curr.topic] =
-                '#' + Math.floor(Math.random() * 16777215).toString(16);
-            }
+        // Generate color scale
+        const uniqueTopics = Array.from(
+          new Set(data.nodes.map((node) => node.topic)),
+        );
+
+        const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+
+        const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
+          (acc: ITopicColourMap, topic, index) => {
+            acc[topic] = colorScale(index);
             return acc;
           },
           {},
         );
-        setTopicColorMap(newTopicColorMap);
+
+        setTopicColorMap(topicColorMap);
       } catch (error) {
         console.error('Error fetching graph data:', error);
       } finally {
