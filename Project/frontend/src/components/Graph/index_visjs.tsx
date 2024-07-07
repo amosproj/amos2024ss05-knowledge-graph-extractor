@@ -1,32 +1,82 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
 import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import {
-  TextField,
-  InputAdornment,
-  Chip,
   Box,
+  Chip,
   CircularProgress,
-  Typography,
+  InputAdornment,
   Stack,
-  useTheme,
+  TextField,
+  Typography,
   useMediaQuery,
+  useTheme,
 } from '@mui/material';
-import FloatingControlCard from './FloatingControlCard';
+import FloatingControlCard from './FloatingControlCard.jsx';
+
+type ITopicColourMap = Record<string, string>;
 
 interface GraphData {
-  nodes: Array<{ id: string; label?: string; topic: string; pages: string; [key: string]: any }>;
+  nodes: Array<{
+    id: string;
+    label?: string;
+    topic: string;
+    pages: string;
+    [key: string]: any;
+  }>;
   edges: Array<{ source: string; target: string; [key: string]: any }>;
   document_name: string;
   graph_created_at: string;
 }
 
-interface ITopicColourMap {
-  [key: string]: string;
-}
+const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
+  topicColorMap,
+}) => {
+  return (
+    <Box
+      sx={{
+        padding: '16px',
+        backgroundColor: '#121826',
+        borderRadius: '10px',
+        color: 'white',
+        maxHeight: '250px',
+        overflowY: 'auto',
+        maxWidth: '500px',
+        position: 'absolute',
+        left: '16px',
+        top: '16px',
+      }}
+    >
+      <Box component="ul" sx={{ padding: 0, margin: 0, listStyle: 'none' }}>
+        {Object.entries(topicColorMap).map(([topic, color]) => (
+          <Box
+            component="li"
+            key={topic}
+            sx={{
+              display: 'flex',
+              marginBottom: '8px',
+            }}
+          >
+            <Box
+              sx={{
+                width: '20px',
+                height: '20px',
+                backgroundColor: color,
+                marginRight: '8px',
+              }}
+            />
+            <span style={{ fontSize: '0.875rem' }}>
+              {topic.substring(topic.indexOf('_') + 1)}
+            </span>
+          </Box>
+        ))}
+      </Box>
+    </Box>
+  );
+};
 
 const VisGraph: React.FC<{
   graphData: GraphData;
@@ -59,6 +109,7 @@ const VisGraph: React.FC<{
             border: '#508e7f',
           },
         },
+        borderWidth: 0.5,
       })),
       edges: graphData.edges.map((edge) => ({
         from: edge.source,
@@ -181,12 +232,16 @@ const GraphVisualization: React.FC = () => {
         setGraphData(data);
 
         // Generate and set topic color map
-        const newTopicColorMap = data.nodes.reduce((acc: ITopicColourMap, curr: any) => {
-          if (!acc[curr.topic]) {
-            acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-          }
-          return acc;
-        }, {});
+        const newTopicColorMap = data.nodes.reduce(
+          (acc: ITopicColourMap, curr: any) => {
+            if (!acc[curr.topic]) {
+              acc[curr.topic] =
+                '#' + Math.floor(Math.random() * 16777215).toString(16);
+            }
+            return acc;
+          },
+          {},
+        );
         setTopicColorMap(newTopicColorMap);
       } catch (error) {
         console.error('Error fetching graph data:', error);
@@ -397,8 +452,12 @@ const GraphVisualization: React.FC = () => {
     );
   }
 
-  const formattedDate = new Date(graphData.graph_created_at).toLocaleDateString();
-  const formattedTime = new Date(graphData.graph_created_at).toLocaleTimeString();
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
 
   return (
     <Stack
@@ -500,6 +559,7 @@ const GraphVisualization: React.FC = () => {
               topicColorMap={topicColorMap}
             />
           )}
+          <Legend topicColorMap={topicColorMap} />
         </Box>
       </Stack>
       <FloatingControlCard
