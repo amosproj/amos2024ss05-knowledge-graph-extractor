@@ -1,22 +1,3 @@
-.container {
-  display: flex;
-  height: 100vh;
-  width: 100vw;
-}
-
-.main_graph_container {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 30px;
-  text-align: center;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  width: 100vw;
-  /* overflow: hidden;  */
-}
-
 .graph_container {
   flex: 1;
   display: flex;
@@ -26,41 +7,9 @@
   justify-content: flex-start;
   height: 100vh;
   width: 100vw;
-
-  /* overflow: hidden;  */
 }
 
-.graph_info {
-  width: 25%;
-  padding: 20px;
-  overflow-y: auto;
-}
 
-.graph_info h1 {
-  margin-bottom: 30px;
-  text-decoration: underline;
-}
-
-.graph_info p {
-  margin-bottom: 30px;
-}
-
-.search_container {
-  position: relative;
-}
-
-.sigma_container {
-  background: var(--mui-palette-primary-main);
-}
-.react-sigma-controls {
-  margin-right: auto;
-}
-.sigma-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-}
 
 .error_container {
   display: flex;
