@@ -514,7 +514,7 @@ const GraphVisualization: React.FC = () => {
         physicsOptions={physicsOptions}
         handlePhysicsChange={handlePhysicsChange}
         restartStabilization={() => setStabilizationComplete(false)}
-        sx={{
+        sx={{                       
           position: 'absolute',
           top: '10px',
           right: '10px',
