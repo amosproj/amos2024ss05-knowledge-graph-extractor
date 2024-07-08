@@ -7,6 +7,7 @@ from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
+from graph_creator.embedding_handler import embeddings_handler
 from graph_creator.schemas.graph_query import QueryRequest
 import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
@@ -335,8 +336,14 @@ async def query_graph(
     user_query = request.query
     #print(f"Received query: {user_query}")
 
-    #todo: implement search
-    answer = 'The answer from the llm for the given question'
+    graphEmbeddingsHandler = embeddings_handler(g_job)
+
+    if graphEmbeddingsHandler.is_embedded():
+        #do search
+        answer = 'The answer from the llm for the given question'
+    else:
+        #can't answer because no embeddings exist
+        answer = 'No embeddings found'
 
     return JSONResponse(
         content={"answer": answer},
