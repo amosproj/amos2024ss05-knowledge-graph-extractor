@@ -1,5 +1,6 @@
 import pandas as pd
 import os
+import logging
 from graph_creator.models.graph_job import GraphJob
 from sentence_transformers import SentenceTransformer
 from langchain_community.vectorstores import FAISS
@@ -30,29 +31,25 @@ class embeddings_handler:
     def is_embedded(self):
         return self.isEmbedded
 
-    def save_data(
-        graph_dir, graph_id, vector_store, embedding_dict, merged_nodes, node_to_merged
-    ):
+    def save_data(self, vector_store, embedding_dict, merged_nodes, node_to_merged):
         for name, data in zip(
             ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"],
             [vector_store, embedding_dict, merged_nodes, node_to_merged],
         ):
-            with open(os.path.join(graph_dir, f"{graph_id}_{name}.pkl"), "wb") as f:
+            with open(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"), "wb") as f:
                 pickle.dump(data, f)
 
-
-    def load_data(graph_dir, graph_id):
+    def load_data(self):
         return [
-            pickle.load(open(os.path.join(graph_dir, f"{graph_id}_{name}.pkl"), "rb"))
+            pickle.load(open(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"), "rb"))
             for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]
         ]
 
 
     def generate_embeddings_and_merge_duplicates(
+        self,
         data,
-        graph_id,
         model_name="xlm-r-bert-base-nli-stsb-mean-tokens",
-        save_dir="Project/backend/codebase/embeddings",
         threshold=0.2,
     ):
         """
@@ -73,11 +70,6 @@ class embeddings_handler:
                 - model (SentenceTransformer): The SentenceTransformer model used for generating embeddings.
                 - node_to_merged (dict): A dictionary mapping original nodes to their corresponding merged node names.
         """
-
-        # Create a directory for the graph if it doesn't exist
-        graph_dir = os.path.join(save_dir, graph_id)
-        os.makedirs(graph_dir, exist_ok=True)
-
         all_nodes = pd.concat([data["node_1"], data["node_2"]]).unique()
         model = SentenceTransformer(model_name)
 
@@ -137,21 +129,24 @@ class embeddings_handler:
             [(node_to_merged[node], emb) for node, emb in embedding_dict.items()],
             embedding=model.encode,
         )
+        try:
+            self.save_data(
+                vector_store, embedding_dict, merged_nodes, node_to_merged
+            )
+        except Exception as e:
+            logging.error(e)
 
-        save_data(
-            graph_dir, graph_id, vector_store, embedding_dict, merged_nodes, node_to_merged
-        )
 
-        return embedding_dict, merged_nodes, merged_df, vector_store, model, node_to_merged
+    def search_graph(self, query, k=20):
 
+        if not self.isEmbedded:
+            logging.error("No embeddings found!")
+            return None
 
-    def search_graph(query, graph_id, save_dir="Project/backend/codebase/embeddings", k=20):
         # Load the model
         model_name = "xlm-r-bert-base-nli-stsb-mean-tokens"
         model = SentenceTransformer(model_name)
-        vector_store, embedding_dict, merged_nodes, node_to_merged = load_data(
-            os.path.join(save_dir, graph_id), graph_id
-        )
+        vector_store, embedding_dict, merged_nodes, node_to_merged = self.embeddings
 
         query_embedding = model.encode([query])[0]
         results = vector_store.similarity_search_with_score(query, k=k)
@@ -180,138 +175,3 @@ class embeddings_handler:
             )
             visited_nodes.add(merged_node)  # Mark this node as visited
         return similar_nodes
-
-
-    def main(self):
-        # Example data
-        data = pd.DataFrame(
-            {
-                "node_1": [
-                    "Name",
-                    "Straße",
-                    "Wohnort",
-                    "Geburtsname",
-                    "Geburtsort",
-                    "Adresse",
-                    "Geburtsdatum",
-                    "Name",
-                    "Strasse",
-                    "wohnort",
-                    "GeburtsName",
-                    "geburtsort",
-                    "Anschrift",
-                    "GeburtsDaten",
-                    "Namen",
-                    "Straßen",
-                    "Wohnorte",
-                    "Geburtsnamen",
-                    "Geburtsorte",
-                    "Adressen",
-                    "Geburtsdaten",
-                    "Vorname",
-                    "Hausnummer",
-                    "PLZ",
-                    "Mädchenname",
-                    "Geburtsstadt",
-                    "Anschrift",
-                    "Geburtsjahr",
-                ],
-                "node_2": [
-                    "Vorname",
-                    "Hausnummer",
-                    "PLZ",
-                    "Mädchenname",
-                    "Geburtsstadt",
-                    "Anschrift",
-                    "Geburtsjahr",
-                    "Spitzname",
-                    "hausnummer",
-                    "Postleitzahl",
-                    "MädchenName",
-                    "GeburtsStadt",
-                    "Adresse",
-                    "GeburtsJahr",
-                    "Vornamen",
-                    "Hausnummern",
-                    "PLZs",
-                    "Mädchennamen",
-                    "Geburtsstädte",
-                    "Adressen",
-                    "Geburtsjahre",
-                    "Nickname",
-                    "HouseNumber",
-                    "PostalCode",
-                    "MaidenName",
-                    "BirthCity",
-                    "Address",
-                    "YearOfBirth",
-                ],
-                "edge": [
-                    "related_as_personal_details",
-                    "located_at",
-                    "located_in",
-                    "related_as_birth_details",
-                    "related_as_place_of_birth",
-                    "located_at",
-                    "related_as_birth_details",
-                    "related_as_personal_details",
-                    "located_at",
-                    "located_in",
-                    "related_as_birth_details",
-                    "related_as_place_of_birth",
-                    "located_at",
-                    "related_as_birth_details",
-                    "related_as_personal_details",
-                    "located_at",
-                    "located_in",
-                    "related_as_birth_details",
-                    "related_as_place_of_birth",
-                    "located_at",
-                    "related_as_birth_details",
-                    "related_as_personal_details",
-                    "located_at",
-                    "located_in",
-                    "related_as_birth_details",
-                    "related_as_place_of_birth",
-                    "located_at",
-                    "related_as_birth_details",
-                ],
-            }
-        )
-
-        # Process the data
-        model_name = "xlm-r-bert-base-nli-stsb-mean-tokens"
-        threshold = 0.2
-        graph_id = "example_graph"
-        embedding_dict, merged_nodes, updated_data, vector_store, model, node_to_merged = (
-            self.generate_embeddings_and_merge_duplicates(
-                data, graph_id, model_name=model_name, threshold=threshold
-            )
-        )
-
-        # Output results
-        print("Process completed.")
-        print(f"Number of merged nodes: {len(merged_nodes)}")
-        print(f"Number of embeddings: {len(embedding_dict)}")
-        print("Merged Nodes:")
-
-        for merged, original in merged_nodes.items():
-            print(f"  {merged}: {original}")
-
-        print("\nUpdated DataFrame:")
-        print(updated_data)
-        print("\n")
-        # Example of a future search
-        query = "What is the name at birth?"
-
-        results = self.search_graph(query, graph_id, k=20)
-
-        print(f"Similar nodes to '{query}':")
-        for result in results:
-            print(f"  Merged Node: {result['merged_node']}")
-            print(f"  Original Nodes: {result['original_nodes']}")
-            print(f"  Average Similarity: {result['similarity']:.4f}")
-            print("  Individual Similarities:")
-            for node, sim in result["individual_similarities"].items():
-                print(f"    {node}: {sim:.4f}")
-            print()
