@@ -16,9 +16,16 @@ import {
   useMediaQuery,
 } from '@mui/material';
 import FloatingControlCard from './FloatingControlCard';
+import PersistentDrawerControls from './PersistentDrawerControls';
 
 interface GraphData {
-  nodes: Array<{ id: string; label?: string; topic: string; pages: string; [key: string]: any }>;
+  nodes: Array<{
+    id: string;
+    label?: string;
+    topic: string;
+    pages: string;
+    [key: string]: any;
+  }>;
   edges: Array<{ source: string; target: string; [key: string]: any }>;
   document_name: string;
   graph_created_at: string;
@@ -93,6 +100,7 @@ const VisGraph: React.FC<{
       setIsStabilizing(false);
       setStabilizationComplete(true);
       isStabilizingRef.current = false;
+      // network.fit();
     });
 
     network.on('stabilized', function () {
@@ -102,6 +110,7 @@ const VisGraph: React.FC<{
         setStabilizationComplete(true);
         isStabilizingRef.current = false;
       }
+      network.fit();
     });
 
     return () => {
@@ -181,12 +190,16 @@ const GraphVisualization: React.FC = () => {
         setGraphData(data);
 
         // Generate and set topic color map
-        const newTopicColorMap = data.nodes.reduce((acc: ITopicColourMap, curr: any) => {
-          if (!acc[curr.topic]) {
-            acc[curr.topic] = '#' + Math.floor(Math.random() * 16777215).toString(16);
-          }
-          return acc;
-        }, {});
+        const newTopicColorMap = data.nodes.reduce(
+          (acc: ITopicColourMap, curr: any) => {
+            if (!acc[curr.topic]) {
+              acc[curr.topic] =
+                '#' + Math.floor(Math.random() * 16777215).toString(16);
+            }
+            return acc;
+          },
+          {},
+        );
         setTopicColorMap(newTopicColorMap);
       } catch (error) {
         console.error('Error fetching graph data:', error);
@@ -397,8 +410,12 @@ const GraphVisualization: React.FC = () => {
     );
   }
 
-  const formattedDate = new Date(graphData.graph_created_at).toLocaleDateString();
-  const formattedTime = new Date(graphData.graph_created_at).toLocaleTimeString();
+  const formattedDate = new Date(
+    graphData.graph_created_at,
+  ).toLocaleDateString();
+  const formattedTime = new Date(
+    graphData.graph_created_at,
+  ).toLocaleTimeString();
 
   return (
     <Stack
@@ -502,7 +519,20 @@ const GraphVisualization: React.FC = () => {
           )}
         </Box>
       </Stack>
-      <FloatingControlCard
+      {/* <FloatingControlCard
+        layout={layout}
+        setLayout={setLayout}
+        physicsOptions={physicsOptions}
+        handlePhysicsChange={handlePhysicsChange}
+        restartStabilization={() => setStabilizationComplete(false)}
+        sx={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+        }}
+      /> */}
+      <PersistentDrawerControls
         layout={layout}
         setLayout={setLayout}
         physicsOptions={physicsOptions}

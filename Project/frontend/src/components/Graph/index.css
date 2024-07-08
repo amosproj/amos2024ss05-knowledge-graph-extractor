@@ -2,6 +2,7 @@
   display: flex;
   height: 100vh;
   width: 100vw;
+  box-sizing: border-box;
 }
 
 .main_graph_container {
@@ -12,22 +13,20 @@
   text-align: center;
   justify-content: center;
   align-items: center;
-  height: 100vh;
-  width: 100vw;
-  /* overflow: hidden;  */
+  height: 100%;
+  width: 100%;
 }
 
 .graph_container {
   flex: 1;
   display: flex;
   flex-direction: row;
-  gap: 30px;
   text-align: center;
   justify-content: flex-start;
-  height: 100vh;
-  width: 100vw;
-
-  /* overflow: hidden;  */
+  height: 100%;
+  width: 100%;
+  padding: 10px; /* Added padding for the visualization container */
+  box-sizing: border-box;
 }
 
 .graph_info {
@@ -52,14 +51,17 @@
 .sigma_container {
   background: var(--mui-palette-primary-main);
 }
+
 .react-sigma-controls {
   margin-right: auto;
 }
+
 .sigma-container {
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .error_container {
@@ -72,7 +74,7 @@
   height: 100vh;
   font-size: 20px;
   font-weight: 600;
-  color: #red;
+  color: red;
 }
 
 .loading_spinner_graph::after {
@@ -117,11 +119,14 @@
   fill: #ffffff;
 }
 
-#tooltip {
-  position: absolute;
-  background: #fff;
-  border: 1px solid #ccc;
-  padding: 10px;
-  display: none;
-  pointer-events: none;
+@media (max-width: 1024px) {
+  .graph_container {
+    padding: 5px; /* Adjust padding for smaller screens */
+  }
+}
+
+@media (max-width: 768px) {
+  .graph_container {
+    padding: 2px; /* Adjust padding for even smaller screens */
+  }
 }
