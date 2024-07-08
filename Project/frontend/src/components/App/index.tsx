@@ -17,10 +17,10 @@ import {
 } from '@mui/material';
 
 import logo from '../../assets/team-logo.png';
-import Graph from '../Graph/index_visjs';
+import Graph from '../Graph/GraphVisualization';
 import UploadPage from '../UploadPage';
 import LandingPage from '../LandingPage';
-
+import Navbar from '../Navbar/Navbar';
 import './index.css';
 
 const theme = createTheme({
@@ -46,9 +46,7 @@ function App() {
             px={2}
             py={1}
           >
-            <NavLink to="/">
-              <img src={logo} alt="Logo" className="logo" />
-            </NavLink>
+            <Navbar />
             <Typography variant="h6">Graph Masters</Typography>
             <NavLink to="/" style={{ textDecoration: 'none' }}>
               <Typography variant="h6" sx={{ color: 'white' }}>
