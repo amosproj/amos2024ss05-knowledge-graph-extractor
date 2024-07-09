@@ -17,7 +17,7 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
         overflowY: 'auto',
         maxWidth: '500px',
         position: 'absolute',
-        right: '16px', // Positioniere die Legende rechts
+        left: '16px',
         top: '16px',
         zIndex: 1300, // Sicherstellen, dass die Legende nicht verdeckt wird
       }}
