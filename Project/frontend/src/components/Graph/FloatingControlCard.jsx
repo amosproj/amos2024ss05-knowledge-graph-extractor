@@ -302,15 +302,15 @@ const FloatingControlCard = ({
         right: '46px',
         width: '300px',
         // padding: '16px',
-        backgroundColor: '#ff0000',
-        color: '#ff0000',
+        background: '#121826',
+        color: '#fff',
         zIndex: 1000,
       }}
     >
       <Accordion>
         <AccordionSummary
           expandIcon={<ExpandMoreIcon style={{ color: '#fff' }} />}
-          style={{ backgroundColor: '#555', color: '#fff' }}
+          style={{ backgroundColor: '#ff0000', color: '#fff' }}
         >
           <Typography>Physics Options</Typography>
         </AccordionSummary>
