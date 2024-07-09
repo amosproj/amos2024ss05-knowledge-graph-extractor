@@ -1,5 +1,8 @@
 import React from 'react';
 import {
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Card,
   CardContent,
   FormControl,
@@ -10,6 +13,7 @@ import {
   Typography,
   Box,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 const FloatingControlCard = ({
   layout,
@@ -295,46 +299,68 @@ const FloatingControlCard = ({
       style={{
         position: 'absolute',
         bottom: '16px',
-        right: '16px',
+        right: '46px',
         width: '300px',
-        padding: '16px',
+        // padding: '16px',
         background: '#121826',
         color: '#fff',
         zIndex: 1000,
       }}
     >
-      <CardContent>
-        <FormControl fullWidth margin="normal">
-          <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
-          <Select
-            value={layout}
-            onChange={(e) => {
-              setLayout(e.target.value);
-              restartStabilization();
-            }}
-            style={{ color: '#fff' }}
-          >
-            <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-            <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-            <MenuItem value="hierarchicalRepulsion">
-              Hierarchical Repulsion
-            </MenuItem>
-            <MenuItem value="repulsion">Repulsion</MenuItem>
-            <MenuItem value="hierarchical">Hierarchical</MenuItem>
-          </Select>
-        </FormControl>
-        {renderSliders()}
-        <Typography gutterBottom>Stabilization Iterations</Typography>
-        <Slider
-          value={physicsOptions.iterations}
-          onChange={handleSliderChange('iterations')}
-          min={0} // Minimum auf 0 gesetzt
-          max={5000}
-          step={100}
-          valueLabelDisplay="auto"
-          style={{ color: '#fff' }}
-        />
-      </CardContent>
+      <Accordion>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon style={{ color: '#fff' }} />}
+          style={{ backgroundColor: '#383838', color: '#fff' }}
+        >
+          <Typography>Physics Options</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
+          <CardContent>
+            <FormControl fullWidth margin="normal">
+              <Box mb={2}>
+                {' '}
+                {/* Add margin bottom to the Box wrapping InputLabel */}
+                <InputLabel
+                  style={{
+                    color: '#fff',
+                  }}
+                >
+                  Layout
+                </InputLabel>
+              </Box>
+              <Select
+                value={layout}
+                onChange={(e) => {
+                  setLayout(e.target.value);
+                  restartStabilization();
+                }}
+                style={{ color: '#fff' }}
+              >
+                <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+                <MenuItem value="forceAtlas2Based">
+                  Force Atlas 2 Based
+                </MenuItem>
+                <MenuItem value="hierarchicalRepulsion">
+                  Hierarchical Repulsion
+                </MenuItem>
+                <MenuItem value="repulsion">Repulsion</MenuItem>
+                <MenuItem value="hierarchical">Hierarchical</MenuItem>
+              </Select>
+            </FormControl>
+            {renderSliders()}
+            <Typography gutterBottom>Stabilization Iterations</Typography>
+            <Slider
+              value={physicsOptions.iterations}
+              onChange={handleSliderChange('iterations')}
+              min={0} // Minimum auf 0 gesetzt
+              max={5000}
+              step={100}
+              valueLabelDisplay="auto"
+              style={{ color: '#fff' }}
+            />
+          </CardContent>
+        </AccordionDetails>
+      </Accordion>
     </Card>
   );
 };
