@@ -19,11 +19,11 @@ class embeddings_handler:
         self.save_dir="Project/backend/codebase/embeddings"
 
         #check for existing embeddings
-        self.graph_dir = os.path.join(self.save_dir, self.graph_id)
-        if os.path.isdir('new_folder'):
+        self.graph_dir = os.path.join(self.save_dir, str(self.graph_id))  # Convert UUID to string
+        if os.path.isdir(self.graph_dir):
             self.isEmbedded = True
             self.embeddings = self.load_data()
-        else:#
+        else:
             self.isEmbedded = False
             self.embeddings = None
 
@@ -40,10 +40,19 @@ class embeddings_handler:
                 pickle.dump(data, f)
 
     def load_data(self):
-        return [
-            pickle.load(open(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"), "rb"))
-            for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]
-        ]
+        loaded_data = []
+        for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]:
+            file_path = os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
+            print(f"Loading {file_path}")
+            try:
+                with open(file_path, "rb") as f:
+                    data = pickle.load(f)
+                    loaded_data.append(data)
+                    print(f"Loaded {name}: {data}")
+            except Exception as e:
+                print(f"Error loading {file_path}: {e}")
+                loaded_data.append(None)
+        return loaded_data
 
 
     def generate_embeddings_and_merge_duplicates(
