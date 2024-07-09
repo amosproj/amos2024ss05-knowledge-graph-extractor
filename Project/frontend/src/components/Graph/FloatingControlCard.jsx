@@ -317,7 +317,17 @@ const FloatingControlCard = ({
         <AccordionDetails>
           <CardContent>
             <FormControl fullWidth margin="normal">
-              <InputLabel style={{ color: '#fff' }}>Layout</InputLabel>
+              <Box mb={2}>
+                {' '}
+                {/* Add margin bottom to the Box wrapping InputLabel */}
+                <InputLabel
+                  style={{
+                    color: '#fff',
+                  }}
+                >
+                  Layout
+                </InputLabel>
+              </Box>
               <Select
                 value={layout}
                 onChange={(e) => {
