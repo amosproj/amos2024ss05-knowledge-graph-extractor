@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo, useCallback } from 'react';
 import {
   Accordion,
   AccordionSummary,
@@ -9,9 +9,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Slider,
-  Typography,
-  Box,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -22,177 +19,140 @@ const FloatingControlCard = ({
   handlePhysicsChange,
   restartStabilization,
 }) => {
-  const handleSliderChange = (name) => (event, value) => {
-    handlePhysicsChange(name, value);
-    restartStabilization();
-  };
+  const handleSliderChange = useCallback(
+    (name) => (event, value) => {
+      handlePhysicsChange(name, value);
+      restartStabilization();
+    },
+    [handlePhysicsChange, restartStabilization],
+  );
 
-  const renderSliders = () => {
+  const renderSliders = useMemo(() => {
     switch (layout) {
       case 'barnesHut':
         return (
           <Box>
-            <Typography gutterBottom>Gravitational Constant</Typography>
-            <Slider
+            <SliderControl
+              label="Gravitational Constant"
               value={physicsOptions.gravitationalConstant}
-              onChange={handleSliderChange('gravitationalConstant')}
               min={-30000}
               max={0}
               step={1000}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('gravitationalConstant')}
             />
-            <Typography gutterBottom>Spring Length</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Length"
               value={physicsOptions.springLength}
-              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springLength')}
             />
-            <Typography gutterBottom>Spring Constant</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Constant"
               value={physicsOptions.springConstant}
-              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springConstant')}
             />
-            <Typography gutterBottom>Damping</Typography>
-            <Slider
+            <SliderControl
+              label="Damping"
               value={physicsOptions.damping}
-              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('damping')}
             />
           </Box>
         );
       case 'forceAtlas2Based':
         return (
           <Box>
-            <Typography gutterBottom>Gravitational Constant</Typography>
-            <Slider
+            <SliderControl
+              label="Gravitational Constant"
               value={physicsOptions.gravitationalConstant}
-              onChange={handleSliderChange('gravitationalConstant')}
               min={-200}
               max={0}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('gravitationalConstant')}
             />
-            <Typography gutterBottom>Spring Length</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Length"
               value={physicsOptions.springLength}
-              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springLength')}
             />
-            <Typography gutterBottom>Spring Constant</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Constant"
               value={physicsOptions.springConstant}
-              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springConstant')}
             />
-            <Typography gutterBottom>Damping</Typography>
-            <Slider
+            <SliderControl
+              label="Damping"
               value={physicsOptions.damping}
-              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('damping')}
             />
           </Box>
         );
       case 'hierarchical':
         return (
           <Box>
-            <Typography gutterBottom>Level Separation</Typography>
-            <Slider
+            <SliderControl
+              label="Level Separation"
               value={physicsOptions.levelSeparation}
-              onChange={handleSliderChange('levelSeparation')}
               min={50}
               max={500}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('levelSeparation')}
             />
-            <Typography gutterBottom>Node Spacing</Typography>
-            <Slider
+            <SliderControl
+              label="Node Spacing"
               value={physicsOptions.nodeSpacing}
-              onChange={handleSliderChange('nodeSpacing')}
               min={50}
               max={200}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('nodeSpacing')}
             />
-            <Typography gutterBottom>Tree Spacing</Typography>
-            <Slider
+            <SliderControl
+              label="Tree Spacing"
               value={physicsOptions.treeSpacing}
-              onChange={handleSliderChange('treeSpacing')}
               min={50}
               max={500}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('treeSpacing')}
             />
-            <Typography gutterBottom>Block Shifting</Typography>
-            <Slider
+            <SliderControl
+              label="Block Shifting"
               value={physicsOptions.blockShifting ? 1 : 0}
+              min={0}
+              max={1}
+              step={1}
               onChange={handleSliderChange('blockShifting')}
-              min={0}
-              max={1}
-              step={1}
-              marks={[
-                { value: 0, label: 'Off' },
-                { value: 1, label: 'On' },
-              ]}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
             />
-            <Typography gutterBottom>Edge Minimization</Typography>
-            <Slider
+            <SliderControl
+              label="Edge Minimization"
               value={physicsOptions.edgeMinimization ? 1 : 0}
+              min={0}
+              max={1}
+              step={1}
               onChange={handleSliderChange('edgeMinimization')}
-              min={0}
-              max={1}
-              step={1}
-              marks={[
-                { value: 0, label: 'Off' },
-                { value: 1, label: 'On' },
-              ]}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
             />
-            <Typography gutterBottom>Parent Centralization</Typography>
-            <Slider
+            <SliderControl
+              label="Parent Centralization"
               value={physicsOptions.parentCentralization ? 1 : 0}
-              onChange={handleSliderChange('parentCentralization')}
               min={0}
               max={1}
               step={1}
-              marks={[
-                { value: 0, label: 'Off' },
-                { value: 1, label: 'On' },
-              ]}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('parentCentralization')}
             />
             <Typography gutterBottom>Direction</Typography>
             <Select
@@ -237,62 +197,52 @@ const FloatingControlCard = ({
       case 'repulsion':
         return (
           <Box>
-            <Typography gutterBottom>Node Distance</Typography>
-            <Slider
+            <SliderControl
+              label="Node Distance"
               value={physicsOptions.nodeDistance}
-              onChange={handleSliderChange('nodeDistance')}
               min={50}
               max={500}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('nodeDistance')}
             />
-            <Typography gutterBottom>Central Gravity</Typography>
-            <Slider
+            <SliderControl
+              label="Central Gravity"
               value={physicsOptions.centralGravity}
-              onChange={handleSliderChange('centralGravity')}
               min={0}
               max={1}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('centralGravity')}
             />
-            <Typography gutterBottom>Spring Length</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Length"
               value={physicsOptions.springLength}
-              onChange={handleSliderChange('springLength')}
               min={50}
               max={300}
               step={10}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springLength')}
             />
-            <Typography gutterBottom>Spring Constant</Typography>
-            <Slider
+            <SliderControl
+              label="Spring Constant"
               value={physicsOptions.springConstant}
-              onChange={handleSliderChange('springConstant')}
               min={0.01}
               max={0.5}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('springConstant')}
             />
-            <Typography gutterBottom>Damping</Typography>
-            <Slider
+            <SliderControl
+              label="Damping"
               value={physicsOptions.damping}
-              onChange={handleSliderChange('damping')}
               min={0.01}
               max={1}
               step={0.01}
-              valueLabelDisplay="auto"
-              style={{ color: '#fff' }}
+              onChange={handleSliderChange('damping')}
             />
           </Box>
         );
       default:
         return null;
     }
-  };
+  }, [layout, physicsOptions, handleSliderChange, restartStabilization]);
 
   return (
     <Card
@@ -365,4 +315,4 @@ const FloatingControlCard = ({
   );
 };
 
-export default FloatingControlCard;
+export default PersistentDrawerControls;

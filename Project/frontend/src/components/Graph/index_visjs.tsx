@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import FloatingControlCard from './FloatingControlCard.jsx';
 import * as d3 from 'd3';
+import PersistentDrawerControls from './PersistentDrawerControls';
 
 type ITopicColourMap = Record<string, string>;
 
@@ -146,6 +147,7 @@ const VisGraph: React.FC<{
       setIsStabilizing(false);
       setStabilizationComplete(true);
       isStabilizingRef.current = false;
+      // network.fit();
     });
 
     network.on('stabilized', function () {
@@ -155,6 +157,7 @@ const VisGraph: React.FC<{
         setStabilizationComplete(true);
         isStabilizingRef.current = false;
       }
+      network.fit();
     });
 
     return () => {
@@ -584,7 +587,20 @@ const GraphVisualization: React.FC = () => {
           <Legend topicColorMap={topicColorMap} />
         </Box>
       </Stack>
-      <FloatingControlCard
+      {/* <FloatingControlCard
+        layout={layout}
+        setLayout={setLayout}
+        physicsOptions={physicsOptions}
+        handlePhysicsChange={handlePhysicsChange}
+        restartStabilization={() => setStabilizationComplete(false)}
+        sx={{
+          position: 'absolute',
+          top: '10px',
+          right: '10px',
+          zIndex: 1000,
+        }}
+      /> */}
+      <PersistentDrawerControls
         layout={layout}
         setLayout={setLayout}
         physicsOptions={physicsOptions}
