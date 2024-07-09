@@ -87,17 +87,19 @@ function UploadPage() {
 
   return (
     <Stack flex={1} justifyContent={'center'} alignItems={'center'} spacing={2}>
-      <Typography
-        variant="h6"
-        className="title"
-        sx={{ color: (theme) => theme.palette.text.secondary }}
-      >
-        Upload a document to generate the graph
-        <Tooltip title={<Typography>{hintText}</Typography>}>
+      <div className='upload_info'>
+        <Typography
+          variant="h6"
+          className="title"
+          sx={{ color: (theme) => theme.palette.text.secondary }}
+        >
+          Upload a document to generate the graph
+        </Typography>
+        <Tooltip title={<Typography>{hintText}</Typography>} placement='top' arrow>
           <InfoIcon color="action" sx={{ mr: 1, cursor: 'pointer' }} />
         </Tooltip>
-      </Typography>
 
+      </div>
       <Upload
         handleAddFile={handleAddFile}
         handleRemoveFile={handleRemoveFile}
