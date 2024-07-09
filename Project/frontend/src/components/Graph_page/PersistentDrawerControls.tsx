@@ -3,24 +3,16 @@ import {
   Accordion,
   AccordionSummary,
   AccordionDetails,
-  Typography,
-  Box,
-  IconButton,
+  Card,
+  CardContent,
   FormControl,
   InputLabel,
   Select,
   MenuItem,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import SliderControl from './SliderControl';
 
-const drawerWidth = 300;
-
-const PersistentDrawerControls = ({
-  open,
-  toggleDrawer,
+const FloatingControlCard = ({
   layout,
   setLayout,
   physicsOptions,
@@ -253,59 +245,73 @@ const PersistentDrawerControls = ({
   }, [layout, physicsOptions, handleSliderChange, restartStabilization]);
 
   return (
-    <Box
-      sx={{
-        width: open ? drawerWidth : 0,
-        flexShrink: 0,
-        '& .MuiBox-root': {
-          width: drawerWidth,
-          boxSizing: 'border-box',
-          marginTop: '64px', // Height of AppBar
-          padding: 2,
-        },
+    <Card
+      style={{
+        position: 'absolute',
+        bottom: '16px',
+        right: '46px',
+        width: '300px',
+        // padding: '16px',
+        background: '#121826',
+        color: '#fff',
+        zIndex: 1000,
       }}
     >
-      <Box sx={{ display: 'flex', alignItems: 'center', padding: 1 }}>
-        <IconButton onClick={toggleDrawer}>
-          {open ? <ChevronRightIcon /> : <ChevronLeftIcon />}
-        </IconButton>
-        <Typography variant="h6" noWrap sx={{ flexGrow: 1, marginLeft: 2 }}>
-          Layout Controls
-        </Typography>
-      </Box>
       <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Layout Options</Typography>
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon style={{ color: '#fff' }} />}
+          style={{ backgroundColor: '#383838', color: '#fff' }}
+        >
+          <Typography>Physics Options</Typography>
         </AccordionSummary>
         <AccordionDetails>
-          <FormControl fullWidth margin="normal">
-            <InputLabel sx={{ color: '#fff' }}>Layout</InputLabel>
-            <Select
-              value={layout}
-              onChange={(e) => {
-                setLayout(e.target.value);
-                restartStabilization();
-              }}
-              sx={{ color: '#fff' }}
-            >
-              <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-              <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
-              <MenuItem value="hierarchicalRepulsion">
-                Hierarchical Repulsion
-              </MenuItem>
-              <MenuItem value="repulsion">Repulsion</MenuItem>
-              <MenuItem value="hierarchical">Hierarchical</MenuItem>
-            </Select>
-          </FormControl>
+          <CardContent>
+            <FormControl fullWidth margin="normal">
+              <Box mb={2}>
+                {' '}
+                {/* Add margin bottom to the Box wrapping InputLabel */}
+                <InputLabel
+                  style={{
+                    color: '#fff',
+                  }}
+                >
+                  Layout
+                </InputLabel>
+              </Box>
+              <Select
+                value={layout}
+                onChange={(e) => {
+                  setLayout(e.target.value);
+                  restartStabilization();
+                }}
+                style={{ color: '#fff' }}
+              >
+                <MenuItem value="barnesHut">Barnes Hut</MenuItem>
+                <MenuItem value="forceAtlas2Based">
+                  Force Atlas 2 Based
+                </MenuItem>
+                <MenuItem value="hierarchicalRepulsion">
+                  Hierarchical Repulsion
+                </MenuItem>
+                <MenuItem value="repulsion">Repulsion</MenuItem>
+                <MenuItem value="hierarchical">Hierarchical</MenuItem>
+              </Select>
+            </FormControl>
+            {renderSliders()}
+            <Typography gutterBottom>Stabilization Iterations</Typography>
+            <Slider
+              value={physicsOptions.iterations}
+              onChange={handleSliderChange('iterations')}
+              min={0} // Minimum auf 0 gesetzt
+              max={5000}
+              step={100}
+              valueLabelDisplay="auto"
+              style={{ color: '#fff' }}
+            />
+          </CardContent>
         </AccordionDetails>
       </Accordion>
-      <Accordion>
-        <AccordionSummary expandIcon={<ExpandMoreIcon />}>
-          <Typography variant="h6">Physics Options</Typography>
-        </AccordionSummary>
-        <AccordionDetails>{renderSliders}</AccordionDetails>
-      </Accordion>
-    </Box>
+    </Card>
   );
 };
 
