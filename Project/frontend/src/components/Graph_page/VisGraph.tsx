@@ -55,7 +55,8 @@ const VisGraph: React.FC<{
         shape: 'dot',
         size: 25,
         ...node,
-        title: `Found in pages: ${node.pages}`,
+        title: `Found in pages: ${node.pages}
+        Topic: ${node.topic.substring(node.topic.indexOf('_') + 1)}`,
         color: {
           background: topicColorMap[node.topic],
           border: 'white',
@@ -68,12 +69,16 @@ const VisGraph: React.FC<{
       edges: graphData.edges.map((edge) => ({
         from: edge.source,
         to: edge.target,
+        ...edge,
+        arrows: {
+          to: { enabled: false }, // Entfernt die Pfeile in Richtung des Ziels
+          from: { enabled: false },
+        },
         color: {
-          color: '#ffffff',
+          color: '#ccccff',
           highlight: '#ffff00',
           hover: '#ffffff',
         },
-        ...edge,
       })),
     };
 
@@ -87,32 +92,36 @@ const VisGraph: React.FC<{
     setIsStabilizing(true);
     setStabilizationProgress(0);
 
-    network.on('stabilizationProgress', function (params) {
+    const stabilizationProgressHandler = (params: any) => {
       const progress = (params.iterations / params.total) * 100;
-      setStabilizationProgress(progress);
-    });
+      setStabilizationProgress((prevProgress) =>
+        Math.max(prevProgress, progress),
+      );
+    };
 
-    network.on('stabilizationIterationsDone', function () {
+    const stabilizationIterationsDoneHandler = () => {
       setStabilizationProgress(100);
       setIsStabilizing(false);
       setStabilizationComplete(true);
       network.fit();
-    });
+    };
 
-    network.on('stabilized', function () {
-      if (isStabilizing) {
-        setStabilizationProgress(100);
-        setIsStabilizing(false);
-        setStabilizationComplete(true);
-      }
-      network.fit();
-    });
+    network.on('stabilizationProgress', stabilizationProgressHandler);
+    network.on(
+      'stabilizationIterationsDone',
+      stabilizationIterationsDoneHandler,
+    );
 
     return () => {
+      network.off('stabilizationProgress', stabilizationProgressHandler);
+      network.off(
+        'stabilizationIterationsDone',
+        stabilizationIterationsDoneHandler,
+      );
       network.destroy();
       networkRef.current = null;
     };
-  }, [graphData, options, topicColorMap]);
+  }, [graphData, options, topicColorMap, setStabilizationComplete]);
 
   return (
     <Box
@@ -120,7 +129,7 @@ const VisGraph: React.FC<{
         position: 'relative',
         width: '100%',
         height: '100%',
-        background: '#1A2130',
+        background: '#0e1e30',
       }}
     >
       {isStabilizing && (

@@ -1,17 +1,14 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { styled, useTheme } from '@mui/material/styles';
-// impport mediauery
-import { useMediaQuery } from '@mui/material';
 import {
+  useMediaQuery,
   Box,
-  Typography,
   CssBaseline,
-  Toolbar,
   IconButton,
-  Drawer,
   Card,
   CardContent,
+  Drawer,
 } from '@mui/material';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
@@ -19,17 +16,18 @@ import VisGraph from './VisGraph';
 import LoadingScreen from './LoadingScreen';
 import ErrorScreen from './ErrorScreen';
 import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
-import PersistentDrawerControls from './PersistentDrawerControls';
 import Navbar from '../Navbar/Navbar';
 import GraphInfoPanel from './GraphInfoPanel';
+import FloatingControlCard from './FloatingControlCard.tsx';
 import {
   initialPhysicsOptions,
   leftDrawerWidth,
-  rightDrawerWidth,
-  physicsOptionsByLayout,
   getOptions,
+  physicsOptionsByLayout,
 } from './config';
 import './index.css';
+import * as d3 from 'd3';
+import Legend from './Legend'; // Importiere die Legend-Komponente
 
 interface GraphData {
   nodes: Array<{
@@ -56,12 +54,11 @@ const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
     easing: theme.transitions.easing.sharp,
     duration: theme.transitions.duration.leavingScreen,
   }),
-  marginLeft: open ? 0 : `-${leftDrawerWidth}px`,
-  marginRight: open ? 0 : `-${rightDrawerWidth}px`,
   position: 'relative',
   padding: '10px',
-  boxSizing: 'border-box', // Ensure padding is included in the width calculation
-  height: 'calc(100vh - 64px)', // Ensure proper height accounting for AppBar
+  boxSizing: 'border-box',
+  height: 'calc(100vh - 64px)',
+  marginLeft: open ? leftDrawerWidth : 0,
 }));
 
 const DrawerHeader = styled('div')(({ theme }) => ({
@@ -84,7 +81,6 @@ const GraphVisualization: React.FC = () => {
   const [physicsOptions, setPhysicsOptions] = useState(initialPhysicsOptions);
 
   const [drawerOpen, setDrawerOpen] = useState(true);
-  const [rightPanelOpen, setRightPanelOpen] = useState(true);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -92,15 +88,15 @@ const GraphVisualization: React.FC = () => {
 
   const toggleDrawer = () => {
     setDrawerOpen(!drawerOpen);
-  };
-
-  const toggleRightPanel = () => {
-    setRightPanelOpen(!rightPanelOpen);
+    if (networkRef.current) {
+      networkRef.current.redraw();
+      networkRef.current.fit();
+    }
   };
 
   useEffect(() => {
     if (isSmallScreen) {
-      setRightPanelOpen(false);
+      setDrawerOpen(false);
     }
   }, [isSmallScreen]);
 
@@ -113,17 +109,38 @@ const GraphVisualization: React.FC = () => {
         const data = await response.json();
         setGraphData(data);
 
-        const newTopicColorMap = data.nodes.reduce(
-          (acc: ITopicColourMap, curr: any) => {
-            if (!acc[curr.topic]) {
-              acc[curr.topic] =
-                '#' + Math.floor(Math.random() * 16777215).toString(16);
-            }
+        // Get the list of unique topics
+        const uniqueTopics = Array.from(
+          new Set(data.nodes.map((node) => node.topic)),
+        );
+
+        // Create color scheme for the topics
+        const colorSchemes = [
+          d3.schemeCategory10,
+          d3.schemePaired,
+          d3.schemeSet1,
+        ];
+        const uniqueColors = Array.from(new Set(colorSchemes.flat()));
+
+        const otherIndex = uniqueTopics.indexOf('other');
+        if (otherIndex !== -1) {
+          uniqueTopics.splice(otherIndex, 1);
+        }
+
+        const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
+          (acc: ITopicColourMap, topic, index) => {
+            acc[topic] = uniqueColors[index % uniqueColors.length];
             return acc;
           },
           {},
         );
-        setTopicColorMap(newTopicColorMap);
+
+        if (otherIndex !== -1) {
+          topicColorMap['other'] =
+            uniqueColors[uniqueTopics.length % uniqueColors.length];
+        }
+
+        setTopicColorMap(topicColorMap);
       } catch (error) {
         console.error('Error fetching graph data:', error);
       } finally {
@@ -131,6 +148,7 @@ const GraphVisualization: React.FC = () => {
       }
     };
 
+    fetchGraphData();
     const fetchKeywords = async () => {
       try {
         const response = await fetch(
@@ -143,7 +161,6 @@ const GraphVisualization: React.FC = () => {
       }
     };
 
-    fetchGraphData();
     fetchKeywords();
   }, [fileId]);
 
@@ -190,25 +207,33 @@ const GraphVisualization: React.FC = () => {
     graphData.graph_created_at,
   ).toLocaleTimeString();
 
+  const isStabilizing = isStabilizingRef.current;
+
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
       <CssBaseline />
       <Navbar />
       <Drawer
         sx={{
-          width: drawerOpen ? leftDrawerWidth : 0,
+          width: 0,
           flexShrink: 0,
           '& .MuiDrawer-paper': {
             width: leftDrawerWidth,
             boxSizing: 'border-box',
             marginTop: '64px',
             borderRight: 0,
+            transition: 'margin 0.3s ease-out',
           },
         }}
         variant="persistent"
         anchor="left"
         open={drawerOpen}
       >
+        <DrawerHeader>
+          <IconButton onClick={toggleDrawer}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </DrawerHeader>
         <GraphInfoPanel
           open={drawerOpen}
           toggleDrawer={toggleDrawer}
@@ -233,19 +258,22 @@ const GraphVisualization: React.FC = () => {
           <ChevronRightIcon />
         </IconButton>
       )}
-      <Main open={drawerOpen || rightPanelOpen}>
+      <Main open={drawerOpen}>
         <DrawerHeader />
         <Card
           sx={{
-            height: 'calc(100% - 64px)',
+            height: '95%',
+            background: '#121826',
             width: '100%',
             overflow: 'hidden',
-            padding: '10px',
-            boxSizing: 'border-box', // Ensure padding is included in the width calculation
+            padding: '5px',
+            boxSizing: 'border-box',
+            margin: '0',
+            position: 'relative',
           }}
         >
-          <CardContent sx={{ height: '100%', padding: 0 }}>
-            {graphData && (
+          <CardContent sx={{ height: '102%', padding: 0 }}>
+            {graphData && !isStabilizingRef.current && (
               <VisGraph
                 graphData={graphData}
                 options={options}
@@ -254,45 +282,17 @@ const GraphVisualization: React.FC = () => {
                 isStabilizingRef={isStabilizingRef}
               />
             )}
+            <Legend topicColorMap={topicColorMap} />
           </CardContent>
         </Card>
       </Main>
-      <Drawer
-        sx={{
-          width: rightPanelOpen ? rightDrawerWidth : 0,
-          flexShrink: 0,
-          '& .MuiDrawer-paper': {
-            width: rightDrawerWidth,
-            boxSizing: 'border-box',
-            marginTop: '64px',
-            borderLeft: 0,
-          },
-        }}
-        variant="persistent"
-        anchor="right"
-        open={rightPanelOpen}
-      >
-        <PersistentDrawerControls
-          open={rightPanelOpen}
-          toggleDrawer={toggleRightPanel}
-          layout={layout}
-          setLayout={setLayout}
-          physicsOptions={physicsOptions}
-          handlePhysicsChange={handlePhysicsChange}
-          restartStabilization={() => setStabilizationComplete(false)}
-        />
-      </Drawer>
-      {!rightPanelOpen && (
-        <IconButton
-          color="inherit"
-          aria-label="open right drawer"
-          edge="end"
-          onClick={toggleRightPanel}
-          sx={{ position: 'absolute', right: 0, top: '64px', zIndex: 1300 }}
-        >
-          <ChevronLeftIcon />
-        </IconButton>
-      )}
+      <FloatingControlCard
+        layout={layout}
+        setLayout={setLayout}
+        physicsOptions={physicsOptions}
+        handlePhysicsChange={handlePhysicsChange}
+        restartStabilization={() => setStabilizationComplete(false)}
+      />
     </Box>
   );
 };

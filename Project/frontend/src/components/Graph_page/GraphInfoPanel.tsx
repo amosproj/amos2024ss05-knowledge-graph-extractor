@@ -8,8 +8,6 @@ import {
   InputAdornment,
   Card,
   CardContent,
-  useTheme,
-  useMediaQuery,
   Divider,
   IconButton,
 } from '@mui/material';
@@ -30,7 +28,7 @@ interface GraphInfoPanelProps {
   searchGraph: (event: React.KeyboardEvent<HTMLDivElement>) => void;
 }
 
-const drawerWidth = 400;
+const drawerWidth = 450;
 
 const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
   open,
@@ -41,20 +39,10 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
   setSearchQuery,
   searchGraph,
 }) => {
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  const formattedDate = new Date(
-    graphData.graph_created_at,
-  ).toLocaleDateString();
-  const formattedTime = new Date(
-    graphData.graph_created_at,
-  ).toLocaleTimeString();
-
   return (
     <Drawer
       sx={{
-        width: 0,
+        width: open ? drawerWidth : 0,
         flexShrink: 0,
         '& .MuiDrawer-paper': {
           width: drawerWidth,
@@ -81,7 +69,7 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
             <Divider sx={{ my: 1 }} />
             <Typography variant="subtitle1">Created At</Typography>
             <Typography variant="body2" color="text.secondary">
-              {formattedDate} {formattedTime}
+              {graphData.graph_created_at}
             </Typography>
           </CardContent>
         </Card>

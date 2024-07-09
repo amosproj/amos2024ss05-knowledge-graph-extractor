@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 
 import logo from '../../assets/team-logo.png';
-import Graph from '../Graph/GraphVisualization';
+import Graph from '../Graph_page/GraphVisualization';
 import UploadPage from '../UploadPage';
 import LandingPage from '../LandingPage';
 import Navbar from '../Navbar/Navbar';
