@@ -25,7 +25,7 @@ import {
   getOptions,
   physicsOptionsByLayout,
 } from './config';
-import './index.css';
+// import './index.css';
 import * as d3 from 'd3';
 import Legend from './Legend'; // Importiere die Legend-Komponente
 
@@ -206,8 +206,6 @@ const GraphVisualization: React.FC = () => {
   const formattedTime = new Date(
     graphData.graph_created_at,
   ).toLocaleTimeString();
-
-  const isStabilizing = isStabilizingRef.current;
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
