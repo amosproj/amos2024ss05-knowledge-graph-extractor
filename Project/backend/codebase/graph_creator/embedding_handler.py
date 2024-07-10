@@ -11,22 +11,21 @@ import numpy as np
 
 class embeddings_handler:
 
-    def __init__(self, g_job :GraphJob):
-        # get graph (document) uuid
+    def __init__(self, g_job: GraphJob):
+        # Get graph (document) uuid
         self.graph_id = g_job.id
 
-        #store embeddings in directory
-        self.save_dir="Project/backend/codebase/embeddings"
+        # Store embeddings in directory
+        self.save_dir = "Project/backend/codebase/embeddings"
 
-        #check for existing embeddings
+        # Ensure the embeddings directory exists
         self.graph_dir = os.path.join(self.save_dir, str(self.graph_id))  # Convert UUID to string
-        if os.path.isdir(self.graph_dir):
-            self.isEmbedded = True
-            self.embeddings = self.load_data()
-        else:
-            self.isEmbedded = False
-            self.embeddings = None
-
+        os.makedirs(self.graph_dir, exist_ok=True)
+        self.isEmbedded = os.path.isdir(self.graph_dir) and all(
+            os.path.isfile(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"))
+            for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]
+        )
+        self.embeddings = self.load_data() if self.isEmbedded else None
 
     def is_embedded(self):
         return self.isEmbedded
@@ -54,7 +53,6 @@ class embeddings_handler:
                 loaded_data.append(None)
         return loaded_data
 
-
     def generate_embeddings_and_merge_duplicates(
         self,
         data,
@@ -65,7 +63,7 @@ class embeddings_handler:
         Generates embeddings for nodes in the given data and merges duplicate nodes based on a threshold.
 
         Args:
-            data (pd.DataFrame): The input data containing 'node_1', 'node_2', and 'edge' columns.
+            data (pd.DataFrame): The input data containing 'Node_1', 'Node_2', and 'Edge' columns.
             model_name (str, optional): The name of the pre-trained model to use for generating embeddings. Defaults to 'xlm-r-bert-base-nli-stsb-mean-tokens'.
             save_dir (str, optional): The directory to save the generated embeddings and other files. Defaults to 'embeddings'.
             threshold (float, optional): The threshold value for hierarchical clustering. Nodes with a cosine distance below this threshold will be merged. Defaults to 0.2.
@@ -79,7 +77,16 @@ class embeddings_handler:
                 - model (SentenceTransformer): The SentenceTransformer model used for generating embeddings.
                 - node_to_merged (dict): A dictionary mapping original nodes to their corresponding merged node names.
         """
-        all_nodes = pd.concat([data["node_1"], data["node_2"]]).unique()
+        # Debug: Print the DataFrame columns
+        print("DataFrame Columns:", data.columns)
+
+        # Ensure columns are as expected
+        expected_columns = ["Node_1", "Node_2", "Edge", "Chunk_id", "Topic_node_1", "Topic_node_2"]
+        for col in expected_columns:
+            if col not in data.columns:
+                raise ValueError(f"Missing expected column: {col}")
+
+        all_nodes = pd.concat([data["Node_1"], data["Node_2"]]).unique()
         model = SentenceTransformer(model_name)
 
         embeddings = model.encode(all_nodes)
@@ -92,13 +99,6 @@ class embeddings_handler:
 
         merged_nodes = {}
         node_to_merged = {}
-        # for label in set(labels):
-        #     cluster = [all_nodes[i] for i in range(len(all_nodes)) if labels[i] == label]
-        #     merged_name = "_".join(cluster)
-        #     # merged_name = max(cluster, key=lambda x: sum(1 for c in x if c.isupper()) / len(x)) # Choose the longest node with the most uppercase characters
-        #     merged_nodes[merged_name] = cluster
-        #     for node in cluster:
-        #         node_to_merged[node] = merged_name
 
         # The under the command find the average embedding of the cluster and assign the node with the smallest cosine distance to the average embedding as the representative node
         for label in set(labels):
@@ -115,18 +115,21 @@ class embeddings_handler:
         seen_edges = set()
         merged_data = []
         for _, row in data.iterrows():
-            node_1 = node_to_merged.get(row["node_1"], row["node_1"])
-            node_2 = node_to_merged.get(row["node_2"], row["node_2"])
-            edge = row["edge"]
+            node_1 = node_to_merged.get(row["Node_1"], row["Node_1"])
+            node_2 = node_to_merged.get(row["Node_2"], row["Node_2"])
+            edge = row["Edge"]
             edge_tuple = (node_1, node_2, edge)
             if node_1 != node_2 and edge_tuple not in seen_edges:
                 merged_data.append(
                     {
-                        "node_1": node_1,
-                        "node_2": node_2,
-                        "edge": edge,
-                        "original_node_1": row["node_1"],
-                        "original_node_2": row["node_2"],
+                        "Node_1": node_1,
+                        "Node_2": node_2,
+                        "Edge": edge,
+                        "Chunk_id": row["Chunk_id"],
+                        "Topic_node_1": row["Topic_node_1"],
+                        "Topic_node_2": row["Topic_node_2"],
+                        "original_Node_1": row["Node_1"],
+                        "original_Node_2": row["Node_2"],
                     }
                 )
                 seen_edges.add(edge_tuple)
@@ -136,7 +139,7 @@ class embeddings_handler:
         # Create FAISS index with original embeddings, but map to merged nodes
         vector_store = FAISS.from_embeddings(
             [(node_to_merged[node], emb) for node, emb in embedding_dict.items()],
-            embedding=model.encode,
+            embedding=model,
         )
         try:
             self.save_data(
@@ -144,7 +147,8 @@ class embeddings_handler:
             )
         except Exception as e:
             logging.error(e)
-
+        
+        return merged_df
 
     def search_graph(self, query, k=20):
 
