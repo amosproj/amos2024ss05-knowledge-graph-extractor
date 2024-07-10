@@ -59,8 +59,6 @@ img {
   gap: 10px;
 }
 
-
-
 .main_wrapper {
   display: flex;
   flex-direction: column;
@@ -70,8 +68,6 @@ img {
   min-width: 100%;
   min-height: 100%;
 }
-
-
 
 .Appcontainer {
   display: flex;

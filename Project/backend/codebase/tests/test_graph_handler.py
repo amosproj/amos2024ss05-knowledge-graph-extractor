@@ -1,7 +1,6 @@
 from requests import patch
-from graph_creator.services.llm.llama_gemini_combination import llama_gemini_combination
 from graph_creator import graph_handler
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 import json
 import pandas as pd
@@ -74,6 +73,7 @@ def test_relation_extraction_from_llm_entity_not_in_lists():
     # Assert
     assert relation is None
 
+
 def test_component_connection_with_llm(mocker):
     """
     Tests if component combination with llm works
@@ -89,7 +89,7 @@ def test_component_connection_with_llm(mocker):
         ]
     """
 
-    patcher = patch('graph_creator.services.llm.llama_gemini_combination')
+    patcher = patch("graph_creator.services.llm.llama_gemini_combination")
     MockLlama3 = patcher.start()
     mock_instance = MockLlama3.return_value
 

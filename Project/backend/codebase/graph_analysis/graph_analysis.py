@@ -1,21 +1,23 @@
 import networkx as nx
-import os
-import json
+
 
 def get_top_n_central_nodes(centrality_dict, n):
     """Sort nodes based on centrality measure and return top N nodes.
-    
+
     Args:
         centrality_dict: Dictionary of nodes with their centrality values.
         n: Number of top nodes to return.
-    
+
     Returns:
         Sorted list of top N nodes with their centrality values.
     """
     # sorted_nodes = sorted(centrality_dict.items(), key=lambda item: item[1], reverse=True)
     # return sorted_nodes[:n]
-    sorted_nodes = sorted(centrality_dict.items(), key=lambda item: item[1], reverse=True)
+    sorted_nodes = sorted(
+        centrality_dict.items(), key=lambda item: item[1], reverse=True
+    )
     return [node for node, _ in sorted_nodes[:n]]
+
 
 def analyze_graph_structure(G):
     """Analyzes the structure of a knowledge graph and provides hopefully useful information.
@@ -32,7 +34,7 @@ def analyze_graph_structure(G):
     num_nodes = G.number_of_nodes()  # Total number of nodes
     num_edges = G.number_of_edges()  # Total number of edges
 
-# Degree Distribution
+    # Degree Distribution
     degree_distribution = dict(G.degree())
     # Degree distribution can indicate the presence of hubs or important nodes
 
@@ -50,7 +52,6 @@ def analyze_graph_structure(G):
     - Degree: node1 = 1, node2 = 2, node3 = 1
     - Degree Centrality: node1 = 0.33(1/3), node2 = 0.66(2/3), node3 = 0.33(1/3)
     """
-
 
     # Betweenness Centrality: Measures node's control over information flow
     betweenness_centrality = nx.betweenness_centrality(G)
@@ -70,7 +71,7 @@ def analyze_graph_structure(G):
     - Betweenness Centrality show the dependency of the network on a node
 
     """
-    
+
     # eigenvector centrality measures the influence of a node in a network
     eigenvector_centrality = nx.eigenvector_centrality(G)
 
@@ -115,7 +116,12 @@ def analyze_graph_structure(G):
     closeness_centrality = get_top_n_central_nodes(nx.closeness_centrality(G), n)
 
     # Find intersection of top nodes from all measures (set intersection)
-    all_centrality_nodes = set(degree_centrality) & set(betweenness_centrality) & set(eigenvector_centrality) & set(closeness_centrality)
+    all_centrality_nodes = (
+        set(degree_centrality)
+        & set(betweenness_centrality)
+        & set(eigenvector_centrality)
+        & set(closeness_centrality)
+    )
 
     top_nodes = list(all_centrality_nodes)[:6]
 

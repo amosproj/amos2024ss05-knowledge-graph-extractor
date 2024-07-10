@@ -1,7 +1,6 @@
 import json
 import logging
 import re
-import time
 
 # from graph_creator import llama3
 # from graph_creator import embedding_handler # To be integrated
@@ -345,18 +344,34 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
     return entity_and_relation_df
 
 
-def add_topic(data: pd.DataFrame) -> pd.DataFrame:
-    documents = list(set(data['node_1']).union(set(data['node_2'])))
+def add_topic(data: pd.DataFrame, max_topics: int = 25) -> pd.DataFrame:
+    documents = list(set(data["node_1"]).union(set(data["node_2"])))
 
     topic_model = BERTopic()
     topics, probabilities = topic_model.fit_transform(documents)
-    topic_name_info = {row['Topic']: row['Name'] for _, row in topic_model.get_topic_info().iterrows()}
-    doc_topic_map = {doc: topic for doc, topic in zip(documents, topics)}
-    doc_topic_strings_map = {doc: topic_name_info.get(topic, "no_topic") for doc, topic in doc_topic_map.items()}
+    topic_info = topic_model.get_topic_info()
+
+    # Keep only the top given number of topics
+    top_topics = topic_model.get_topic_info().head(max_topics)["Topic"].tolist()
+
+    topic_name_info = {
+        row["Topic"]: row["Name"] for _, row in topic_info.iterrows()
+    }
+
+    # Create a mapping for "other" topics
+    doc_topic_map = {doc: (topic if topic in top_topics else "other") for doc, topic in zip(documents, topics)}
+    doc_topic_strings_map = {
+        doc: (topic_name_info.get(topic, "other") if topic != "other" else "other")
+        for doc, topic in doc_topic_map.items()
+    }
 
     # Add new columns to the DataFrame and populate them
-    data['topic_node_1'] = [doc_topic_strings_map[node] for i, node in data['node_1'].items()]
-    data['topic_node_2'] = [doc_topic_strings_map[node] for i, node in data['node_2'].items()]
+    data["topic_node_1"] = [
+        doc_topic_strings_map[node] for i, node in data["node_1"].items()
+    ]
+    data["topic_node_2"] = [
+        doc_topic_strings_map[node] for i, node in data["node_2"].items()
+    ]
     return data
 
 
