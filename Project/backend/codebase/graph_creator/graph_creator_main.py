@@ -1,6 +1,7 @@
 import logging
-
+from graph_creator.embedding_handler import embeddings_handler
 from graph_creator import graph_handler
+import os 
 from graph_creator.services.llm.llama_gemini_combination import llama_gemini_combination
 from graph_creator.models.graph_job import GraphJob
 from graph_creator.services import netx_graphdb
@@ -88,6 +89,15 @@ def create_and_store_graph(uuid, entities_and_relations, chunks, llm_handler):
         chunks[i] = chunks[i].dict()
     combined = graph_handler.connect_with_llm(df_e_and_r, chunks, llm_handler)
 
+        # Create an instance of the embeddings handler
+    embeddings_handler_instance = embeddings_handler(GraphJob(id=uuid))
+
+    # Ensure the embeddings directory exists
+    os.makedirs(embeddings_handler_instance.graph_dir, exist_ok=True)
+
+    # Generate embeddings and merge duplicates
+    combined = embeddings_handler_instance.generate_embeddings_and_merge_duplicates(combined)
+    
     # get graph db service
     graph_db_service = netx_graphdb.NetXGraphDB()
 
