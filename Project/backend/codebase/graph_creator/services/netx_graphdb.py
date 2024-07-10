@@ -36,12 +36,18 @@ class NetXGraphDB:
 
             chunk_id = edge["chunk_id"]
             page_number = chunk_to_page[int(chunk_id)]
+            if isinstance(page_number, int):
+                page_number += 1
 
             # Add nodes with page attribute
             if edge["node_1"] not in graph:
-                graph.add_node(edge["node_1"], pages=set([]), topic=edge["topic_node_1"])
+                graph.add_node(
+                    edge["node_1"], pages=set([]), topic=edge["topic_node_1"]
+                )
             if edge["node_2"] not in graph:
-                graph.add_node(edge["node_2"], pages=set([]), topic=edge["topic_node_2"])
+                graph.add_node(
+                    edge["node_2"], pages=set([]), topic=edge["topic_node_2"]
+                )
 
             # Add edge with attributes to the graph
             graph.add_edge(edge["node_1"], edge["node_2"], relation=edge["edge"])
@@ -128,7 +134,7 @@ class NetXGraphDB:
 
     @staticmethod
     def _graph_bfs_edges(
-            graph: nx.Graph, graph_job: GraphJob, node: str, adj_depth: int
+        graph: nx.Graph, graph_job: GraphJob, node: str, adj_depth: int
     ) -> GraphVisData:
         nodes_data = []
         edges_data = []
@@ -170,14 +176,16 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(document_name=graph_job.name,
-                            graph_created_at=graph_job.updated_at,
-                            nodes=nodes_data,
-                            edges=edges_data)
+        return GraphVisData(
+            document_name=graph_job.name,
+            graph_created_at=graph_job.updated_at,
+            nodes=nodes_data,
+            edges=edges_data,
+        )
 
     @staticmethod
     def _all_graph_data_for_visualization(
-            graph: nx.Graph, graph_job: GraphJob
+        graph: nx.Graph, graph_job: GraphJob
     ) -> GraphVisData:
         nodes_data = []
         edges_data = []
@@ -208,7 +216,9 @@ class NetXGraphDB:
                 )
             )
 
-        return GraphVisData(document_name=graph_job.name,
-                            graph_created_at=graph_job.updated_at,
-                            nodes=nodes_data,
-                            edges=edges_data)
+        return GraphVisData(
+            document_name=graph_job.name,
+            graph_created_at=graph_job.updated_at,
+            nodes=nodes_data,
+            edges=edges_data,
+        )

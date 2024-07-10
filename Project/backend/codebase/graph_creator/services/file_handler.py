@@ -7,7 +7,10 @@ from langchain_community.document_loaders import TextLoader
 from langchain_community.document_loaders import Docx2txtLoader
 from langchain_community.document_loaders import UnstructuredPowerPointLoader
 
-from langchain_text_splitters import RecursiveCharacterTextSplitter, RecursiveJsonSplitter
+from langchain_text_splitters import (
+    RecursiveCharacterTextSplitter,
+    RecursiveJsonSplitter,
+)
 
 
 class FileHandler:
@@ -40,7 +43,9 @@ class FileHandler:
             raise ValueError("Failed to load documents.")
 
         # splits text into chunks including metadata for mapping from chunk to pdf page (splits[0].metadata['page'])
-        text_splitter = RecursiveCharacterTextSplitter(chunk_size=os.getenv("CHUNK_SIZE", 1500), chunk_overlap=150)
+        text_splitter = RecursiveCharacterTextSplitter(
+            chunk_size=os.getenv("CHUNK_SIZE", 1500), chunk_overlap=150
+        )
         splits = text_splitter.split_documents(docs)
         return splits
 
@@ -56,4 +61,3 @@ class FileHandler:
         splitter = RecursiveJsonSplitter(max_chunk_size=os.getenv("CHUNK_SIZE", 1500))
         json_chunks = splitter.create_documents(texts=[json_data])
         return json_chunks
-

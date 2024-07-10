@@ -3,7 +3,10 @@ import { MultiDirectedGraph } from 'graphology';
 import { SigmaContainer, useSigma } from '@react-sigma/core';
 import { useParams } from 'react-router-dom';
 import '@react-sigma/core/lib/react-sigma.min.css';
-import EdgeCurveProgram, { DEFAULT_EDGE_CURVATURE, indexParallelEdgesIndex } from '@sigma/edge-curve';
+import EdgeCurveProgram, {
+  DEFAULT_EDGE_CURVATURE,
+  indexParallelEdgesIndex,
+} from '@sigma/edge-curve';
 import { EdgeArrowProgram } from 'sigma/rendering';
 import forceAtlas2 from 'graphology-layout-forceatlas2';
 import './index.css';
@@ -52,26 +55,22 @@ export default function GraphVisualization() {
       .then((res) => res.json())
       .then((graphData) => {
         const graph = new MultiDirectedGraph();
-        graphData?.nodes?.forEach(
-          (node) => {
-            const { id, ...rest } = node;
-            graph.addNode(id, {
-              ...rest,
-              size: 15, // just for testing, i am making all the same size
-              x: Math.random() * 1000,
-              y: Math.random() * 1000,
-            });
-          },
-        );
-        graphData?.edges?.forEach(
-          (edge) => {
-            const { id, source, target, ...rest } = edge;
-            graph.addEdgeWithKey(id, source, target, {
-              ...rest,
-              size: 2, // edge
-            });
-          },
-        );
+        graphData?.nodes?.forEach((node) => {
+          const { id, ...rest } = node;
+          graph.addNode(id, {
+            ...rest,
+            size: 15, // just for testing, i am making all the same size
+            x: Math.random() * 1000,
+            y: Math.random() * 1000,
+          });
+        });
+        graphData?.edges?.forEach((edge) => {
+          const { id, source, target, ...rest } = edge;
+          graph.addEdgeWithKey(id, source, target, {
+            ...rest,
+            size: 2, // edge
+          });
+        });
         indexParallelEdgesIndex(graph, {
           edgeIndexAttribute: 'parallelIndex',
           edgeMaxIndexAttribute: 'parallelMaxIndex',
@@ -103,9 +102,7 @@ export default function GraphVisualization() {
     return <div className="loading_spinner_graph">Loading graph...</div>;
   }
   if (!graphData) {
-    return (
-      <div className="error_container">Sorry, an error has occurred!</div>
-    );
+    return <div className="error_container">Sorry, an error has occurred!</div>;
   }
   return (
     <section className="graph_container">
