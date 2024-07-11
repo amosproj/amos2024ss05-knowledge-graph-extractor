@@ -134,7 +134,8 @@ def index_entity_relation_table(entity_and_relation_df, entities):
         entities_dict[entities[i]] = i
 
     relations = []
-    for i, row in entity_and_relation_df.iterrows():
+    entity_and_relation_df_withoutna = entity_and_relation_df.dropna()
+    for i, row in entity_and_relation_df_withoutna.iterrows():
         relations.append([entities_dict[row["node_1"]], entities_dict[row["node_2"]]])
 
     return entities_dict, relations
@@ -213,7 +214,8 @@ def get_entities_by_chunk(entity_and_relation_df, entities_dict):
         A dictionary containing all entities per chunk as ids
     """
     entities_by_chunk = {}
-    for i, row in entity_and_relation_df.iterrows():
+    entity_and_relation_df_withoutna = entity_and_relation_df.dropna()
+    for i, row in entity_and_relation_df_withoutna.iterrows():
         if row["chunk_id"] in entities_by_chunk:
             entities_by_chunk[row["chunk_id"]].append(entities_dict[row["node_1"]])
             entities_by_chunk[row["chunk_id"]].append(entities_dict[row["node_2"]])
@@ -333,15 +335,18 @@ def add_relations_to_data(entity_and_relation_df, new_relations):
 
     """
     for relation in new_relations:
-        node_1 = relation["node_1"]
-        node_2 = relation["node_2"]
-        edge = relation["edge"]
-        chunk_id = relation["chunk_id"]
+        try:
+            node_1 = relation["node_1"]
+            node_2 = relation["node_2"]
+            edge = relation["edge"]
+            chunk_id = relation["chunk_id"]
 
-        pos = len(entity_and_relation_df.index)
-        entity_and_relation_df.loc[pos] = [node_1, node_2, edge, chunk_id]
-
-    return entity_and_relation_df
+            pos = len(entity_and_relation_df.index)
+            entity_and_relation_df.loc[pos] = [node_1, node_2, edge, chunk_id]
+        except ValueError:
+            print(f"Error in add_relations_to_data: ,", node_1, node_2, edge, chunk_id)
+            pass
+    return entity_and_relation_df.dropna()
 
 
 def add_topic(data: pd.DataFrame, max_topics: int = 25) -> pd.DataFrame:
