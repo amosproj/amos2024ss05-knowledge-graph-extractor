@@ -19,7 +19,7 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
         borderRadius: '10px',
         color: 'white',
         overflowY: 'auto',
-        // maxWidth: '300px',
+        maxWidth: '350px',
         position: 'absolute',
         left: '16px',
         top: '16px',
