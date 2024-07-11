@@ -15,11 +15,11 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
         color: 'white',
         maxHeight: '250px',
         overflowY: 'auto',
-        maxWidth: '500px',
+        // maxWidth: '300px',
         position: 'absolute',
         left: '16px',
         top: '16px',
-        zIndex: 1300, // Sicherstellen, dass die Legende nicht verdeckt wird
+        zIndex: 1300,
       }}
     >
       <Box component="ul" sx={{ padding: 0, margin: 0, listStyle: 'none' }}>
@@ -38,11 +38,21 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
                 height: '20px',
                 backgroundColor: color,
                 marginRight: '8px',
+                flexShrink: 0,
               }}
             />
-            <span style={{ fontSize: '0.875rem' }}>
+            <Box
+              component="span"
+              sx={{
+                fontSize: '0.875rem',
+                wordWrap: 'break-word',
+                whiteSpace: 'normal',
+                // maxWidth: '250px',
+                overflowWrap: 'break-word',
+              }}
+            >
               {topic.substring(topic.indexOf('_') + 1)}
-            </span>
+            </Box>
           </Box>
         ))}
       </Box>
