@@ -1,5 +1,12 @@
 import React from 'react';
-import { Box } from '@mui/material';
+import {
+  Accordion,
+  AccordionDetails,
+  AccordionSummary,
+  Box,
+  Typography,
+} from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
 type ITopicColourMap = Record<string, string>;
 
@@ -9,11 +16,8 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
   return (
     <Box
       sx={{
-        padding: '16px',
-        backgroundColor: '#121826',
         borderRadius: '10px',
         color: 'white',
-        maxHeight: '250px',
         overflowY: 'auto',
         // maxWidth: '300px',
         position: 'absolute',
@@ -22,40 +26,60 @@ const Legend: React.FC<{ topicColorMap: ITopicColourMap }> = ({
         zIndex: 1300,
       }}
     >
-      <Box component="ul" sx={{ padding: 0, margin: 0, listStyle: 'none' }}>
-        {Object.entries(topicColorMap).map(([topic, color]) => (
+      <Accordion
+        sx={{
+          backgroundColor: '#0d1117',
+          color: 'white',
+        }}
+      >
+        <AccordionSummary
+          expandIcon={<ExpandMoreIcon style={{ color: '#fff' }} />}
+        >
+          <Typography>Topic / Color Legend</Typography>
+        </AccordionSummary>
+        <AccordionDetails>
           <Box
-            component="li"
-            key={topic}
             sx={{
-              display: 'flex',
-              marginBottom: '8px',
+              maxHeight: '250px',
+              overflowY: 'auto',
             }}
           >
-            <Box
-              sx={{
-                width: '20px',
-                height: '20px',
-                backgroundColor: color,
-                marginRight: '8px',
-                flexShrink: 0,
-              }}
-            />
-            <Box
-              component="span"
-              sx={{
-                fontSize: '0.875rem',
-                wordWrap: 'break-word',
-                whiteSpace: 'normal',
-                // maxWidth: '250px',
-                overflowWrap: 'break-word',
-              }}
-            >
-              {topic.substring(topic.indexOf('_') + 1)}
+            <Box component="ul">
+              {Object.entries(topicColorMap).map(([topic, color]) => (
+                <Box
+                  component="li"
+                  key={topic}
+                  sx={{
+                    display: 'flex',
+                    marginBottom: '8px',
+                  }}
+                >
+                  <Box
+                    sx={{
+                      width: '20px',
+                      height: '20px',
+                      backgroundColor: color,
+                      marginRight: '8px',
+                      flexShrink: 0,
+                    }}
+                  />
+                  <Box
+                    component="span"
+                    sx={{
+                      fontSize: '0.875rem',
+                      wordWrap: 'break-word',
+                      whiteSpace: 'normal',
+                      overflowWrap: 'break-word',
+                    }}
+                  >
+                    {topic.substring(topic.indexOf('_') + 1)}
+                  </Box>
+                </Box>
+              ))}
             </Box>
           </Box>
-        ))}
-      </Box>
+        </AccordionDetails>
+      </Accordion>
     </Box>
   );
 };
