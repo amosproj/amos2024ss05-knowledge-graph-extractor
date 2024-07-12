@@ -28,7 +28,7 @@ const Navbar = () => {
   }, [location.pathname]);
 
   return (
-    <AppBar position="fixed" elevation={0.7}>
+    <AppBar position="fixed" elevation={1}>
       <Toolbar>
         <Stack
           direction="row"
