@@ -15,9 +15,6 @@ const Navbar = () => {
         case '/':
           setTitle('Home');
           break;
-        case '/upload':
-          setTitle('Upload');
-          break;
         case '/about': // todo
           setTitle('About');
           break;
@@ -47,16 +44,6 @@ const Navbar = () => {
           </NavLink>
           <Typography variant="h6">{title}</Typography>
           <Stack direction="row" spacing={2}>
-            <NavLink to="/" style={{ textDecoration: 'none' }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>
-                Home
-              </Typography>
-            </NavLink>
-            <NavLink to="/upload" style={{ textDecoration: 'none' }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>
-                Upload
-              </Typography>
-            </NavLink>
             <NavLink to="/about" style={{ textDecoration: 'none' }}>
               <Typography variant="h6" sx={{ color: 'white' }}>
                 About
