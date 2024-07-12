@@ -70,7 +70,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 }));
 
 const GraphVisualization: React.FC = () => {
-  const { fileId } = useParams<{ fileId: string }>();
+  const { fileId = '' } = useParams<{ fileId: string }>();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [layout, setLayout] = useState('barnesHut');
@@ -102,12 +102,18 @@ const GraphVisualization: React.FC = () => {
 
   useEffect(() => {
     const fetchGraphData = async () => {
+      if (sessionStorage.getItem(fileId)) {
+        setGraphData(JSON.parse(sessionStorage.getItem(fileId) as string));
+        setIsLoading(false);
+        return;
+      }
       try {
         const response = await fetch(
           `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
         );
         const data = await response.json();
         setGraphData(data);
+        sessionStorage.setItem(fileId, JSON.stringify(data));
 
         // Get the list of unique topics
         const uniqueTopics = Array.from(
