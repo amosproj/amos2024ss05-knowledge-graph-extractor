@@ -44,7 +44,12 @@ const Navbar = () => {
           </NavLink>
           <Typography variant="h6">{title}</Typography>
           <Stack direction="row" spacing={2}>
-            <a href="https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/wiki" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
+            <a
+              href="https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/wiki"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
               <Typography variant="h6" sx={{ color: 'white' }}>
                 About
               </Typography>
