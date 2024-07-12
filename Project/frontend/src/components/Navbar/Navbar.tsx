@@ -15,8 +15,8 @@ const Navbar = () => {
         case '/':
           setTitle('Home');
           break;
-        case '/about': // todo
-          setTitle('About');
+        case '/upload': // todo
+          setTitle('Upload');
           break;
         default:
           setTitle('Graph Masters');
@@ -44,11 +44,11 @@ const Navbar = () => {
           </NavLink>
           <Typography variant="h6">{title}</Typography>
           <Stack direction="row" spacing={2}>
-            <NavLink to="/about" style={{ textDecoration: 'none' }}>
+            <a href="https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/wiki" target="_blank" rel="noopener noreferrer" style={{ textDecoration: 'none' }}>
               <Typography variant="h6" sx={{ color: 'white' }}>
                 About
               </Typography>
-            </NavLink>
+            </a>
           </Stack>
         </Stack>
       </Toolbar>
