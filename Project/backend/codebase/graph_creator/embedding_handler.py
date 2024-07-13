@@ -16,7 +16,7 @@ class embeddings_handler:
         self.graph_id = g_job.id
 
         # Store embeddings in directory
-        self.save_dir = "Project/backend/codebase/embeddings"
+        self.save_dir = ".media/embeddings"
 
         # Ensure the embeddings directory exists
         self.graph_dir = os.path.join(self.save_dir, str(self.graph_id))  # Convert UUID to string
@@ -63,7 +63,7 @@ class embeddings_handler:
         Generates embeddings for nodes in the given data and merges duplicate nodes based on a threshold.
 
         Args:
-            data (pd.DataFrame): The input data containing 'Node_1', 'Node_2', and 'Edge' columns.
+            data (pd.DataFrame): The input data containing 'node_1', 'node_2', and 'edge' columns.
             model_name (str, optional): The name of the pre-trained model to use for generating embeddings. Defaults to 'xlm-r-bert-base-nli-stsb-mean-tokens'.
             save_dir (str, optional): The directory to save the generated embeddings and other files. Defaults to 'embeddings'.
             threshold (float, optional): The threshold value for hierarchical clustering. Nodes with a cosine distance below this threshold will be merged. Defaults to 0.2.
@@ -81,12 +81,15 @@ class embeddings_handler:
         print("DataFrame Columns:", data.columns)
 
         # Ensure columns are as expected
-        expected_columns = ["Node_1", "Node_2", "Edge", "Chunk_id", "Topic_node_1", "Topic_node_2"]
+        expected_columns = ["node_1", "node_2", "edge", "chunk_id", "topic_node_1", "topic_node_2"]
         for col in expected_columns:
             if col not in data.columns:
                 raise ValueError(f"Missing expected column: {col}")
+            
+        #work on copy of dataframe
+        data = data.copy()
 
-        all_nodes = pd.concat([data["Node_1"], data["Node_2"]]).unique()
+        all_nodes = pd.concat([data["node_1"], data["node_2"]]).unique()
         model = SentenceTransformer(model_name)
 
         embeddings = model.encode(all_nodes)
@@ -115,21 +118,21 @@ class embeddings_handler:
         seen_edges = set()
         merged_data = []
         for _, row in data.iterrows():
-            node_1 = node_to_merged.get(row["Node_1"], row["Node_1"])
-            node_2 = node_to_merged.get(row["Node_2"], row["Node_2"])
-            edge = row["Edge"]
+            node_1 = node_to_merged.get(row["node_1"], row["node_1"])
+            node_2 = node_to_merged.get(row["node_2"], row["node_2"])
+            edge = row["edge"]
             edge_tuple = (node_1, node_2, edge)
             if node_1 != node_2 and edge_tuple not in seen_edges:
                 merged_data.append(
                     {
-                        "Node_1": node_1,
-                        "Node_2": node_2,
-                        "Edge": edge,
-                        "Chunk_id": row["Chunk_id"],
-                        "Topic_node_1": row["Topic_node_1"],
-                        "Topic_node_2": row["Topic_node_2"],
-                        "original_Node_1": row["Node_1"],
-                        "original_Node_2": row["Node_2"],
+                        "node_1": node_1,
+                        "node_2": node_2,
+                        "edge": edge,
+                        "chunk_id": row["chunk_id"],
+                        "topic_node_1": row["topic_node_1"],
+                        "topic_node_2": row["topic_node_2"],
+                        "original_Node_1": row["node_1"],
+                        "original_Node_2": row["node_2"],
                     }
                 )
                 seen_edges.add(edge_tuple)

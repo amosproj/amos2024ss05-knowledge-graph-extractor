@@ -92,9 +92,6 @@ def create_and_store_graph(uuid, entities_and_relations, chunks, llm_handler):
         # Create an instance of the embeddings handler
     embeddings_handler_instance = embeddings_handler(GraphJob(id=uuid))
 
-    # Ensure the embeddings directory exists
-    os.makedirs(embeddings_handler_instance.graph_dir, exist_ok=True)
-
     # Generate embeddings and merge duplicates
     combined = embeddings_handler_instance.generate_embeddings_and_merge_duplicates(combined)
     
