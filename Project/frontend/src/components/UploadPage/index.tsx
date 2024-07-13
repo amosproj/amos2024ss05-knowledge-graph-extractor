@@ -14,7 +14,6 @@ import InfoIcon from '@mui/icons-material/Info'; // Import InfoIcon for hint but
 import { GENERATE_API_PATH, GraphStatus } from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
 import Upload from '../Upload';
-import './index.css';
 
 function UploadPage() {
   const [fileId, setFileId] = useState('');
@@ -87,19 +86,27 @@ function UploadPage() {
 
   return (
     <Stack flex={1} justifyContent={'center'} alignItems={'center'} spacing={2}>
-      <div className='upload_info'>
+      <Stack
+        direction="row"
+        alignItems="center"
+        justifyContent="center"
+        spacing={1}
+        sx={{ gap: '5px' }}
+      >
         <Typography
           variant="h6"
-          className="title"
           sx={{ color: (theme) => theme.palette.text.secondary }}
         >
           Upload a document to generate the graph
         </Typography>
-        <Tooltip title={<Typography>{hintText}</Typography>} placement='top' arrow>
-          <InfoIcon color="action" sx={{ mr: 1, cursor: 'pointer' }} />
+        <Tooltip
+          title={<Typography>{hintText}</Typography>}
+          placement="top"
+          arrow
+        >
+          <InfoIcon color="action" sx={{ cursor: 'pointer' }} />
         </Tooltip>
-
-      </div>
+      </Stack>
       <Upload
         handleAddFile={handleAddFile}
         handleRemoveFile={handleRemoveFile}
