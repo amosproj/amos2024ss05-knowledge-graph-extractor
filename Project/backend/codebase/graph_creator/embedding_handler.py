@@ -33,11 +33,12 @@ class embeddings_handler:
         self.embeddings = self.load_data() if self.isEmbedded  and not lazyLoad else None
 
     def delete(self):
-        if self.isEmbedded:
-            files = [os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
-                     for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]]
-            for file in files:
+        files = [os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
+                    for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]]
+        for file in files:
+            if os.path.exists(file):
                 os.remove(file)
+        if os.path.exists(self.graph_dir):
             os.rmdir(self.graph_dir)
 
     def is_embedded(self):
