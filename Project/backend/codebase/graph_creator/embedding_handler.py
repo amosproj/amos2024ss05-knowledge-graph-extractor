@@ -11,26 +11,49 @@ import numpy as np
 
 class embeddings_handler:
 
-    def __init__(self, g_job: GraphJob):
+    def __init__(self, g_job: GraphJob, lazyLoad=False):
         # Get graph (document) uuid
         self.graph_id = g_job.id
 
         # Store embeddings in directory
         self.save_dir = ".media/embeddings"
 
+        # Model used for embedding
+        self.model_name = "xlm-r-bert-base-nli-stsb-mean-tokens"
+
         # Ensure the embeddings directory exists
         self.graph_dir = os.path.join(self.save_dir, str(self.graph_id))  # Convert UUID to string
+
+        # Check if Graph already embedded
         os.makedirs(self.graph_dir, exist_ok=True)
         self.isEmbedded = os.path.isdir(self.graph_dir) and all(
             os.path.isfile(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"))
             for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]
         )
-        self.embeddings = self.load_data() if self.isEmbedded else None
+        self.embeddings = self.load_data() if self.isEmbedded  and not lazyLoad else None
+
+    def delete(self):
+        if self.isEmbedded:
+            files = [os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
+                     for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]]
+            for file in files:
+                os.remove(file)
+            os.rmdir(self.graph_dir)
 
     def is_embedded(self):
         return self.isEmbedded
 
     def save_data(self, vector_store, embedding_dict, merged_nodes, node_to_merged):
+        """
+        Serialize and make variables of embedding step persistant
+        
+        Args:
+            vector_store   : langchain_community.vectorstores.faiss.FAISS
+            embedding_dict : dict
+            merged_nodes   : dict
+            node_to_merged : dict
+        """
+        # store dictionaries
         for name, data in zip(
             ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"],
             [vector_store, embedding_dict, merged_nodes, node_to_merged],
@@ -42,12 +65,12 @@ class embeddings_handler:
         loaded_data = []
         for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]:
             file_path = os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
-            print(f"Loading {file_path}")
+            #print(f"Loading {file_path}")
             try:
                 with open(file_path, "rb") as f:
                     data = pickle.load(f)
                     loaded_data.append(data)
-                    print(f"Loaded {name}: {data}")
+                    #print(f"Loaded {name}: {data}")
             except Exception as e:
                 print(f"Error loading {file_path}: {e}")
                 loaded_data.append(None)
@@ -56,7 +79,6 @@ class embeddings_handler:
     def generate_embeddings_and_merge_duplicates(
         self,
         data,
-        model_name="xlm-r-bert-base-nli-stsb-mean-tokens",
         threshold=0.2,
     ):
         """
@@ -90,7 +112,7 @@ class embeddings_handler:
         data = data.copy()
 
         all_nodes = pd.concat([data["node_1"], data["node_2"]]).unique()
-        model = SentenceTransformer(model_name)
+        model = SentenceTransformer(self.model_name)
 
         embeddings = model.encode(all_nodes)
         embedding_dict = {node: emb for node, emb in zip(all_nodes, embeddings)}
@@ -160,8 +182,7 @@ class embeddings_handler:
             return None
 
         # Load the model
-        model_name = "xlm-r-bert-base-nli-stsb-mean-tokens"
-        model = SentenceTransformer(model_name)
+        model = SentenceTransformer(self.model_name)
         vector_store, embedding_dict, merged_nodes, node_to_merged = self.embeddings
 
         query_embedding = model.encode([query])[0]

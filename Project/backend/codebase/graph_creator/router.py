@@ -195,6 +195,9 @@ async def delete_graph_job(
     graph_job_id = graph_job.id
     await graph_job_dao.delete_graph_job(graph_job)
     netx_services.delete_graph(graph_job_id)
+    graphEmbeddingsHandler = embeddings_handler(graph_job, lazyLoad=True)
+    graphEmbeddingsHandler.delete()
+
 
 
 @router.post("/create_graph/{graph_job_id}")
@@ -340,6 +343,8 @@ async def query_graph(
 
     if graphEmbeddingsHandler.is_embedded():
         #do search
+        #result = graphEmbeddingsHandler.search_graph(user_query, k=3)
+        #print(result)
         answer = 'The answer from the llm for the given question'
     else:
         #can't answer because no embeddings exist
