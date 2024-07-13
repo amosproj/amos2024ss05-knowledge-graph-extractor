@@ -62,7 +62,7 @@ class embeddings_handler:
             with open(os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl"), "wb") as f:
                 pickle.dump(data, f)
 
-    def load_data(self):
+    def load_data(self) -> list[FAISS, dict, dict, dict]:
         loaded_data = []
         for name in ["faiss_index", "embedding_dict", "merged_nodes", "node_to_merged"]:
             file_path = os.path.join(self.graph_dir, f"{self.graph_id}_{name}.pkl")
@@ -187,7 +187,7 @@ class embeddings_handler:
         vector_store, embedding_dict, merged_nodes, node_to_merged = self.embeddings
 
         query_embedding = model.encode([query])[0]
-        results = vector_store.similarity_search_with_score(query, k=k)
+        results = vector_store.similarity_search_with_score_by_vector(query_embedding, k=k)
         similar_nodes = []
         visited_nodes = (
             set()
