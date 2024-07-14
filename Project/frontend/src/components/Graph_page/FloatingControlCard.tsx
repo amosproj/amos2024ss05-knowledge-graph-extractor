@@ -9,7 +9,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  Slider,
   Typography,
   Box,
 } from '@mui/material';
@@ -22,8 +21,14 @@ const FloatingControlCard = ({
   physicsOptions,
   handlePhysicsChange,
   restartStabilization,
+}: {
+  layout: string,
+  setLayout: (layout: string) => void,
+  physicsOptions: any,
+  handlePhysicsChange: (name: string, value: any) => void,
+  restartStabilization: () => void,
 }) => {
-  const handleSliderChange = (name) => (event, value) => {
+  const handleSliderChange = (name: string) => (event, value: any) => {
     handlePhysicsChange(name, value);
     restartStabilization();
   };

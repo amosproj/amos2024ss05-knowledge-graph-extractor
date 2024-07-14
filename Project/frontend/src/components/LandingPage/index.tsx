@@ -1,7 +1,5 @@
 import React from 'react';
-
-import { Button, Container, Stack, Typography } from '@mui/material';
-
+import { Button, Container, Stack, Typography, Link } from '@mui/material';
 import GraphList from '../GraphList';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,10 +36,18 @@ const LandingPage = () => {
           </Button>
         </Stack>
       </Stack>
-
       <section className="graph_list_container">
         <GraphList />
       </section>
+      {/* Footer message */}
+      <Typography
+        variant="body2"
+        color="textSecondary"
+        align="center"
+        sx={{ mt: 30 }}
+      >
+        Made with 💙 at FAU and TU Berlin.
+      </Typography>
     </Container>
   );
 };

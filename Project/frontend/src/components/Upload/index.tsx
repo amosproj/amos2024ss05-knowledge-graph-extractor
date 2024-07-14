@@ -4,8 +4,6 @@ import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
 
 import { GRAPH_DELETE_API_PATH, UPLOAD_API_PATH } from '../../constant';
 
-import './index.css';
-
 registerPlugin(FilePondPluginFileValidateType);
 
 export interface IFile {
@@ -58,7 +56,7 @@ function Upload(props: UploadProps) {
     props.handleAddFile?.(error, file);
 
   return (
-    <section className="upload_wrapper">
+    <section style={{ width: '500px' }}>
       <FilePond
         allowMultiple={false}
         server={server}

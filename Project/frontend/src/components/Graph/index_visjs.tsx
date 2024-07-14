@@ -523,19 +523,7 @@ const GraphVisualization: React.FC = () => {
           <Legend topicColorMap={topicColorMap} />
         </Box>
       </Stack>
-      {/* <FloatingControlCard
-        layout={layout}
-        setLayout={setLayout}
-        physicsOptions={physicsOptions}
-        handlePhysicsChange={handlePhysicsChange}
-        restartStabilization={() => setStabilizationComplete(false)}
-        sx={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-        }}
-      /> */}
+
       <PersistentDrawerControls
         layout={layout}
         setLayout={setLayout}
