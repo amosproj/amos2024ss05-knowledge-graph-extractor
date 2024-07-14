@@ -3,9 +3,6 @@ import React from 'react';
 import { FilePond, registerPlugin, FilePondProps } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-
-
-import { GRAPH_DELETE_API_PATH, UPLOAD_API_PATH } from '../../constant';
 import {
   GRAPH_DELETE_API_PATH,
   UPLOAD_API_PATH,
