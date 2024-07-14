@@ -6,7 +6,7 @@ import { messageSeverity } from '../../constant';
 
 interface CustomizedSnackbarsProps {
   open: boolean;
-  handleClick: () => void;
+  handleClick?: () => void;
   handleClose: (event?: React.SyntheticEvent | Event, reason?: string) => void;
   severity_value?: messageSeverity;
   message?: string;
