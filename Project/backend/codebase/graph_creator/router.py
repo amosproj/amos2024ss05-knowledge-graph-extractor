@@ -345,7 +345,7 @@ async def query_graph(
         #do search
         result = graphEmbeddingsHandler.search_graph(user_query, k=3)
         #print(result)
-        answer = 'The answer from the llm for the given question'
+        answer = str(result)
     else:
         #can't answer because no embeddings exist
         answer = 'No embeddings found'
