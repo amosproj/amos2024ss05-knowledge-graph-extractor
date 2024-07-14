@@ -36,6 +36,8 @@ class NetXGraphDB:
 
             chunk_id = edge["chunk_id"]
             page_number = chunk_to_page[int(chunk_id)]
+            if isinstance(page_number, int):
+                page_number += 1
 
             # Add nodes with page attribute
             if edge["node_1"] not in graph:
