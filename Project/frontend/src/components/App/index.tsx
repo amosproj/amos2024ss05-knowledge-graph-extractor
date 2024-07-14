@@ -5,14 +5,11 @@ import {
   Routes,
 } from 'react-router-dom';
 import {
-  AppBar,
   createTheme,
   CssBaseline,
-  Divider,
   Paper,
   Stack,
   ThemeProvider,
-  Toolbar,
   Typography,
 } from '@mui/material';
 
@@ -37,7 +34,7 @@ function App() {
         <Stack direction="column" flex={1}>
           <Paper
             variant="elevation"
-            elevation={0.7}
+            elevation={1}
             component={Stack}
             display={'flex'}
             flexDirection={'row'}
