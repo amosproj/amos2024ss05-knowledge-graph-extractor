@@ -101,60 +101,57 @@ const GraphVisualization: React.FC = () => {
   }, [isSmallScreen]);
 
   useEffect(() => {
+    if (!graphData) return;
+
+    // Get the list of unique topics
+    const uniqueTopics = Array.from(
+      new Set(graphData?.nodes.map((node) => node.topic)),
+    );
+
+    // Create color scheme for the topics
+    const colorSchemes = [d3.schemeCategory10, d3.schemePaired, d3.schemeSet1];
+    const uniqueColors = Array.from(new Set(colorSchemes.flat()));
+
+    const otherIndex = uniqueTopics.indexOf('other');
+    if (otherIndex !== -1) {
+      uniqueTopics.splice(otherIndex, 1);
+    }
+
+    const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
+      (acc: ITopicColourMap, topic, index) => {
+        acc[topic] = uniqueColors[index % uniqueColors.length];
+        return acc;
+      },
+      {},
+    );
+
+    if (otherIndex !== -1) {
+      topicColorMap['other'] =
+        uniqueColors[uniqueTopics.length % uniqueColors.length];
+    }
+    setTopicColorMap(topicColorMap);
+  }, [graphData]);
+
+  useEffect(() => {
     const fetchGraphData = async () => {
       if (sessionStorage.getItem(fileId)) {
         setGraphData(JSON.parse(sessionStorage.getItem(fileId) as string));
         setIsLoading(false);
-        return;
-      }
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
-        );
-        const data = await response.json();
-        setGraphData(data);
-        sessionStorage.setItem(fileId, JSON.stringify(data));
-
-        // Get the list of unique topics
-        const uniqueTopics = Array.from(
-          new Set(data.nodes.map((node) => node.topic)),
-        );
-
-        // Create color scheme for the topics
-        const colorSchemes = [
-          d3.schemeCategory10,
-          d3.schemePaired,
-          d3.schemeSet1,
-        ];
-        const uniqueColors = Array.from(new Set(colorSchemes.flat()));
-
-        const otherIndex = uniqueTopics.indexOf('other');
-        if (otherIndex !== -1) {
-          uniqueTopics.splice(otherIndex, 1);
+      } else {
+        try {
+          const response = await fetch(
+            `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
+          );
+          const data = await response.json();
+          setGraphData(data);
+          sessionStorage.setItem(fileId, JSON.stringify(data));
+        } catch (error) {
+          console.error(error);
+        } finally {
+          setIsLoading(false);
         }
-
-        const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
-          (acc: ITopicColourMap, topic, index) => {
-            acc[topic] = uniqueColors[index % uniqueColors.length];
-            return acc;
-          },
-          {},
-        );
-
-        if (otherIndex !== -1) {
-          topicColorMap['other'] =
-            uniqueColors[uniqueTopics.length % uniqueColors.length];
-        }
-
-        setTopicColorMap(topicColorMap);
-      } catch (error) {
-        console.error('Error fetching graph data:', error);
-      } finally {
-        setIsLoading(false);
       }
     };
-
-    fetchGraphData();
     const fetchKeywords = async () => {
       try {
         const response = await fetch(
@@ -167,6 +164,7 @@ const GraphVisualization: React.FC = () => {
       }
     };
 
+    fetchGraphData();
     fetchKeywords();
   }, [fileId]);
 
@@ -205,13 +203,6 @@ const GraphVisualization: React.FC = () => {
   if (!graphData) {
     return <ErrorScreen />;
   }
-
-  const formattedDate = new Date(
-    graphData.graph_created_at,
-  ).toLocaleDateString();
-  const formattedTime = new Date(
-    graphData.graph_created_at,
-  ).toLocaleTimeString();
 
   return (
     <Box sx={{ display: 'flex', height: '100vh' }}>
