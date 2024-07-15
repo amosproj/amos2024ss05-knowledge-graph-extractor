@@ -213,7 +213,7 @@ const GraphVisualization: React.FC = () => {
       const result = await response.json();
       
       // Parse the result directly
-      const parsedResults: SearchResult[] = JSON.parse(result.answer.replace(/'/g, '"'));
+      const parsedResults: SearchResult[] = JSON.parse(result.answer);
       setSearchResults(parsedResults);
     } catch (error) {
       console.error('Error fetching the search results:', error);
