@@ -1,8 +1,16 @@
+import React from 'react';
+
 import { FilePond, registerPlugin, FilePondProps } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
+import {
+  GRAPH_DELETE_API_PATH,
+  UPLOAD_API_PATH,
+  messageSeverity,
+} from '../../constant';
+import CustomizedSnackbars from '../Snackbar';
+import { Notification } from '../GraphList';
 
-import { GRAPH_DELETE_API_PATH, UPLOAD_API_PATH } from '../../constant';
 
 registerPlugin(FilePondPluginFileValidateType);
 
@@ -21,6 +29,12 @@ type UploadProps = {
 };
 
 function Upload(props: UploadProps) {
+  const [notification, setNotification] = React.useState<Notification>({
+    show: false,
+    severity: messageSeverity.SUCCESS,
+    message: '',
+  });
+
   const server: FilePondProps['server'] = {
     url: `${import.meta.env.VITE_BACKEND_HOST}`,
     process: {
@@ -52,8 +66,45 @@ function Upload(props: UploadProps) {
     },
   };
 
-  const handleFileProcess: FilePondProps['onprocessfile'] = (error, file) =>
+  const handleFileProcess: FilePondProps['onprocessfile'] = (error, file) => {
+    console.log(error, file);
     props.handleAddFile?.(error, file);
+  };
+
+  const handleAddFile: FilePondProps['onaddfile'] = (error, file) => {
+    if (error) {
+      setNotification({
+        show: true,
+        severity: messageSeverity.ERROR,
+        message: `${error.main}. ${error.sub}.`,
+      });
+    }
+  };
+
+  const handleClose = (
+    event?: React.SyntheticEvent | Event,
+    reason?: string,
+  ) => {
+    if (reason === 'clickaway') {
+      return;
+    }
+    setNotification({
+      show: false,
+      severity: notification.severity,
+      message: notification.message,
+    });
+  };
+
+  const renderSnackbar = () => {
+    return (
+      <CustomizedSnackbars
+        open={notification.show}
+        handleClose={handleClose}
+        message={notification.message}
+        severity_value={notification.severity}
+      />
+    );
+  };
 
   return (
     <section style={{ width: '500px' }}>
@@ -73,7 +124,11 @@ function Upload(props: UploadProps) {
         onprocessfile={handleFileProcess}
         onremovefile={props.handleRemoveFile}
         labelFileProcessingError={(error) => error.body}
+        labelFileTypeNotAllowed="Invalid file type"
+        fileValidateTypeLabelExpectedTypes="Kindly check the info"
+        onaddfile={handleAddFile}
       />
+      {renderSnackbar()}
     </section>
   );
 }

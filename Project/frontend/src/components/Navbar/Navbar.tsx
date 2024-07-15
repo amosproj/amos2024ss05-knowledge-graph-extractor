@@ -15,11 +15,8 @@ const Navbar = () => {
         case '/':
           setTitle('Home');
           break;
-        case '/upload':
+        case '/upload': // todo
           setTitle('Upload');
-          break;
-        case '/about': // todo
-          setTitle('About');
           break;
         default:
           setTitle('Graph Masters');
@@ -28,7 +25,7 @@ const Navbar = () => {
   }, [location.pathname]);
 
   return (
-    <AppBar position="fixed" elevation={0.7}>
+    <AppBar position="fixed" elevation={1}>
       <Toolbar>
         <Stack
           direction="row"
@@ -47,21 +44,16 @@ const Navbar = () => {
           </NavLink>
           <Typography variant="h6">{title}</Typography>
           <Stack direction="row" spacing={2}>
-            <NavLink to="/" style={{ textDecoration: 'none' }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>
-                Home
-              </Typography>
-            </NavLink>
-            <NavLink to="/upload" style={{ textDecoration: 'none' }}>
-              <Typography variant="h6" sx={{ color: 'white' }}>
-                Upload
-              </Typography>
-            </NavLink>
-            <NavLink to="/about" style={{ textDecoration: 'none' }}>
+            <a
+              href="https://github.com/amosproj/amos2024ss05-knowledge-graph-extractor/wiki"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ textDecoration: 'none' }}
+            >
               <Typography variant="h6" sx={{ color: 'white' }}>
                 About
               </Typography>
-            </NavLink>
+            </a>
           </Stack>
         </Stack>
       </Toolbar>

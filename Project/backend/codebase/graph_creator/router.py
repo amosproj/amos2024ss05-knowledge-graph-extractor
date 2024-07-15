@@ -196,7 +196,7 @@ async def delete_graph_job(
     await graph_job_dao.delete_graph_job(graph_job)
     netx_services.delete_graph(graph_job_id)
     graphEmbeddingsHandler = embeddings_handler(graph_job, lazyLoad=True)
-    graphEmbeddingsHandler.delete()
+    graphEmbeddingsHandler.delete_embeddings()
 
 
 
