@@ -343,7 +343,7 @@ async def query_graph(
 
     if graphEmbeddingsHandler.is_embedded():
         #do search
-        result = graphEmbeddingsHandler.search_graph(user_query, k=3)
+        result = graphEmbeddingsHandler.search_graph(user_query, k=10)
         #print(result)
         answer = str(result)
     else:
