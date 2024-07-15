@@ -15,7 +15,7 @@ import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import VisGraph from './VisGraph';
 import LoadingScreen from './LoadingScreen';
 import ErrorScreen from './ErrorScreen';
-import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
+import { KEYWORDS_API_PATH, VISUALIZE_API_PATH, GRAPH_SEARCH_API_PATH } from '../../constant';
 import Navbar from '../Navbar/Navbar';
 import GraphInfoPanel from './GraphInfoPanel';
 import FloatingControlCard from './FloatingControlCard.tsx';
@@ -25,9 +25,8 @@ import {
   getOptions,
   physicsOptionsByLayout,
 } from './config';
-// import './index.css';
 import * as d3 from 'd3';
-import Legend from './Legend'; // Importiere die Legend-Komponente
+import Legend from './Legend';
 
 interface GraphData {
   nodes: Array<{
@@ -44,6 +43,15 @@ interface GraphData {
 
 interface ITopicColourMap {
   [key: string]: string;
+}
+
+interface SearchResult {
+  merged_node: string;
+  original_nodes: string[];
+  similarity: number;
+  individual_similarities: {
+    [key: string]: number;
+  };
 }
 
 const Main = styled('main', { shouldForwardProp: (prop) => prop !== 'open' })<{
@@ -79,8 +87,9 @@ const GraphVisualization: React.FC = () => {
   const [stabilizationComplete, setStabilizationComplete] = useState(false);
   const [topicColorMap, setTopicColorMap] = useState<ITopicColourMap>({});
   const [physicsOptions, setPhysicsOptions] = useState(initialPhysicsOptions);
-
   const [drawerOpen, setDrawerOpen] = useState(true);
+  const [searchResults, setSearchResults] = useState<SearchResult[]>([]);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
 
   const theme = useTheme();
   const isSmallScreen = useMediaQuery(theme.breakpoints.down('sm'));
@@ -186,14 +195,32 @@ const GraphVisualization: React.FC = () => {
 
   const options = getOptions(layout, physicsOptions);
 
-  const searchGraph = (event: React.KeyboardEvent<HTMLDivElement>) => {
-    if (event.key === 'Enter') {
-      performSearch();
-    }
-  };
+  const performSearch = async (query: string) => {
+    if (!query.trim()) return;
 
-  const performSearch = () => {
-    console.log('Searching for:', searchQuery);
+    setSearchIsLoading(true);
+    setSearchResults([]); // Reset results before new search
+
+    try {
+      const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_SEARCH_API_PATH.replace(':fileId', fileId)}`;
+      const response = await fetch(API, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ query }),
+      });
+      const result = await response.json();
+      
+      // Parse the result directly
+      const parsedResults: SearchResult[] = JSON.parse(result.answer.replace(/'/g, '"'));
+      setSearchResults(parsedResults);
+    } catch (error) {
+      console.error('Error fetching the search results:', error);
+      setSearchResults([]);
+    } finally {
+      setSearchIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -239,7 +266,10 @@ const GraphVisualization: React.FC = () => {
           keywords={keywords}
           searchQuery={searchQuery}
           setSearchQuery={setSearchQuery}
-          searchGraph={searchGraph}
+          performSearch={performSearch}
+          searchResults={searchResults}
+          searchIsLoading={searchIsLoading}
+          fileId={fileId}
         />
       </Drawer>
       {!drawerOpen && (
@@ -249,47 +279,47 @@ const GraphVisualization: React.FC = () => {
           edge="start"
           onClick={toggleDrawer}
           sx={{ position: 'absolute', left: 0, top: '64px', zIndex: 1300 }}
-        >
-          <ChevronRightIcon />
-        </IconButton>
-      )}
-      <Main open={drawerOpen}>
-        <DrawerHeader />
-        <Card
-          sx={{
-            height: '95%',
-            background: '#121826',
-            width: '100%',
-            overflow: 'hidden',
-            padding: '5px',
-            boxSizing: 'border-box',
-            margin: '0',
-            position: 'relative',
-          }}
-        >
-          <CardContent sx={{ height: '102%', padding: 0 }}>
-            {graphData && !isStabilizingRef.current && (
-              <VisGraph
-                graphData={graphData}
-                options={options}
-                setStabilizationComplete={setStabilizationComplete}
-                topicColorMap={topicColorMap}
-                isStabilizingRef={isStabilizingRef}
-              />
-            )}
-            <Legend topicColorMap={topicColorMap} />
-          </CardContent>
-        </Card>
-      </Main>
-      <FloatingControlCard
-        layout={layout}
-        setLayout={setLayout}
-        physicsOptions={physicsOptions}
-        handlePhysicsChange={handlePhysicsChange}
-        restartStabilization={() => setStabilizationComplete(false)}
-      />
-    </Box>
-  );
-};
-
-export default GraphVisualization;
+          >
+            <ChevronRightIcon />
+          </IconButton>
+        )}
+        <Main open={drawerOpen}>
+          <DrawerHeader />
+          <Card
+            sx={{
+              height: '95%',
+              background: '#121826',
+              width: '100%',
+              overflow: 'hidden',
+              padding: '5px',
+              boxSizing: 'border-box',
+              margin: '0',
+              position: 'relative',
+            }}
+          >
+            <CardContent sx={{ height: '102%', padding: 0 }}>
+              {graphData && !isStabilizingRef.current && (
+                <VisGraph
+                  graphData={graphData}
+                  options={options}
+                  setStabilizationComplete={setStabilizationComplete}
+                  topicColorMap={topicColorMap}
+                  isStabilizingRef={isStabilizingRef}
+                />
+              )}
+              <Legend topicColorMap={topicColorMap} />
+            </CardContent>
+          </Card>
+        </Main>
+        <FloatingControlCard
+          layout={layout}
+          setLayout={setLayout}
+          physicsOptions={physicsOptions}
+          handlePhysicsChange={handlePhysicsChange}
+          restartStabilization={() => setStabilizationComplete(false)}
+        />
+      </Box>
+    );
+  };
+  
+  export default GraphVisualization;

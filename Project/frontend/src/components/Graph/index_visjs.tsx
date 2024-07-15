@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
-import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
+import { KEYWORDS_API_PATH, VISUALIZE_API_PATH, GRAPH_SEARCH_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
@@ -202,6 +202,8 @@ const GraphVisualization: React.FC = () => {
   const { fileId = '' } = useParams<{ fileId: string }>();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [answerText, setAnswerText] = useState("");
   const [layout, setLayout] = useState('barnesHut');
   const [searchQuery, setSearchQuery] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -375,9 +377,27 @@ const GraphVisualization: React.FC = () => {
     }
   };
 
-  const performSearch = () => {
+  const performSearch = async () => {
     // Perform the search based on searchQuery
-    console.log('Searching for:', searchQuery);
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_SEARCH_API_PATH.replace(':fileId', fileId)}`;
+
+    setSearchIsLoading(true);
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const result = await response.json();
+      setAnswerText(result.answer);
+      setSearchIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching the search results:", error);
+      setAnswerText("An error occurred while fetching the search results.");
+      setSearchIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -484,6 +504,10 @@ const GraphVisualization: React.FC = () => {
           }}
           sx={{ marginBottom: '10px' }}
         />
+          {searchIsLoading ? <>
+            <CircularProgress size={15} />
+            <Box sx={{ ml: 2 }}>Searching...</Box>
+          </> : <></>}
         <TextField
           placeholder="Answer to your search will be displayed here!"
           fullWidth
@@ -493,6 +517,7 @@ const GraphVisualization: React.FC = () => {
             readOnly: true,
           }}
           sx={{ marginBottom: '10px' }}
+          value={searchIsLoading ? '' : answerText}
         />
       </Stack>
 

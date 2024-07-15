@@ -3,7 +3,6 @@ import React from 'react';
 import { FilePond, registerPlugin, FilePondProps } from 'react-filepond';
 import 'filepond/dist/filepond.min.css';
 import FilePondPluginFileValidateType from 'filepond-plugin-file-validate-type';
-
 import {
   GRAPH_DELETE_API_PATH,
   UPLOAD_API_PATH,
@@ -11,6 +10,7 @@ import {
 } from '../../constant';
 import CustomizedSnackbars from '../Snackbar';
 import { Notification } from '../GraphList';
+
 
 registerPlugin(FilePondPluginFileValidateType);
 
