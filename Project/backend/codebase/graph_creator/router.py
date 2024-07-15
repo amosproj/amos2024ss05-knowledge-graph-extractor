@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -343,9 +344,9 @@ async def query_graph(
 
     if graphEmbeddingsHandler.is_embedded():
         #do search
-        result = graphEmbeddingsHandler.search_graph(user_query, k=10)
+        result = graphEmbeddingsHandler.search_graph(user_query, k=4)
         #print(result)
-        answer = str(result)
+        answer = json.dumps(result)
     else:
         #can't answer because no embeddings exist
         answer = 'No embeddings found'
