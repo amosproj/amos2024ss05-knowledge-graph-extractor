@@ -8,6 +8,7 @@ import pickle
 from scipy.cluster.hierarchy import linkage, fcluster
 from scipy.spatial.distance import pdist, cosine
 import numpy as np
+from sklearn.exceptions import NotFittedError
 
 class embeddings_handler:
 
@@ -19,7 +20,7 @@ class embeddings_handler:
         self.save_dir = ".media/embeddings"
 
         # Model used for embedding
-        self.model_name = "xlm-r-bert-base-nli-stsb-mean-tokens"
+        self.model_name = "all-MiniLM-L6-v2"
 
         # Ensure the embeddings directory exists
         self.graph_dir = os.path.join(self.save_dir, str(self.graph_id))  # Convert UUID to string
