@@ -57,6 +57,13 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
   searchIsLoading,
   fileId,
 }) => {
+
+  const formatdateTime = () => {
+    const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
+    const date = new Date(graphData.graph_created_at).toLocaleDateString('UTC', options);
+    return date;
+  }
+  
   return (
     <Drawer
       sx={{
@@ -87,7 +94,7 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
             <Divider sx={{ my: 1 }} />
             <Typography variant="subtitle1">Created At</Typography>
             <Typography variant="body2" color="text.secondary">
-              {graphData.graph_created_at}
+              {formatdateTime()}
             </Typography>
           </CardContent>
         </Card>
