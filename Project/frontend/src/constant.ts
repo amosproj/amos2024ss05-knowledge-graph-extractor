@@ -4,6 +4,7 @@ export const VISUALIZE_API_PATH = '/api/graph/visualize/:fileId';
 export const GRAPH_LIST_API_PATH = '/api/graph/graph_jobs';
 export const GRAPH_DELETE_API_PATH = '/api/graph/graph_jobs/:fileId';
 export const KEYWORDS_API_PATH = '/api/graph/graph_keywords/:fileId';
+export const GRAPH_SEARCH_API_PATH = '/api/graph/graph_search/:fileId';
 
 export enum GraphStatus {
   DOC_UPLOADED = 'document_uploaded',

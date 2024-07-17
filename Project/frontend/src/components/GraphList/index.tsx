@@ -33,7 +33,7 @@ interface IGraphList {
   updated_at: string | null;
 }
 
-interface notification {
+export interface Notification {
   show: boolean;
   severity: messageSeverity;
   message: string;
@@ -58,7 +58,7 @@ const GraphList = () => {
   const [loading, setLoading] = React.useState<boolean>(true);
   const [error, setError] = React.useState<string | null>(null);
   const [generating, setGenerating] = React.useState<string | null>(null);
-  const [notification, setNotification] = React.useState<notification>({
+  const [notification, setNotification] = React.useState<Notification>({
     show: false,
     severity: messageSeverity.SUCCESS,
     message: '',
@@ -113,7 +113,7 @@ const GraphList = () => {
     });
   };
 
-  const notify = (n: notification) => {
+  const notify = (n: Notification) => {
     setNotification(n);
   };
 

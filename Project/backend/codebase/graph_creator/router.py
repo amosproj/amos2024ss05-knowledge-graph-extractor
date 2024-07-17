@@ -1,3 +1,4 @@
+import json
 import logging
 import os
 import uuid
@@ -7,6 +8,8 @@ from fastapi import APIRouter, Depends
 from fastapi import UploadFile, File, HTTPException
 from starlette.responses import JSONResponse
 
+from graph_creator.embedding_handler import embeddings_handler
+from graph_creator.schemas.graph_query import QueryRequest
 import graph_creator.graph_creator_main as graph_creator_main
 from graph_creator.dao.graph_job_dao import GraphJobDAO
 from graph_creator.schemas.graph_job import GraphJobCreate
@@ -193,6 +196,9 @@ async def delete_graph_job(
     graph_job_id = graph_job.id
     await graph_job_dao.delete_graph_job(graph_job)
     netx_services.delete_graph(graph_job_id)
+    graphEmbeddingsHandler = embeddings_handler(graph_job, lazyLoad=True)
+    graphEmbeddingsHandler.delete_embeddings()
+
 
 
 @router.post("/create_graph/{graph_job_id}")
@@ -298,3 +304,54 @@ async def query_graph(
     graph = netx_services.load_graph(graph_job_id=graph_job_id)
     graph_keywords = analyze_graph_structure(graph)
     return graph_keywords
+
+
+@router.post("/graph_search/{graph_job_id}")
+async def query_graph(
+    graph_job_id: uuid.UUID,
+    request: QueryRequest,
+    graph_job_dao: GraphJobDAO = Depends(),
+):
+    """
+    Reads a graph job by id and tries to answer a query about the graph using embeddings
+
+    Args:
+        graph_job_id (uuid.UUID): ID of the graph job to be read.
+        request (QueryRequest): contains user query
+        graph_job_dao (GraphJobDAO): graph job database access object
+
+    Returns:
+        Answer to question from the user regarding the graph
+
+    Raises:
+        HTTPException: If there is no graph job with the given ID.
+    """
+
+    g_job = await graph_job_dao.get_graph_job_by_id(graph_job_id)
+
+    if not g_job:
+        raise HTTPException(status_code=404, detail="Graph job not found")
+    if g_job.status != GraphStatus.GRAPH_READY:
+        raise HTTPException(
+            status_code=400,
+            detail="No graph created for this job!",
+        )
+    
+    user_query = request.query
+    #print(f"Received query: {user_query}")
+
+    graphEmbeddingsHandler = embeddings_handler(g_job)
+
+    if graphEmbeddingsHandler.is_embedded():
+        #do search
+        result = graphEmbeddingsHandler.search_graph(user_query, k=4)
+        #print(result)
+        answer = json.dumps(result)
+    else:
+        #can't answer because no embeddings exist
+        answer = 'No embeddings found'
+
+    return JSONResponse(
+        content={"answer": answer},
+        status_code=200,
+    )

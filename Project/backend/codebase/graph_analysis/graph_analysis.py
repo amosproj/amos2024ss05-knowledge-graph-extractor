@@ -108,7 +108,7 @@ def analyze_graph_structure(G):
     - Here, node 0, 1 (1.0) has the highest closeness centrality because it is connected to all other nodes (node 2, 3 = 0.75)
     - Closeness Centrality show the average distance of a node to all other nodes in the network
     """
-    n = 20  # Number of top nodes to return
+    n = 20 if num_nodes > 20 else 5  # Number of top nodes to return
     # Calculate centrality measures
     degree_centrality = get_top_n_central_nodes(nx.degree_centrality(G), n)
     betweenness_centrality = get_top_n_central_nodes(nx.betweenness_centrality(G), n)

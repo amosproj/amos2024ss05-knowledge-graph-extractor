@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { Network, Options } from 'vis-network/standalone/esm/vis-network';
 import { useParams } from 'react-router-dom';
 import './index.css';
-import { KEYWORDS_API_PATH, VISUALIZE_API_PATH } from '../../constant';
+import { KEYWORDS_API_PATH, VISUALIZE_API_PATH, GRAPH_SEARCH_API_PATH } from '../../constant';
 import SearchIcon from '@mui/icons-material/Search';
 import {
   Box,
@@ -202,6 +202,8 @@ const GraphVisualization: React.FC = () => {
   const { fileId = '' } = useParams<{ fileId: string }>();
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [searchIsLoading, setSearchIsLoading] = useState(false);
+  const [answerText, setAnswerText] = useState("");
   const [layout, setLayout] = useState('barnesHut');
   const [searchQuery, setSearchQuery] = useState('');
   const [keywords, setKeywords] = useState<string[]>([]);
@@ -226,70 +228,6 @@ const GraphVisualization: React.FC = () => {
 
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
-
-  useEffect(() => {
-    const fetchGraphData = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_HOST}${VISUALIZE_API_PATH.replace(':fileId', fileId)}`,
-        );
-        const data = await response.json();
-        setGraphData(data);
-
-        // Get the list of unique topics
-        const uniqueTopics = Array.from(
-          new Set(data.nodes.map((node) => node.topic)),
-        );
-
-        // Create color scheme for the topics
-        const colorSchemes = [
-          d3.schemeCategory10,
-          d3.schemePaired,
-          d3.schemeSet1,
-        ];
-        const uniqueColors = Array.from(new Set(colorSchemes.flat()));
-
-        const otherIndex = uniqueTopics.indexOf('other');
-        if (otherIndex !== -1) {
-          uniqueTopics.splice(otherIndex, 1);
-        }
-
-        const topicColorMap: ITopicColourMap = uniqueTopics.reduce(
-          (acc: ITopicColourMap, topic, index) => {
-            acc[topic] = uniqueColors[index % uniqueColors.length];
-            return acc;
-          },
-          {},
-        );
-
-        if (otherIndex !== -1) {
-          topicColorMap['other'] =
-            uniqueColors[uniqueTopics.length % uniqueColors.length];
-        }
-
-        setTopicColorMap(topicColorMap);
-      } catch (error) {
-        console.error('Error fetching graph data:', error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    const fetchKeywords = async () => {
-      try {
-        const response = await fetch(
-          `${import.meta.env.VITE_BACKEND_HOST}${KEYWORDS_API_PATH.replace(':fileId', fileId)}`,
-        );
-        const data = await response.json();
-        setKeywords(data);
-      } catch (error) {
-        console.error('Error fetching keywords:', error);
-      }
-    };
-
-    fetchGraphData();
-    fetchKeywords();
-  }, [fileId]);
 
   useEffect(() => {
     switch (layout) {
@@ -439,9 +377,27 @@ const GraphVisualization: React.FC = () => {
     }
   };
 
-  const performSearch = () => {
+  const performSearch = async () => {
     // Perform the search based on searchQuery
-    console.log('Searching for:', searchQuery);
+    const API = `${import.meta.env.VITE_BACKEND_HOST}${GRAPH_SEARCH_API_PATH.replace(':fileId', fileId)}`;
+
+    setSearchIsLoading(true);
+    try {
+      const response = await fetch(API, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ query: searchQuery }),
+      });
+      const result = await response.json();
+      setAnswerText(result.answer);
+      setSearchIsLoading(false);
+    } catch (error) {
+      console.error("Error fetching the search results:", error);
+      setAnswerText("An error occurred while fetching the search results.");
+      setSearchIsLoading(false);
+    }
   };
 
   if (isLoading) {
@@ -548,6 +504,10 @@ const GraphVisualization: React.FC = () => {
           }}
           sx={{ marginBottom: '10px' }}
         />
+          {searchIsLoading ? <>
+            <CircularProgress size={15} />
+            <Box sx={{ ml: 2 }}>Searching...</Box>
+          </> : <></>}
         <TextField
           placeholder="Answer to your search will be displayed here!"
           fullWidth
@@ -557,6 +517,7 @@ const GraphVisualization: React.FC = () => {
             readOnly: true,
           }}
           sx={{ marginBottom: '10px' }}
+          value={searchIsLoading ? '' : answerText}
         />
       </Stack>
 
@@ -587,19 +548,7 @@ const GraphVisualization: React.FC = () => {
           <Legend topicColorMap={topicColorMap} />
         </Box>
       </Stack>
-      {/* <FloatingControlCard
-        layout={layout}
-        setLayout={setLayout}
-        physicsOptions={physicsOptions}
-        handlePhysicsChange={handlePhysicsChange}
-        restartStabilization={() => setStabilizationComplete(false)}
-        sx={{
-          position: 'absolute',
-          top: '10px',
-          right: '10px',
-          zIndex: 1000,
-        }}
-      /> */}
+
       <PersistentDrawerControls
         layout={layout}
         setLayout={setLayout}

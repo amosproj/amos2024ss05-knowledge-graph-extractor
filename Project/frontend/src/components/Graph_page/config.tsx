@@ -20,7 +20,7 @@ export const physicsOptionsByLayout = {
     gravitationalConstant: -20000,
     springLength: 100,
     springConstant: 0.1,
-    damping: 0.09,
+    damping: 0.29,
   },
   forceAtlas2Based: {
     gravitationalConstant: -50,
@@ -32,13 +32,13 @@ export const physicsOptionsByLayout = {
     gravitationalConstant: 0,
     springLength: 120,
     springConstant: 0,
-    damping: 0,
+    damping: 0.2,
   },
   repulsion: {
     gravitationalConstant: 0.2,
     springLength: 200,
     springConstant: 0.05,
-    damping: 0.09,
+    damping: 0.59,
   },
   hierarchical: {
     levelSeparation: 150,
