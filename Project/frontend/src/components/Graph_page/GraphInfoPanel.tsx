@@ -57,13 +57,12 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
   searchIsLoading,
   fileId,
 }) => {
-
   const formatdateTime = () => {
     const options: Intl.DateTimeFormatOptions = { year: 'numeric', month: 'numeric', day: 'numeric', hour: 'numeric', minute: 'numeric' };
     const date = new Date(graphData.graph_created_at).toLocaleDateString('UTC', options);
     return date;
   }
-  
+
   return (
     <Drawer
       sx={{
@@ -78,7 +77,7 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
       variant="persistent"
       anchor="left"
       open={open}
-    >
+      >
       <Box sx={{ overflow: 'auto', padding: 2 }}>
         <IconButton onClick={toggleDrawer}>
           {open ? <ChevronLeftIcon /> : <ChevronRightIcon />}
@@ -178,3 +177,4 @@ const GraphInfoPanel: React.FC<GraphInfoPanelProps> = ({
 };
 
 export default GraphInfoPanel;
+
