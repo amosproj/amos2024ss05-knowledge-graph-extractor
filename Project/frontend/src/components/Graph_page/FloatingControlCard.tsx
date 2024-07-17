@@ -28,7 +28,7 @@ const FloatingControlCard = ({
   handlePhysicsChange: (name: string, value: any) => void,
   restartStabilization: () => void,
 }) => {
-  const handleSliderChange = (name: string) => (event, value: any) => {
+  const handleSliderChange = (name: string) => (event: any, value: any) => {
     handlePhysicsChange(name, value);
     restartStabilization();
   };
@@ -40,7 +40,7 @@ const FloatingControlCard = ({
           <Box>
             <SliderControl
               label="Gravitational Constant"
-              value={physicsOptions.gravitationalConstant}
+              value={physicsOptions.gravitationalConstant ?? -2000}
               min={-30000}
               max={0}
               step={1000}
@@ -48,7 +48,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Length"
-              value={physicsOptions.springLength}
+              value={physicsOptions.springLength ?? 100}
               min={50}
               max={300}
               step={10}
@@ -56,7 +56,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Constant"
-              value={physicsOptions.springConstant}
+              value={physicsOptions.springConstant ?? 0.04}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -64,7 +64,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Damping"
-              value={physicsOptions.damping}
+              value={physicsOptions.damping ?? 0.09}
               min={0.01}
               max={1}
               step={0.01}
@@ -77,7 +77,7 @@ const FloatingControlCard = ({
           <Box>
             <SliderControl
               label="Gravitational Constant"
-              value={physicsOptions.gravitationalConstant}
+              value={physicsOptions.gravitationalConstant ?? -50}
               min={-200}
               max={0}
               step={10}
@@ -85,7 +85,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Length"
-              value={physicsOptions.springLength}
+              value={physicsOptions.springLength ?? 100}
               min={50}
               max={300}
               step={10}
@@ -93,7 +93,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Constant"
-              value={physicsOptions.springConstant}
+              value={physicsOptions.springConstant ?? 0.08}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -101,7 +101,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Damping"
-              value={physicsOptions.damping}
+              value={physicsOptions.damping ?? 0.4}
               min={0.01}
               max={1}
               step={0.01}
@@ -114,7 +114,7 @@ const FloatingControlCard = ({
           <Box>
             <SliderControl
               label="Level Separation"
-              value={physicsOptions.levelSeparation}
+              value={physicsOptions.levelSeparation ?? 150}
               min={50}
               max={500}
               step={10}
@@ -122,7 +122,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Node Spacing"
-              value={physicsOptions.nodeSpacing}
+              value={physicsOptions.nodeSpacing ?? 100}
               min={50}
               max={200}
               step={10}
@@ -130,7 +130,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Tree Spacing"
-              value={physicsOptions.treeSpacing}
+              value={physicsOptions.treeSpacing ?? 200}
               min={50}
               max={500}
               step={10}
@@ -163,7 +163,7 @@ const FloatingControlCard = ({
             <FormControl fullWidth margin="normal">
               <InputLabel>Direction</InputLabel>
               <Select
-                value={physicsOptions.direction}
+                value={physicsOptions.direction ?? 'UD'}
                 onChange={(e) => {
                   handlePhysicsChange('direction', e.target.value);
                   restartStabilization();
@@ -178,7 +178,7 @@ const FloatingControlCard = ({
             <FormControl fullWidth margin="normal">
               <InputLabel>Sort Method</InputLabel>
               <Select
-                value={physicsOptions.sortMethod}
+                value={physicsOptions.sortMethod ?? 'hubsize'}
                 onChange={(e) => {
                   handlePhysicsChange('sortMethod', e.target.value);
                   restartStabilization();
@@ -191,7 +191,7 @@ const FloatingControlCard = ({
             <FormControl fullWidth margin="normal">
               <InputLabel>Shake Towards</InputLabel>
               <Select
-                value={physicsOptions.shakeTowards}
+                value={physicsOptions.shakeTowards ?? 'roots'}
                 onChange={(e) => {
                   handlePhysicsChange('shakeTowards', e.target.value);
                   restartStabilization();
@@ -208,7 +208,7 @@ const FloatingControlCard = ({
           <Box>
             <SliderControl
               label="Node Distance"
-              value={physicsOptions.nodeDistance}
+              value={physicsOptions.nodeDistance ?? 100}
               min={50}
               max={500}
               step={10}
@@ -216,7 +216,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Central Gravity"
-              value={physicsOptions.centralGravity}
+              value={physicsOptions.centralGravity ?? 0.2}
               min={0}
               max={1}
               step={0.01}
@@ -224,7 +224,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Length"
-              value={physicsOptions.springLength}
+              value={physicsOptions.springLength ?? 200}
               min={50}
               max={300}
               step={10}
@@ -232,7 +232,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Spring Constant"
-              value={physicsOptions.springConstant}
+              value={physicsOptions.springConstant ?? 0.05}
               min={0.01}
               max={0.5}
               step={0.01}
@@ -240,7 +240,7 @@ const FloatingControlCard = ({
             />
             <SliderControl
               label="Damping"
-              value={physicsOptions.damping}
+              value={physicsOptions.damping ?? 0.09}
               min={0.01}
               max={1}
               step={0.01}
@@ -260,7 +260,6 @@ const FloatingControlCard = ({
         bottom: '16px',
         right: '46px',
         width: '300px',
-        // background: '#121826',
         color: '#fff',
         zIndex: 1000,
       }}
@@ -285,12 +284,8 @@ const FloatingControlCard = ({
                 style={{ color: '#fff' }}
               >
                 <MenuItem value="barnesHut">Barnes Hut</MenuItem>
-                <MenuItem value="forceAtlas2Based">
-                  Force Atlas 2 Based
-                </MenuItem>
-                <MenuItem value="hierarchicalRepulsion">
-                  Hierarchical Repulsion
-                </MenuItem>
+                <MenuItem value="forceAtlas2Based">Force Atlas 2 Based</MenuItem>
+                <MenuItem value="hierarchicalRepulsion">Hierarchical Repulsion</MenuItem>
                 <MenuItem value="repulsion">Repulsion</MenuItem>
                 <MenuItem value="hierarchical">Hierarchical</MenuItem>
               </Select>
@@ -298,7 +293,7 @@ const FloatingControlCard = ({
             {renderSliders()}
             <SliderControl
               label="Stabilization Iterations"
-              value={physicsOptions.iterations}
+              value={physicsOptions.iterations ?? 1000}
               min={0}
               max={5000}
               step={100}

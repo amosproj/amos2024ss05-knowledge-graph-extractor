@@ -34,6 +34,8 @@ interface GraphData {
     label?: string;
     topic: string;
     pages: string;
+    x?: number;
+    y?: number;
     [key: string]: any;
   }>;
   edges: Array<{ source: string; target: string; [key: string]: any }>;
@@ -144,7 +146,9 @@ const GraphVisualization: React.FC = () => {
   useEffect(() => {
     const fetchGraphData = async () => {
       if (sessionStorage.getItem(fileId)) {
-        setGraphData(JSON.parse(sessionStorage.getItem(fileId) as string));
+        const savedGraphData = JSON.parse(sessionStorage.getItem(fileId) as string);
+        setGraphData(savedGraphData);
+        setStabilizationComplete(true); // Assume layout was previously stabilized
         setIsLoading(false);
       } else {
         try {
@@ -161,6 +165,7 @@ const GraphVisualization: React.FC = () => {
         }
       }
     };
+
     const fetchKeywords = async () => {
       try {
         const response = await fetch(
@@ -279,47 +284,50 @@ const GraphVisualization: React.FC = () => {
           edge="start"
           onClick={toggleDrawer}
           sx={{ position: 'absolute', left: 0, top: '64px', zIndex: 1300 }}
-          >
-            <ChevronRightIcon />
-          </IconButton>
-        )}
-        <Main open={drawerOpen}>
-          <DrawerHeader />
-          <Card
-            sx={{
-              height: '95%',
-              background: '#121826',
-              width: '100%',
-              overflow: 'hidden',
-              padding: '5px',
-              boxSizing: 'border-box',
-              margin: '0',
-              position: 'relative',
-            }}
-          >
-            <CardContent sx={{ height: '102%', padding: 0 }}>
-              {graphData && !isStabilizingRef.current && (
-                <VisGraph
-                  graphData={graphData}
-                  options={options}
-                  setStabilizationComplete={setStabilizationComplete}
-                  topicColorMap={topicColorMap}
-                  isStabilizingRef={isStabilizingRef}
-                />
-              )}
-              <Legend topicColorMap={topicColorMap} />
-            </CardContent>
-          </Card>
-        </Main>
-        <FloatingControlCard
-          layout={layout}
-          setLayout={setLayout}
-          physicsOptions={physicsOptions}
-          handlePhysicsChange={handlePhysicsChange}
-          restartStabilization={() => setStabilizationComplete(false)}
-        />
-      </Box>
-    );
-  };
-  
-  export default GraphVisualization;
+        >
+          <ChevronRightIcon />
+        </IconButton>
+      )}
+      <Main open={drawerOpen}>
+        <DrawerHeader />
+        <Card
+          sx={{
+            height: '95%',
+            background: '#121826',
+            width: '100%',
+            overflow: 'hidden',
+            padding: '5px',
+            boxSizing: 'border-box',
+            margin: '0',
+            position: 'relative',
+          }}
+        >
+          <CardContent sx={{ height: '102%', padding: 0 }}>
+            {graphData && (
+              <VisGraph
+                graphData={graphData}
+                options={options}
+                setStabilizationComplete={setStabilizationComplete}
+                stabilizationComplete={stabilizationComplete}
+                setGraphData={setGraphData}
+                topicColorMap={topicColorMap}
+                isStabilizingRef={isStabilizingRef}
+                fileId={fileId} // Pass the fileId to the VisGraph component
+              />
+            )}
+            <Legend topicColorMap={topicColorMap} />
+          </CardContent>
+        </Card>
+      </Main>
+      <FloatingControlCard
+        layout={layout}
+        setLayout={setLayout}
+        physicsOptions={physicsOptions}
+        handlePhysicsChange={handlePhysicsChange}
+        restartStabilization={() => setStabilizationComplete(false)}
+      />
+    </Box>
+  );
+};
+
+export default GraphVisualization;
